@@ -1,3 +1,7 @@
+# 2.2.4
+
+- Added PfundsSchlingel to allow Invites
+
 # 2.2.3
 
 - Revive Announcement ausgebaut

@@ -26,7 +26,31 @@ local guildOfficers =
     "Luminette",
     "Cricksumage",
     "Devschlingel",
-    "Pudidev"
+    "Pudidev",
+    -- Ab hier kommen PfundsSchlingel
+    "Cowihendrixs",
+    "Eowendra",
+    "Akimah",
+    "Automatix",
+    "Bartzmorak",
+    "Coldchase",
+    "Ganadorian",
+    "Hufgeruch",
+    "Kalterwalter",
+    "Kipptum",
+    "Knubbsi",
+    "Kritze",
+    "Lucifia",
+    "Lündra",
+    "Meltfacé",
+    "Naikjin",
+    "Pfeilgiftfro",
+    "Raixxen",
+    "Treeguard",
+    "Tuskdoc",
+    "Tötemir",
+    "Wujujade",
+    "Ûshnotz"
 }
 
 function SchlingelInc.GuildRecruitment:GetPendingRequests()
@@ -82,7 +106,6 @@ function SchlingelInc:RefreshAllRequestUIs()
         SchlingelInc:Print("Fehler: Recruitment Tab oder UpdateData Methode nicht gefunden.")
     end
 end
-
 
 function SchlingelInc.GuildRecruitment:HandleAcceptRequest(playerName)
     if not playerName then return end
