@@ -97,24 +97,21 @@ end
 
 -- Überprüft, ob sich der Spieler in einem relevanten Schlachtfeld befindet.
 function SchlingelInc:IsInBattleground()
-    local isInBattleground = false
-    local level = UnitLevel("player")
-    local isInAllowedBattleground = false
-
-    -- Durchläuft alle möglichen Schlachtfeld-IDs.
-    for i = 1, GetMaxBattlefieldID() do
-        local battleFieldStatus = GetBattlefieldStatus(i)
-        if battleFieldStatus == "active" then
-            isInBattleground = true -- Spieler ist in irgendeinem Schlachtfeld.
-            break
-        end
+    local inInstance, instanceType = IsInInstance()
+    if inInstance and instanceType == "pvp"then
+        return true
+    else
+        return false
     end
+end
 
-    -- Nur relevant, wenn Spieler in einem Schlachtfeld UND Level 60 oder höher ist.
-    if isInBattleground and level >= 60 then
-        isInAllowedBattleground = true
+function SchlingelInc:IsInRaid()
+    local inInstance, instanceType = IsInInstance()
+    if inInstance and instanceType == "raid" then
+        return true
+    else 
+        return false
     end
-    return isInAllowedBattleground
 end
 
 -- Event-Handler für den 'frame' (lauscht auf CHAT_MSG_ADDON).
@@ -186,9 +183,9 @@ function SchlingelInc:CompareVersions(v1, v2)
     local a1, a2, a3, channel = SchlingelInc:ParseVersion(v1) -- Parsed v1.
     local b1, b2, b3, channel = SchlingelInc:ParseVersion(v2) -- Parsed v2.
 
-    if a1 ~= b1 then return a1 - b1 end -- Vergleiche Major-Version.
-    if a2 ~= b2 then return a2 - b2 end -- Vergleiche Minor-Version.
-    return a3 - b3                      -- Vergleiche Patch-Version.
+    if a1 ~= b1 then return a1 - b1 end                       -- Vergleiche Major-Version.
+    if a2 ~= b2 then return a2 - b2 end                       -- Vergleiche Minor-Version.
+    return a3 - b3                                            -- Vergleiche Patch-Version.
 end
 
 -- Speichert die originale SendChatMessage Funktion, um sie später aufrufen zu können.
