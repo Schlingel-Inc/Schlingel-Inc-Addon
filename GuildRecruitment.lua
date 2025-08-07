@@ -90,18 +90,14 @@ local function HandleAddonMessage(message)
                 money = money,
             }
             table.insert(inviteRequests, requestData)
-            SchlingelInc:Print(string.format("Neue Gildenanfrage von %s (Level %s) in %s erhalten.", name, level, zone))
-            SchlingelInc:RefreshAllRequestUIs()
+            local message = string.format("Neue Gildenanfrage von %s (Level %s) in %s erhalten.", name, level, zone)
+            SchlingelInc:Print(message)
+            SchlingelInc:ShowInviteMessage(message)
         end
     elseif message:find("^INVITE_SENT:") and CanGuildInvite() then
         local playerName = message:match("^INVITE_SENT:([^:]+)$")
         SchlingelInc:RemovePlayerFromListAndUpdateUI(playerName)
     end
-end
-
-
-function SchlingelInc:RefreshAllRequestUIs()
-    SchlingelInc:UpdateMiniInviteLog()
 end
 
 function SchlingelInc.GuildRecruitment:HandleAcceptRequest(playerName)
