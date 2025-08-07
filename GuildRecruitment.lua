@@ -90,7 +90,7 @@ local function HandleAddonMessage(message)
                 money = money,
             }
             table.insert(inviteRequests, requestData)
-            local message = string.format("Neue Gildenanfrage von %s (Level %s) in %s erhalten.", name, level, zone)
+            local message = string.format("Neue Gildenanfrage von %s (Level %s) mit %s in der Tasche aus %s erhalten.", name, level, money, zone)
             SchlingelInc:Print(message)
             SchlingelInc:ShowInviteMessage(message)
         end

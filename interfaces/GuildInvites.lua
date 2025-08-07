@@ -1,11 +1,12 @@
 -- Frame für die Nachricht
 local InviteMessageFrame = CreateFrame("Frame", "InviteMessageFrame", UIParent, "BackdropTemplate")
+InviteMessageFrame:ClearAllPoints()
 InviteMessageFrame:SetSize(300, 75)
-InviteMessageFrame:SetPoint("TOP", UIParent, "TOP", 0, 0)
+InviteMessageFrame:SetPoint("RIGHT", UIParent, "RIGHT", -50, -200)
 InviteMessageFrame:SetFrameStrata("FULLSCREEN_DIALOG")
 InviteMessageFrame:SetFrameLevel(1000)
 InviteMessageFrame:Hide()
-InviteMessageFrame:SetAlpha(0)
+InviteMessageFrame:SetAlpha(1)
 
 -- Hintergrund
 InviteMessageFrame:SetBackdrop({
@@ -50,7 +51,6 @@ fadeIn:SetSmoothing("IN")
 -- Nachricht anzeigen
 function SchlingelInc:ShowInviteMessage(message)
     InviteMessageFrame.text:SetText(message)
-    InviteMessageFrame:SetPoint("TOP", UIParent, "TOP", 0, 0)
     InviteMessageFrame:Show()
     animGroup:Stop()
     animGroup:Play()
