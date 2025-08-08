@@ -65,8 +65,8 @@ function SchlingelInc.GuildRecruitment:SendGuildRequest()
     local playerGold = GetMoneyString(GetMoney(), true)
     local message = string.format("INVITE_REQUEST:%s:%d:%d:%s:%s", playerName, playerLevel, playerExp, zone, playerGold)
 
-    -- Debug Aufruf zum testen. debugTarget mit dem gewünschten Character initialisieren, der die Nachricht erhalten soll
-    -- local debugTarget = ""
+    -- --Debug Aufruf zum testen. debugTarget mit dem gewünschten Character initialisieren, der die Nachricht erhalten soll
+    -- local debugTarget = "Pudidev"
     -- C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, message, "WHISPER", debugTarget)
     
     -- Sendet die Anfrage an alle Officer.
@@ -92,6 +92,10 @@ local function HandleAddonMessage(message)
         end
     elseif message:find("^INVITE_SENT:") and CanGuildInvite() then
         SchlingelInc.GuildInvites:HideInviteMessage()
+    elseif message:find("^INVITE_DECLINED:") then
+        local name = message:match("^INVITE_DECLINED:(.+)$")
+        SchlingelInc:Print("Ein Officer hat die Anfrage von " .. name .. " abgelehnt.")
+        SchlingelInc.GuildInvites:HideInviteMessage()
     end
 end
 
@@ -101,7 +105,9 @@ function SchlingelInc.GuildRecruitment:HandleAcceptRequest(playerName)
     if CanGuildInvite() then
         SchlingelInc:Print("Versuche, " .. playerName .. " in die Gilde einzuladen...")
         C_GuildInfo.Invite(playerName)
-        C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "INVITE_SENT:" .. playerName, "OFFICER")
+        for _, name in ipairs(guildOfficers) do
+            C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "INVITE_SENT:" .. playerName, "WHISPER", name)
+        end
     else
         SchlingelInc:Print("Du hast keine Berechtigung, Spieler in die Gilde einzuladen.")
     end
@@ -109,9 +115,10 @@ end
 
 function SchlingelInc.GuildRecruitment:HandleDeclineRequest(playerName)
     if not playerName then return end
-
+        for _, name in ipairs(guildOfficers) do
+            C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "INVITE_DECLINED:" .. playerName, "WHISPER", name)
+        end
     SchlingelInc:Print("Anfrage von " .. playerName .. " wurde abgelehnt.")
-    C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "INVITE_SENT:" .. playerName, "OFFICER")
 end
 
 local addonMessageGlobalHandlerFrame = CreateFrame("Frame")

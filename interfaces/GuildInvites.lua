@@ -1,5 +1,4 @@
 SchlingelInc.GuildInvites = {}
-local playerName
 
 -- Frame für die Nachricht
 local InviteMessageFrame = CreateFrame("Frame", "InviteMessageFrame", UIParent, "BackdropTemplate")
@@ -45,13 +44,15 @@ InviteMessageFrame.text:SetText("")
 
 -- Buttons
 local function HandleAcceptClick()
-    SchlingelInc.GuildRecruitment:HandleAcceptRequest(playerName)
+    SchlingelInc.GuildRecruitment:HandleAcceptRequest(InviteMessageFrame.playerName)
+    SchlingelInc.GuildInvites:HideInviteMessage()
 end
 SchlingelInc.UIHelpers:CreateStyledButton(InviteMessageFrame, "Annehmen", 75, 25, "CENTER", InviteMessageFrame,
     "CENTER", -50, -25, "UIPanelButtonTemplate", HandleAcceptClick)
 
-    local function HandleDeclinetClick()
-    SchlingelInc.GuildRecruitment:HandleDeclineRequest(playerName)
+local function HandleDeclinetClick()
+    SchlingelInc.GuildRecruitment:HandleDeclineRequest(InviteMessageFrame.playerName)
+    SchlingelInc.GuildInvites:HideInviteMessage()
 end
 SchlingelInc.UIHelpers:CreateStyledButton(InviteMessageFrame, "Ablehnen", 75, 25, "CENTER", InviteMessageFrame,
     "CENTER", 50, -25, "UIPanelButtonTemplate", HandleDeclinetClick)
@@ -66,15 +67,17 @@ fadeIn:SetSmoothing("IN")
 
 -- Nachricht anzeigen
 function SchlingelInc.GuildInvites:ShowInviteMessage(message, requestData)
-    playerName = requestData["name"]
+if InviteMessageFrame:IsShown() then
+    print("InviteFrame already shown — skipping.")
+    return
+end
+    InviteMessageFrame.playerName = requestData["name"]
     InviteMessageFrame.text:SetText(message)
     InviteMessageFrame:Show()
-    animGroup:Stop()
     animGroup:Play()
 end
 
 -- Nachricht verbergen
 function SchlingelInc.GuildInvites:HideInviteMessage()
-    InviteMessageFrame:ClearAllPoints()
     InviteMessageFrame:Hide()
 end
