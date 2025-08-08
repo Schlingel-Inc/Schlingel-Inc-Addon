@@ -1,3 +1,11 @@
+# 2.2.6
+
+- Reworking Invite Interface
+
+# 2.2.5
+
+- fix PfundsSchlingel name
+
 # 2.2.4
 
 - Added PfundsSchlingel to allow Invites

@@ -1,7 +1,10 @@
+SchlingelInc.GuildInvites = {}
+local playerName
+
 -- Frame für die Nachricht
 local InviteMessageFrame = CreateFrame("Frame", "InviteMessageFrame", UIParent, "BackdropTemplate")
 InviteMessageFrame:ClearAllPoints()
-InviteMessageFrame:SetSize(300, 75)
+InviteMessageFrame:SetSize(350, 100)
 InviteMessageFrame:SetPoint("RIGHT", UIParent, "RIGHT", -50, -200)
 InviteMessageFrame:SetFrameStrata("FULLSCREEN_DIALOG")
 InviteMessageFrame:SetFrameLevel(1000)
@@ -21,13 +24,13 @@ InviteMessageFrame:SetBackdropColor(0, 0, 0, 0.8)
 local icon = InviteMessageFrame:CreateTexture(nil, "ARTWORK")
 icon:SetSize(32, 32)
 icon:SetPoint("TOPLEFT", InviteMessageFrame, "TOPLEFT", 10, -10)
-icon:SetTexture("Interface\\Icons\\Ability_Rogue_FeignDeath")
+icon:SetTexture("Interface\\Icons\\inv_letter_18")
 
 -- Header
 local header = InviteMessageFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 header:SetPoint("TOPLEFT", icon, "TOPRIGHT", 10, -2)
 header:SetText("Neue Gildenanfrage!")
-header:SetTextColor(1, 0.2, 0.2, 1)
+header:SetTextColor(1, 1, 1, 1)
 
 -- Text
 InviteMessageFrame.text = InviteMessageFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -35,10 +38,23 @@ InviteMessageFrame.text:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -4)
 InviteMessageFrame.text:SetPoint("RIGHT", InviteMessageFrame, -10, 0)
 InviteMessageFrame.text:SetJustifyH("LEFT")
 InviteMessageFrame.text:SetJustifyV("TOP")
-InviteMessageFrame.text:SetTextColor(1, 0.1, 0.1, 1)
+InviteMessageFrame.text:SetTextColor(1, 1, 1, 1)
 InviteMessageFrame.text:SetShadowColor(0, 0, 0, 1)
 InviteMessageFrame.text:SetShadowOffset(1, -1)
 InviteMessageFrame.text:SetText("")
+
+-- Buttons
+local function HandleAcceptClick()
+    SchlingelInc.GuildRecruitment:HandleAcceptRequest(playerName)
+end
+SchlingelInc.UIHelpers:CreateStyledButton(InviteMessageFrame, "Annehmen", 75, 25, "CENTER", InviteMessageFrame,
+    "CENTER", -50, -25, "UIPanelButtonTemplate", HandleAcceptClick)
+
+    local function HandleDeclinetClick()
+    SchlingelInc.GuildRecruitment:HandleDeclineRequest(playerName)
+end
+SchlingelInc.UIHelpers:CreateStyledButton(InviteMessageFrame, "Ablehnen", 75, 25, "CENTER", InviteMessageFrame,
+    "CENTER", 50, -25, "UIPanelButtonTemplate", HandleDeclinetClick)
 
 -- Animation vorbereiten
 local animGroup = InviteMessageFrame:CreateAnimationGroup()
@@ -49,9 +65,16 @@ fadeIn:SetToAlpha(1)
 fadeIn:SetSmoothing("IN")
 
 -- Nachricht anzeigen
-function SchlingelInc:ShowInviteMessage(message)
+function SchlingelInc.GuildInvites:ShowInviteMessage(message, requestData)
+    playerName = requestData["name"]
     InviteMessageFrame.text:SetText(message)
     InviteMessageFrame:Show()
     animGroup:Stop()
     animGroup:Play()
+end
+
+-- Nachricht verbergen
+function SchlingelInc.GuildInvites:HideInviteMessage()
+    InviteMessageFrame:ClearAllPoints()
+    InviteMessageFrame:Hide()
 end

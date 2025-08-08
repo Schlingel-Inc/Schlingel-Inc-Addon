@@ -2,7 +2,7 @@
 ## Title: Schlingel Inc
 ## Notes: Visit DerHauges Discord for more information: https://discord.gg/KXkyUZW
 ## Author: Cricksu, Pudi, Canasterzaster
-## Version: 2.2.4
+## Version: 2.2.6-beta
 ## SavedVariablesPerCharacter: CharacterDeaths, SchlingelOptionsDB
 
 # Notwendiges externe Abhängigkeiten aus dem Lib Folder
@@ -19,8 +19,8 @@ GuildRecruitment.lua
 LevelUp.lua
 interfaces\DeathAnnouncement.lua
 interfaces\Deathlog.lua
-interfaces\GuildInvites.lua
 interfaces\UIHelpers.lua
+interfaces\GuildInvites.lua
 interfaces\offiInterface\tabs\GuildInfo.lua
 interfaces\offiInterface\tabs\Stats.lua
 interfaces\offiInterface\tabs\Inactivity.lua

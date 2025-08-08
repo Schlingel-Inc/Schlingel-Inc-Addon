@@ -2,8 +2,6 @@
 SchlingelInc.GuildRecruitment = SchlingelInc.GuildRecruitment or {}
 SchlingelInc.GuildRecruitment.inviteRequests = SchlingelInc.GuildRecruitment.inviteRequests or {}
 
-local inviteRequests = SchlingelInc.GuildRecruitment.inviteRequests
-
 local guildOfficers =
 {
     "Kurtibrown",
@@ -53,10 +51,6 @@ local guildOfficers =
     "Ûshnotz"
 }
 
-function SchlingelInc.GuildRecruitment:GetPendingRequests()
-    return inviteRequests
-end
-
 function SchlingelInc.GuildRecruitment:SendGuildRequest()
     local playerName = UnitName("player")
     local playerLevel = UnitLevel("player")
@@ -89,14 +83,12 @@ local function HandleAddonMessage(message)
                 zone = zone,
                 money = money,
             }
-            table.insert(inviteRequests, requestData)
             local message = string.format("Neue Gildenanfrage von %s (Level %s) mit %s in der Tasche aus %s erhalten.", name, level, money, zone)
             SchlingelInc:Print(message)
-            SchlingelInc:ShowInviteMessage(message)
+            SchlingelInc.GuildInvites:ShowInviteMessage(message, requestData)
         end
     elseif message:find("^INVITE_SENT:") and CanGuildInvite() then
-        local playerName = message:match("^INVITE_SENT:([^:]+)$")
-        SchlingelInc:RemovePlayerFromListAndUpdateUI(playerName)
+        SchlingelInc.GuildInvites:HideInviteMessage()
     end
 end
 
@@ -129,16 +121,6 @@ addonMessageGlobalHandlerFrame:SetScript("OnEvent", function(self, event, prefix
         end
     end
 end)
-
-function SchlingelInc:RemovePlayerFromListAndUpdateUI(playerName)
-    for i = #inviteRequests, 1, -1 do
-        if inviteRequests[i].name == playerName then
-            table.remove(inviteRequests, i)
-            SchlingelInc:RefreshAllRequestUIs()
-            break
-        end
-    end
-end
 
 -- Gibt formatierten Zonennamen zurück
 function SchlingelInc.GuildRecruitment:GetPlayerZone()
