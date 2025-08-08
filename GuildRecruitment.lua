@@ -68,6 +68,7 @@ function SchlingelInc.GuildRecruitment:SendGuildRequest()
     -- Debug Aufruf zum testen. debugTarget mit dem gewünschten Character initialisieren, der die Nachricht erhalten soll
     -- local debugTarget = ""
     -- C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, message, "WHISPER", debugTarget)
+    
     -- Sendet die Anfrage an alle Officer.
     for _, name in ipairs(guildOfficers) do
         C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, message, "WHISPER", name)
