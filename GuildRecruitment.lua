@@ -39,7 +39,7 @@ local guildOfficers =
     "Knubbsi",
     "Kritze",
     "Lucifia",
-    "Lündra",
+    "Lünda",
     "Meltfacé",
     "Naikjin",
     "Pfeilgiftfro",
