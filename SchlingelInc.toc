@@ -2,7 +2,7 @@
 ## Title: Schlingel Inc
 ## Notes: Visit DerHauges Discord for more information: https://discord.gg/KXkyUZW
 ## Author: Cricksu, Pudi, Canasterzaster
-## Version: 2.1.5-dev
+## Version: 2.2.6-beta
 ## SavedVariablesPerCharacter: CharacterDeaths, SavedAchievements, AchievementPoints
 
 # Notwendiges externe Abhängigkeiten aus dem Lib Folder
@@ -13,13 +13,20 @@ libs\LibDBIcon-1.0\LibDBIcon-1.0\LibDBIcon-1.0.lua
 
 # Unsere lua files.
 Global.lua
+Options.lua
 Rules.lua
 GuildRecruitment.lua
 LevelUp.lua
-Death.lua
 Achievements.lua
+interfaces\DeathAnnouncement.lua
+interfaces\Deathlog.lua
 interfaces\UIHelpers.lua
-interfaces\OffiInterface.lua
+interfaces\offiInterface\tabs\GuildInfo.lua
+interfaces\offiInterface\tabs\Recruitment.lua
+interfaces\offiInterface\tabs\Stats.lua
+interfaces\offiInterface\tabs\Inactivity.lua
+interfaces\offiInterface\OffiInterface.lua
 interfaces\SchlingelInterface.lua
 interfaces\PvPFrame.lua
+Death.lua
 Main.lua

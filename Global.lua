@@ -40,32 +40,6 @@ function SchlingelInc:CountTable(table)
     return count
 end
 
-function SchlingelInc:UpdateGuildMembers()
-    -- lade alle Namen von Spielern aus der Gilde in eine Tabelle wenn diese online sind
-    local guild_members = {}
-    C_GuildInfo.GuildRoster()
-    for i = 1, GetNumGuildMembers() do
-        local name, _, _, _, _, _, _, _, online = GetGuildRosterInfo(i)
-        if name and online then
-            -- Falls der Name einen Realm enthält (z.B. "Spielername-Realm"), nur den Spielernamen extrahieren
-            local simple_name = strsplit("-", name)
-            guild_members[simple_name] = true
-        end
-    end
-
-    SchlingelInc.guildMembers = guild_members
-    local found = false
-    for _, guildMember in ipairs(SchlingelInc.guildMembers) do
-        print(guildMember) -- debug
-        if guildMember == SchlingelInc:RemoveRealmFromName(UnitName("player")) then
-            print("found") -- debug
-            found = true
-            break
-        end
-    end
-    print("GuildRoster updated") -- debug
-end
-
 -- Überprüft Abhängigkeiten und warnt bei Problemen.
 function SchlingelInc:CheckDependencies()
     -- Definition eines Popup-Dialogs für die Warnung vor veralteten Addons.
@@ -123,24 +97,21 @@ end
 
 -- Überprüft, ob sich der Spieler in einem relevanten Schlachtfeld befindet.
 function SchlingelInc:IsInBattleground()
-    local isInBattleground = false
-    local level = UnitLevel("player")
-    local isInAllowedBattleground = false
-
-    -- Durchläuft alle möglichen Schlachtfeld-IDs.
-    for i = 1, GetMaxBattlefieldID() do
-        local battleFieldStatus = GetBattlefieldStatus(i)
-        if battleFieldStatus == "active" then
-            isInBattleground = true -- Spieler ist in irgendeinem Schlachtfeld.
-            break
-        end
+    local inInstance, instanceType = IsInInstance()
+    if inInstance and instanceType == "pvp"then
+        return true
+    else
+        return false
     end
+end
 
-    -- Nur relevant, wenn Spieler in einem Schlachtfeld UND Level 55 oder höher ist.
-    if isInBattleground and level >= 55 then
-        isInAllowedBattleground = true
+function SchlingelInc:IsInRaid()
+    local inInstance, instanceType = IsInInstance()
+    if inInstance and instanceType == "raid" then
+        return true
+    else 
+        return false
     end
-    return isInAllowedBattleground
 end
 
 -- Event-Handler für den 'frame' (lauscht auf CHAT_MSG_ADDON).
@@ -160,6 +131,10 @@ end)
 
 -- Event-Handler für den 'pvpFrame' (lauscht auf PLAYER_TARGET_CHANGED).
 pvpFrame:SetScript("OnEvent", function()
+    if SchlingelOptionsDB["pvp_alert"] == false then
+        --SchlingelInc:Print("Skip PvP Frame")
+        return
+    end
     -- Führt die PvP-Zielüberprüfung nur aus, wenn der Spieler NICHT in einem Schlachtfeld ist.
     if not SchlingelInc:IsInBattleground() then
         SchlingelInc:CheckTargetPvP()
@@ -169,7 +144,7 @@ end)
 -- Hilfsfunktion zum parsen der Versionsnummern
 function SchlingelInc:ParseVersion(v)
     local major, minor, patch, channel = string.match(v, "(%d+)%.(%d+)%.?(%d*)%-?(%w*)")
-    return tonumber(major or 0), tonumber(minor or 0), tonumber(patch or 0), tostring(channel or nil)
+    return tonumber(major or 0), tonumber(minor or 0), tonumber(patch or 0), tostring(channel or "stable")
 end
 
 -- Überprüft die Addon-Versionen anderer Spieler in der Gilde.
@@ -197,10 +172,9 @@ function SchlingelInc:CheckAddonVersion()
 
     -- Wenn der Spieler in einer Gilde ist, sendet er seine eigene Version an die Gilde.
     if IsInGuild() then
-        local major, minor, patch, channel = SchlingelInc:ParseVersion(SchlingelInc.version) -- Parsed die eigene Version.
-        if (channel == nil) then
-            C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "VERSION:" .. SchlingelInc.version, "GUILD")
-        end
+    local major, minor, patch, channel = SchlingelInc:ParseVersion(SchlingelInc.version)
+    if IsInGuild() and channel == "stable" then
+        C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "VERSION:" .. SchlingelInc.version, "GUILD")
     end
 end
 
@@ -256,7 +230,7 @@ guildChatFrame:RegisterEvent("CHAT_MSG_GUILD") -- Registriert das Event für Gil
 -- Fügt einen Filter für Gilden-Chat-Nachrichten hinzu.
 ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", function(self, event, msg, sender, ...)
     -- Funktion wird nur ausgeführt, wenn der Spieler Gildenmitglieder einladen darf (eine Art Berechtigungsprüfung).
-    if not CanGuildInvite() then
+    if SchlingelOptionsDB["show_version"] == false then
         return false, msg, sender, ... -- Nachricht unverändert durchlassen.
     end
 
@@ -315,13 +289,18 @@ if LDB then                                                                -- F�
         icon = "Interface\\AddOns\\SchlingelInc\\media\\icon-minimap.tga", -- Pfad zum Icon.
         OnClick = function(clickedFrame, button)
             if button == "LeftButton" then
+                if IsShiftKeyDown() then
+                    SchlingelInc:ToggleDeathLogWindow()
+                    return
+                end
                 if SchlingelInc.ToggleInfoWindow then
                     SchlingelInc:ToggleInfoWindow()
+                    return
                 else
                     SchlingelInc:Print(SchlingelInc.name .. ": ToggleInfoWindow ist nicht verfügbar.")
                 end
             elseif button == "RightButton" then
-                if CanGuildInvite("player") then
+                if CanGuildInvite() then
                     if SchlingelInc.ToggleOffiWindow then
                         SchlingelInc:ToggleOffiWindow()
                     else
@@ -339,7 +318,8 @@ if LDB then                                                                -- F�
             GameTooltip:AddLine(SchlingelInc.name, 1, 0.7, 0.9)                                -- Addon-Name im Tooltip.
             GameTooltip:AddLine("Version: " .. (SchlingelInc.version or "Unbekannt"), 1, 1, 1) -- Version im Tooltip.
             GameTooltip:AddLine("Linksklick: Info anzeigen", 1, 1, 1)                          -- Hinweis für Linksklick.
-            if CanGuildInvite("player") then
+            GameTooltip:AddLine("Shift + Linksklick: Deathlog", 1, 1, 1)                       -- Hinweis für Shift + Linksklick.
+            if CanGuildInvite() then
                 GameTooltip:AddLine("Rechtsklick: Offi-Fenster", 0.8, 0.8, 0.8)                -- Hinweis für Rechtsklick.
             end
             GameTooltip:Show()                                                                 -- Zeigt den Tooltip an.
