@@ -15,6 +15,12 @@ function SchlingelInc:OnLoad()
     -- Initialisiert die Minimap-Icon-Funktionalität.
     SchlingelInc:InitMinimapIcon()
 
+    -- Initialisiert die Erfolge
+    SchlingelInc.Achievements:Initialize()
+
+    -- Initialisiert die Gildenmitglieder.
+    -- SchlingelInc:UpdateGuildMembers()
+
     -- Gibt eine Bestätigungsnachricht aus, dass das Addon geladen wurde, inklusive Version.
     SchlingelInc:Print("Addon version " .. SchlingelInc.version .. " geladen")
 end

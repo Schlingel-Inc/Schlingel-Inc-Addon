@@ -141,6 +141,7 @@ pvpFrame:SetScript("OnEvent", function()
     end
 end)
 
+-- Hilfsfunktion zum parsen der Versionsnummern
 function SchlingelInc:ParseVersion(v)
     local major, minor, patch, channel = string.match(v, "(%d+)%.(%d+)%.?(%d*)%-?(%w*)")
     return tonumber(major or 0), tonumber(minor or 0), tonumber(patch or 0), tostring(channel or "stable")
@@ -170,6 +171,7 @@ function SchlingelInc:CheckAddonVersion()
     end)
 
     -- Wenn der Spieler in einer Gilde ist, sendet er seine eigene Version an die Gilde.
+    if IsInGuild() then
     local major, minor, patch, channel = SchlingelInc:ParseVersion(SchlingelInc.version)
     if IsInGuild() and channel == "stable" then
         C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "VERSION:" .. SchlingelInc.version, "GUILD")
