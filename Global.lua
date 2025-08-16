@@ -296,15 +296,11 @@ if LDB then                                                                -- F�
                 if SchlingelInc.ToggleInfoWindow then
                     SchlingelInc:ToggleInfoWindow()
                     return
-                else
-                    SchlingelInc:Print(SchlingelInc.name .. ": ToggleInfoWindow ist nicht verfügbar.")
                 end
             elseif button == "RightButton" then
                 if CanGuildInvite() then
                     if SchlingelInc.ToggleOffiWindow then
                         SchlingelInc:ToggleOffiWindow()
-                    else
-                        SchlingelInc:Print(SchlingelInc.name .. ": ToggleOffiWindow ist nicht verfügbar.")
                     end
                 else
                     return

@@ -2,8 +2,6 @@
 SchlingelInc.GuildRecruitment = SchlingelInc.GuildRecruitment or {}
 SchlingelInc.GuildRecruitment.inviteRequests = SchlingelInc.GuildRecruitment.inviteRequests or {}
 
-local inviteRequests = SchlingelInc.GuildRecruitment.inviteRequests
-
 local guildOfficers =
 {
     "Kurtibrown",
@@ -53,10 +51,6 @@ local guildOfficers =
     "Ûshnotz"
 }
 
-function SchlingelInc.GuildRecruitment:GetPendingRequests()
-    return inviteRequests
-end
-
 function SchlingelInc.GuildRecruitment:SendGuildRequest()
     local playerName = UnitName("player")
     local playerLevel = UnitLevel("player")
@@ -71,6 +65,10 @@ function SchlingelInc.GuildRecruitment:SendGuildRequest()
     local playerGold = GetMoneyString(GetMoney(), true)
     local message = string.format("INVITE_REQUEST:%s:%d:%d:%s:%s", playerName, playerLevel, playerExp, zone, playerGold)
 
+    -- --Debug Aufruf zum testen. debugTarget mit dem gewünschten Character initialisieren, der die Nachricht erhalten soll
+    -- local debugTarget = "Pudidev"
+    -- C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, message, "WHISPER", debugTarget)
+    
     -- Sendet die Anfrage an alle Officer.
     for _, name in ipairs(guildOfficers) do
         C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, message, "WHISPER", name)
@@ -88,22 +86,16 @@ local function HandleAddonMessage(message)
                 zone = zone,
                 money = money,
             }
-            table.insert(inviteRequests, requestData)
-            SchlingelInc:Print(string.format("Neue Gildenanfrage von %s (Level %s) in %s erhalten.", name, level, zone))
-            SchlingelInc:RefreshAllRequestUIs()
+            local message = string.format("Neue Gildenanfrage von %s (Level %s) mit %s in der Tasche aus %s erhalten.", name, level, money, zone)
+            SchlingelInc:Print(message)
+            SchlingelInc.GuildInvites:ShowInviteMessage(message, requestData)
         end
     elseif message:find("^INVITE_SENT:") and CanGuildInvite() then
-        local playerName = message:match("^INVITE_SENT:([^:]+)$")
-        SchlingelInc:RemovePlayerFromListAndUpdateUI(playerName)
-    end
-end
-
-
-function SchlingelInc:RefreshAllRequestUIs()
-    if SchlingelInc.Tabs and SchlingelInc.Tabs.Recruitment and SchlingelInc.Tabs.Recruitment.UpdateData then
-        SchlingelInc.Tabs.Recruitment:UpdateData(SchlingelInc.GuildRecruitment:GetPendingRequests())
-    else
-        SchlingelInc:Print("Fehler: Recruitment Tab oder UpdateData Methode nicht gefunden.")
+        SchlingelInc.GuildInvites:HideInviteMessage()
+    elseif message:find("^INVITE_DECLINED:") then
+        local name = message:match("^INVITE_DECLINED:(.+)$")
+        SchlingelInc:Print("Ein Officer hat die Anfrage von " .. name .. " abgelehnt.")
+        SchlingelInc.GuildInvites:HideInviteMessage()
     end
 end
 
@@ -113,7 +105,9 @@ function SchlingelInc.GuildRecruitment:HandleAcceptRequest(playerName)
     if CanGuildInvite() then
         SchlingelInc:Print("Versuche, " .. playerName .. " in die Gilde einzuladen...")
         C_GuildInfo.Invite(playerName)
-        C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "INVITE_SENT:" .. playerName, "OFFICER")
+        for _, name in ipairs(guildOfficers) do
+            C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "INVITE_SENT:" .. playerName, "WHISPER", name)
+        end
     else
         SchlingelInc:Print("Du hast keine Berechtigung, Spieler in die Gilde einzuladen.")
     end
@@ -121,9 +115,10 @@ end
 
 function SchlingelInc.GuildRecruitment:HandleDeclineRequest(playerName)
     if not playerName then return end
-
+        for _, name in ipairs(guildOfficers) do
+            C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "INVITE_DECLINED:" .. playerName, "WHISPER", name)
+        end
     SchlingelInc:Print("Anfrage von " .. playerName .. " wurde abgelehnt.")
-    C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "INVITE_SENT:" .. playerName, "OFFICER")
 end
 
 local addonMessageGlobalHandlerFrame = CreateFrame("Frame")
@@ -136,16 +131,6 @@ addonMessageGlobalHandlerFrame:SetScript("OnEvent", function(self, event, prefix
         end
     end
 end)
-
-function SchlingelInc:RemovePlayerFromListAndUpdateUI(playerName)
-    for i = #inviteRequests, 1, -1 do
-        if inviteRequests[i].name == playerName then
-            table.remove(inviteRequests, i)
-            SchlingelInc:RefreshAllRequestUIs()
-            break
-        end
-    end
-end
 
 -- Gibt formatierten Zonennamen zurück
 function SchlingelInc.GuildRecruitment:GetPlayerZone()
