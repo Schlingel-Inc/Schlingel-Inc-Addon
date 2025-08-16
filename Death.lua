@@ -79,7 +79,6 @@ SlashCmdList["DEATHSET"] = function(msg)
 		SchlingelInc:Print("Ungültiger Input. Benutze: /deathset <Zahl>")
 		return
 	end
-  
 	CharacterDeaths = inputValue
 	SchlingelInc:Print("Tod-Counter wurde auf " .. CharacterDeaths .. " gesetzt.")
 end

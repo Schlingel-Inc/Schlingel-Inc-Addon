@@ -353,3 +353,4 @@ function SchlingelInc:InitMinimapIcon()
         SchlingelInc:Print("Minimap-Icon registriert.")
     end
 end
+end
