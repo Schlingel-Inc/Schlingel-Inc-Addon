@@ -1,3 +1,7 @@
+# 2.2.7
+
+- Disable grouping restrictions
+
 # 2.2.6
 
 - Reworking Invite Interface

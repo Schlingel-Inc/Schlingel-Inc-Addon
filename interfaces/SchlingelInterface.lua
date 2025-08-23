@@ -26,7 +26,7 @@ local BACKDROP_SETTINGS = {
 local Rulestext = {
     "Die Nutzung des Briefkastens ist verboten!",
     "Die Nutzung des Auktionshauses ist verboten!",
-    "Gruppen mit Spielern außerhalb der Gilden sind verboten!",
+    -- "Gruppen mit Spielern außerhalb der Gilden sind verboten!",
     "Handeln mit Spielern außerhalb der Gilden ist verboten!"
 }
 
