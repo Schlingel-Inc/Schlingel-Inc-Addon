@@ -4,7 +4,7 @@
 
 # 2.2.7
 
--- Removed Grouping rules
+- Disable grouping restrictions
 
 # 2.2.6
 
