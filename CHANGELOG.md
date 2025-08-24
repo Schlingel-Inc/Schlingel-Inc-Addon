@@ -1,3 +1,7 @@
+# 2.2.8
+
+-- Fixed invite whitelist
+
 # 2.2.7
 
 - Disable grouping restrictions
