@@ -4,34 +4,41 @@ SchlingelInc.GuildRecruitment.inviteRequests = SchlingelInc.GuildRecruitment.inv
 
 local guildOfficers =
 {
+    -- Gildenleitung/Mods
+    -- Kurti
     "Kurtibrown",
+    "Schmurt",
+    "Schmurti",
+    -- Dörte
+    "Dörtchen",
+    "Siegdörty",
+    -- Fihlo
+    "Syluri",
+    "Syltank",
+    -- Hauke
+    "Totanka",
+    -- Hauke Bankaccount
     "Schlingbank",
     "Schlinglbank",
-    "Dörtchen",
-    "Schmurt",
-    "Siegdörty",
-    "Syluri",
-    "Totanka",
-    "Syltank",
-    "Heilkrampf",
-    "Fenriic",
-    "Totärztin",
-    "Totemtanz",
-    "Bärmuut",
-    "Mortblanche",
-    "Pfarrer",
-    "Onymaholy",
+    -- Dev-Schlingel
     "Luminette",
     "Cricksumage",
     "Devschlingel",
     "Pudidev",
+    -- alte Offiziere
+    "Fenriic",
+    "Totärztin",
+    -- neue Offiziere
+    "Coldchase",
+    "Coltchase",
+    "Raixxen",
+    "Peirithoos",
     -- Ab hier kommen PfundsSchlingel
-    "Cowihendrixs",
-    "Eowendra",
     "Akimah",
     "Automatix",
     "Bartzmorak",
-    "Coldchase",
+    "Cowihendrixs",
+    "Eowendra",
     "Ganadorian",
     "Hufgeruch",
     "Kalterwalter",
@@ -40,13 +47,14 @@ local guildOfficers =
     "Kritze",
     "Lucifia",
     "Lünda",
-    "Meltfacé",
+    "Meltfacê",
     "Naikjin",
+    "Pfarrer",
     "Pfeilgiftfro",
-    "Raixxen",
     "Treeguard",
     "Tuskdoc",
     "Tötemir",
+    "Vindicætor",
     "Wujujade",
     "Ûshnotz"
 }
@@ -68,7 +76,7 @@ function SchlingelInc.GuildRecruitment:SendGuildRequest()
     -- --Debug Aufruf zum testen. debugTarget mit dem gewünschten Character initialisieren, der die Nachricht erhalten soll
     -- local debugTarget = "Pudidev"
     -- C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, message, "WHISPER", debugTarget)
-    
+
     -- Sendet die Anfrage an alle Officer.
     for _, name in ipairs(guildOfficers) do
         C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, message, "WHISPER", name)
@@ -86,7 +94,8 @@ local function HandleAddonMessage(message)
                 zone = zone,
                 money = money,
             }
-            local message = string.format("Neue Gildenanfrage von %s (Level %s) mit %s in der Tasche aus %s erhalten.", name, level, money, zone)
+            local message = string.format("Neue Gildenanfrage von %s (Level %s) mit %s in der Tasche aus %s erhalten.",
+                name, level, money, zone)
             SchlingelInc:Print(message)
             SchlingelInc.GuildInvites:ShowInviteMessage(message, requestData)
         end
@@ -115,9 +124,9 @@ end
 
 function SchlingelInc.GuildRecruitment:HandleDeclineRequest(playerName)
     if not playerName then return end
-        for _, name in ipairs(guildOfficers) do
-            C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "INVITE_DECLINED:" .. playerName, "WHISPER", name)
-        end
+    for _, name in ipairs(guildOfficers) do
+        C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "INVITE_DECLINED:" .. playerName, "WHISPER", name)
+    end
     SchlingelInc:Print("Anfrage von " .. playerName .. " wurde abgelehnt.")
 end
 
