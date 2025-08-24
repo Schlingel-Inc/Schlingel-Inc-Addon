@@ -1,3 +1,11 @@
+# 2.2.8
+
+-- Fixed invite whitelist
+
+# 2.2.7
+
+-- Removed Grouping rules
+
 # 2.2.6
 
 - Reworking Invite Interface

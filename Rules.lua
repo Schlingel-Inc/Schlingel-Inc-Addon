@@ -45,7 +45,7 @@ function SchlingelInc.Rules:ProhibitGroupingWithNonGuildMembers()
             local isInGuild = tContains(guildMembers, SchlingelInc:RemoveRealmFromName(memberName))
             if not isInGuild then
                 SchlingelInc:Print("Gruppen mit Spielern außerhalb der Gilde sind verboten!")
-                LeaveParty()     -- Verlasse die Gruppe
+                LeaveParty() -- Verlasse die Gruppe
             end
         end
     end
@@ -68,9 +68,9 @@ function SchlingelInc.Rules:Initialize()
         elseif event == "TRADE_SHOW" then
             self:ProhibitTradeWithNonGuildMembers()
         elseif event == "GROUP_ROSTER_UPDATE" or event == "RAID_ROSTER_UPDATE" then
-            if not SchlingelInc:IsInBattleground() then
-                self:ProhibitGroupingWithNonGuildMembers()
-            end
+            -- if not SchlingelInc:IsInBattleground() then
+            -- self:ProhibitGroupingWithNonGuildMembers()
+            -- end
         end
     end)
 end
