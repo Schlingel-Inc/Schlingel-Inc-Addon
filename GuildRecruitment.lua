@@ -47,24 +47,13 @@ function SchlingelInc.GuildRecruitment:SendGuildRequest()
     local playerGold = GetMoneyString(GetMoney(), true)
     local message = string.format("INVITE_REQUEST:%s:%d:%d:%s:%s", playerName, playerLevel, playerExp, zone, playerGold)
 
-    local guildOfficers = {}
-
-    -- Hybrid-System:
-    -- 1. Wenn Spieler IN der Gilde ist -> nutze dynamische Officer-Liste (GuildCache)
-    -- 2. Wenn Spieler NICHT in der Gilde ist -> nutze Fallback-Liste (Constants)
-    if IsInGuild() then
-        -- Spieler IST in der Gilde - verwende dynamische Officer-Liste
-        guildOfficers = GetAuthorizedOfficers()
-        SchlingelInc.Debug:Print("Nutze dynamische Officer-Liste (GuildCache)")
-    else
-        -- Spieler ist NICHT in der Gilde - verwende Fallback-Liste
-        guildOfficers = SchlingelInc.Constants.FALLBACK_OFFICERS
-        SchlingelInc.Debug:Print("Nutze Fallback-Officer-Liste (nicht in Gilde)")
-    end
+    -- Level 1 Spieler sind IMMER außerhalb der Gilde
+    -- Nutze die Fallback-Officer-Liste aus Constants
+    local guildOfficers = SchlingelInc.Constants.FALLBACK_OFFICERS
 
     if #guildOfficers == 0 then
         SchlingelInc:Print(SchlingelInc.Constants.COLORS.ERROR ..
-            "Keine Officers verfügbar. Bitte kontaktiere einen Officer direkt.|r")
+            "Keine Officers konfiguriert. Bitte kontaktiere einen Officer direkt.|r")
         return
     end
 
