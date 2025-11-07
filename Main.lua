@@ -9,6 +9,7 @@ function SchlingelInc:OnLoad()
     SchlingelInc.Rules:Initialize()
     SchlingelInc.LevelUps:Initialize()
     SchlingelInc.GuildRecruitment:Initialize()
+    SchlingelInc.Debug:Initialize()
 
     SchlingelInc:InitializeOptionsDB()
 

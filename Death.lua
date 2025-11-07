@@ -173,18 +173,3 @@ SlashCmdList["DEATHSET"] = function(msg)
 	CharacterDeaths = inputValue
 	SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS .. "Tod-Counter wurde auf " .. CharacterDeaths .. " gesetzt.|r")
 end
-
--- -- Slash-Befehl definieren zu Deugzwecken
--- SLASH_DEATHFRAME1 = '/deathframe'
--- SlashCmdList["DEATHFRAME"] = function()
--- 	SchlingelInc.DeathAnnouncement:ShowDeathMessage("Pudidev ist mit Level 100 in Mordor gestorben!")
--- 			SchlingelInc.DeathLogData = SchlingelInc.DeathLogData or {}
--- 			table.insert(SchlingelInc.DeathLogData, {
--- 			name = "Pudidev",
--- 			class = "Krieger",
--- 			level = math.random(60),
--- 			zone = "Durotar",
--- 			cause = "Eber"
--- 			})
--- 			SchlingelInc:UpdateMiniDeathLog()
--- end

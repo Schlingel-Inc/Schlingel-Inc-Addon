@@ -129,9 +129,3 @@ function SchlingelInc.EventManager:DebugInfo()
 	end
 	print("=======================================")
 end
-
---- Slash-Befehl für Debug-Informationen
-SLASH_EVENTDEBUG1 = '/eventdebug'
-SlashCmdList["EVENTDEBUG"] = function()
-	SchlingelInc.EventManager:DebugInfo()
-end

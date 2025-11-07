@@ -15,6 +15,7 @@ libs\LibDBIcon-1.0\LibDBIcon-1.0\LibDBIcon-1.0.lua
 Global.lua
 Constants.lua
 EventManager.lua
+Debug.lua
 Options.lua
 Rules.lua
 GuildRecruitment.lua
