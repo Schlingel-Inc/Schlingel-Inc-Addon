@@ -2,62 +2,29 @@
 SchlingelInc.GuildRecruitment = SchlingelInc.GuildRecruitment or {}
 SchlingelInc.GuildRecruitment.inviteRequests = SchlingelInc.GuildRecruitment.inviteRequests or {}
 
-local guildOfficers =
-{
-    -- Gildenleitung/Mods
-    -- Kurti
-    "Kurtibrown",
-    "Schmurt",
-    "Schmurti",
-    -- Dörte
-    "Dörtchen",
-    "Siegdörty",
-    -- Fihlo
-    "Syluri",
-    "Syltank",
-    -- Hauke
-    "Totanka",
-    -- Hauke Bankaccount
-    "Schlingbank",
-    "Schlinglbank",
-    -- Dev-Schlingel
-    "Luminette",
-    "Cricksumage",
-    "Devschlingel",
-    "Pudidev",
-    -- alte Offiziere
-    "Fenriic",
-    "Totärztin",
-    -- neue Offiziere
-    "Coldchase",
-    "Coltchase",
-    "Raixxen",
-    "Peirithoos",
-    -- Ab hier kommen PfundsSchlingel
-    "Akimah",
-    "Automatix",
-    "Bartzmorak",
-    "Cowihendrixs",
-    "Eowendra",
-    "Ganadorian",
-    "Hufgeruch",
-    "Kalterwalter",
-    "Kipptum",
-    "Knubbsi",
-    "Kritze",
-    "Lucifia",
-    "Lünda",
-    "Meltfacê",
-    "Naikjin",
-    "Pfarrer",
-    "Pfeilgiftfro",
-    "Treeguard",
-    "Tuskdoc",
-    "Tötemir",
-    "Vindicætor",
-    "Wujujade",
-    "Ûshnotz"
-}
+-- Gibt eine Liste aller Officers zurück, die Einladungsrechte haben
+-- Basierend auf den in Constants.OFFICER_RANKS definierten Rängen
+local function GetAuthorizedOfficers()
+	local officers = {}
+
+	-- Durchlaufe alle autorisierten Ränge
+	for _, rankName in ipairs(SchlingelInc.Constants.OFFICER_RANKS) do
+		local membersWithRank = SchlingelInc.GuildCache:GetMembersByRank(rankName)
+
+		-- Füge alle Online-Mitglieder dieses Rangs zur Officer-Liste hinzu
+		for _, member in ipairs(membersWithRank) do
+			if member.isOnline then
+				table.insert(officers, member.name)
+			end
+		end
+	end
+
+	SchlingelInc.Debug:Print(string.format(
+		"Gefundene online Officers mit Einladungsrechten: %d", #officers
+	))
+
+	return officers
+end
 
 function SchlingelInc.GuildRecruitment:SendGuildRequest()
     local playerName = UnitName("player")
@@ -73,10 +40,22 @@ function SchlingelInc.GuildRecruitment:SendGuildRequest()
     local playerGold = GetMoneyString(GetMoney(), true)
     local message = string.format("INVITE_REQUEST:%s:%d:%d:%s:%s", playerName, playerLevel, playerExp, zone, playerGold)
 
-    -- Sendet die Anfrage an alle Officer.
+    -- Hole dynamisch alle online Officers mit Einladungsrechten
+    local guildOfficers = GetAuthorizedOfficers()
+
+    if #guildOfficers == 0 then
+        SchlingelInc:Print(SchlingelInc.Constants.COLORS.WARNING ..
+            "Keine Officers online. Deine Anfrage kann aktuell nicht gesendet werden.|r")
+        return
+    end
+
+    -- Sendet die Anfrage an alle online Officers
     for _, name in ipairs(guildOfficers) do
         C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, message, "WHISPER", name)
     end
+
+    SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS ..
+        string.format("Gildenanfrage an %d Officers gesendet.", #guildOfficers) .. "|r")
 end
 
 local function HandleAddonMessage(message)
@@ -110,6 +89,9 @@ function SchlingelInc.GuildRecruitment:HandleAcceptRequest(playerName)
     if CanGuildInvite() then
         SchlingelInc:Print("Versuche, " .. playerName .. " in die Gilde einzuladen...")
         C_GuildInfo.Invite(playerName)
+
+        -- Benachrichtige alle online Officers über die gesendete Einladung
+        local guildOfficers = GetAuthorizedOfficers()
         for _, name in ipairs(guildOfficers) do
             C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "INVITE_SENT:" .. playerName, "WHISPER", name)
         end
@@ -120,9 +102,13 @@ end
 
 function SchlingelInc.GuildRecruitment:HandleDeclineRequest(playerName)
     if not playerName then return end
+
+    -- Benachrichtige alle online Officers über die abgelehnte Anfrage
+    local guildOfficers = GetAuthorizedOfficers()
     for _, name in ipairs(guildOfficers) do
         C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "INVITE_DECLINED:" .. playerName, "WHISPER", name)
     end
+
     SchlingelInc:Print("Anfrage von " .. playerName .. " wurde abgelehnt.")
 end
 

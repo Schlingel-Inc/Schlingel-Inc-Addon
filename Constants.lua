@@ -57,3 +57,12 @@ SchlingelInc.Constants.PRONOUNS = {
 	[2] = "der",  -- Male
 	[3] = "die"   -- Female
 }
+
+-- Gildenränge mit Einladungsrechten (für Guild Recruitment)
+-- Diese Ränge erhalten Guild Invite Requests per Addon Message
+SchlingelInc.Constants.OFFICER_RANKS = {
+	"Devschlingel",      -- Developer
+	"Pfundschlingel",    -- Officers
+	"Großschlingel",     -- Officers
+	-- Füge hier weitere Ränge hinzu, die Einladungsrechte haben sollen
+}
