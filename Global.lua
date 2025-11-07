@@ -114,12 +114,11 @@ function SchlingelInc.Global:Initialize()
 	-- Version Checking Handler
 	local highestSeenVersion = SchlingelInc.version
 	SchlingelInc.EventManager:RegisterHandler("CHAT_MSG_ADDON",
-		function(_, prefix, message)
+		function(_, prefix, message, _, sender)
 			if prefix == SchlingelInc.prefix then
 				local receivedVersion = message:match("^VERSION:(.+)$")
 				if receivedVersion then
 					-- Speichere Version für Guild Member Versions
-					local sender = select(4, ...)  -- Hole Sender aus varargs
 					if sender then
 						SchlingelInc.guildMemberVersions[sender] = receivedVersion
 					end
