@@ -54,6 +54,11 @@ function SchlingelInc.Debug:Initialize()
 			end
 		elseif command == "guildrequest" then
 			SchlingelInc.Debug:TestGuildRequest(args[2])
+		elseif command == "cachestats" then
+			SchlingelInc.Debug:ShowCacheStats()
+		elseif command == "cacherefresh" then
+			SchlingelInc.GuildCache:ForceRefresh()
+			SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS .. "Guild Cache Refresh erzwungen|r")
 		else
 			SchlingelInc:Print(SchlingelInc.Constants.COLORS.WARNING ..
 				"Unbekannter Befehl. Nutze /schlingeldebug help für Hilfe.|r")
@@ -74,6 +79,8 @@ function SchlingelInc.Debug:ShowHelp()
 	print(SchlingelInc.colorCode .. "/schlingeldebug deathframe" .. "|r - Test Death Announcement Frame")
 	print(SchlingelInc.colorCode .. "/schlingeldebug deathset <zahl>" .. "|r - Setzt den Tod-Counter")
 	print(SchlingelInc.colorCode .. "/schlingeldebug guildrequest <name>" .. "|r - Testet Guild Request an einen Officer")
+	print(SchlingelInc.colorCode .. "/schlingeldebug cachestats" .. "|r - Zeigt Guild Cache Statistiken")
+	print(SchlingelInc.colorCode .. "/schlingeldebug cacherefresh" .. "|r - Erzwingt Guild Cache Refresh")
 	print(SchlingelInc.Constants.COLORS.WARNING .. "Alias: /sdebug <befehl>" .. "|r")
 end
 
@@ -148,6 +155,28 @@ function SchlingelInc.Debug:TestGuildRequest(targetName)
 
 	SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS ..
 		"Test Guild Request an " .. targetName .. " gesendet|r")
+end
+
+-- Zeigt Guild Cache Statistiken
+function SchlingelInc.Debug:ShowCacheStats()
+	local stats = SchlingelInc.GuildCache:GetStats()
+
+	print(SchlingelInc.Constants.COLORS.INFO .. "=== Guild Cache Statistiken ===" .. "|r")
+	print(string.format("Mitglieder im Cache: %d", stats.memberCount))
+	print(string.format("Letzte Aktualisierung: vor %.1f Sekunden", stats.age))
+	print(string.format("Cache gültig: %s", stats.isValid and "Ja" or "Nein"))
+
+	if stats.isValid then
+		print(string.format("Cache läuft ab in: %.1f Sekunden", stats.expiresIn))
+	else
+		print(SchlingelInc.Constants.COLORS.WARNING .. "Cache ist abgelaufen und wird beim nächsten Zugriff aktualisiert" .. "|r")
+	end
+
+	-- Zeige einige Online-Mitglieder als Beispiel
+	local onlineMembers = SchlingelInc.GuildCache:GetOnlineMembers()
+	print(string.format("Online Mitglieder: %d", #onlineMembers))
+
+	print("=======================================")
 end
 
 -- Debug-Print-Funktion (nur wenn Debug-Modus aktiviert ist)

@@ -5,6 +5,7 @@ function SchlingelInc:OnLoad()
 
     -- Initialisiert Kernmodule des Addons.
     SchlingelInc.Global:Initialize()
+    SchlingelInc.GuildCache:Initialize()
     SchlingelInc.Death:Initialize()
     SchlingelInc.Rules:Initialize()
     SchlingelInc.LevelUps:Initialize()
