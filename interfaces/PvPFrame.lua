@@ -20,8 +20,8 @@ function SchlingelInc:CheckTargetPvP()
         local lastAlert = SchlingelInc.lastPvPAlert and SchlingelInc.lastPvPAlert[name] or 0
         if not SchlingelInc.lastPvPAlert then SchlingelInc.lastPvPAlert = {} end -- Sicherstellen, dass Tabelle existiert.
 
-        -- Nur warnen, wenn die letzte Warnung für diesen Spieler mehr als 10 Sekunden her ist.
-        if (now - lastAlert) > 10 then
+        -- Nur warnen, wenn die letzte Warnung für diesen Spieler mehr als X Sekunden her ist.
+        if (now - lastAlert) > SchlingelInc.Constants.COOLDOWNS.PVP_ALERT then
             SchlingelInc.lastPvPAlert[name] = now -- Aktualisiert den Zeitpunkt der letzten Warnung.
             SchlingelInc:ShowPvPWarning(name .. " ist PvP-aktiv!")
         end
@@ -42,9 +42,7 @@ function SchlingelInc:ShowPvPWarning(text)
     SchlingelInc:RumbleFrame(SchlingelInc.pvpWarningFrame)   -- Startet den "Rumble"-Effekt.
 
     if SchlingelOptionsDB["pvp_alert_sound"] == true then
-        PlaySound(8174) -- Horde-Flagge aufgenommen
-    -- else
-    --     SchlingelInc:Print("Skip PvP Sound")
+        PlaySound(SchlingelInc.Constants.SOUNDS.PVP_ALERT)
     end
 
     -- Blendet das Fenster nach 1 Sekunde langsam aus.

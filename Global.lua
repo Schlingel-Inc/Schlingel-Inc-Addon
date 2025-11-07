@@ -98,20 +98,12 @@ end
 -- Überprüft, ob sich der Spieler in einem relevanten Schlachtfeld befindet.
 function SchlingelInc:IsInBattleground()
     local inInstance, instanceType = IsInInstance()
-    if inInstance and instanceType == "pvp"then
-        return true
-    else
-        return false
-    end
+    return inInstance and instanceType == SchlingelInc.Constants.INSTANCE_TYPES.PVP
 end
 
 function SchlingelInc:IsInRaid()
     local inInstance, instanceType = IsInInstance()
-    if inInstance and instanceType == "raid" then
-        return true
-    else 
-        return false
-    end
+    return inInstance and instanceType == SchlingelInc.Constants.INSTANCE_TYPES.RAID
 end
 
 -- Event-Handler für den 'frame' (lauscht auf CHAT_MSG_ADDON).
