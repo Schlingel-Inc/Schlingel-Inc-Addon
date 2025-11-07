@@ -162,13 +162,6 @@ function SchlingelInc:ParseVersion(v)
     return tonumber(major or 0), tonumber(minor or 0), tonumber(patch or 0), tostring(channel or "stable")
 end
 
--- Überprüft die Addon-Versionen anderer Spieler in der Gilde.
--- Diese Funktion wird jetzt vom EventManager gehandhabt (siehe Global:Initialize)
-function SchlingelInc:CheckAddonVersion()
-	-- Version wird bereits vom VersionChecker Event Handler gesendet
-	-- Diese Funktion bleibt für Kompatibilität, macht aber nichts mehr
-end
-
 -- Vergleicht zwei Versionsnummern (z.B. "1.2.3" mit "1.3.0").
 -- Gibt >0 zurück, wenn v1 > v2; <0 wenn v1 < v2; 0 wenn v1 == v2.
 function SchlingelInc:CompareVersions(v1, v2)

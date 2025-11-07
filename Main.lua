@@ -38,7 +38,6 @@ addonLoadedFrame:SetScript("OnEvent", function(self, event, addonName)
         SchlingelInc.EventManager:RegisterHandler("PLAYER_ENTERING_WORLD",
             function()
                 SchlingelInc:CheckDependencies()
-                SchlingelInc:CheckAddonVersion()
 
                 if not SchlingelInc.initialPlayTimeRequested then
                     RequestTimePlayed()
