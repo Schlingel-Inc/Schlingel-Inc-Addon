@@ -9,12 +9,6 @@ SchlingelInc.Constants.MAX_LEVEL = 70
 -- Level Meilensteine für Ankündigungen
 SchlingelInc.Constants.LEVEL_MILESTONES = {10, 20, 30, 40, 50, 60, 70}
 
--- Geschlecht Konstanten
-SchlingelInc.Constants.GENDER = {
-	MALE = 2,
-	FEMALE = 3
-}
-
 -- Instanz-Typen
 SchlingelInc.Constants.INSTANCE_TYPES = {
 	PVP = "pvp",
@@ -42,14 +36,6 @@ SchlingelInc.Constants.COOLDOWNS = {
 	PVP_ALERT = 10,
 	INVITE_REQUEST = 300,  -- 5 Minuten
 	GUILD_ROSTER_CACHE = 60  -- 1 Minute
-}
-
--- Combat Log Events für Schadenserkennung
-SchlingelInc.Constants.DAMAGE_EVENTS = {
-	"SWING_DAMAGE",
-	"RANGE_DAMAGE",
-	"SPELL_DAMAGE",
-	"SPELL_PERIODIC_DAMAGE"
 }
 
 -- Pronomen für Geschlechter
