@@ -4,7 +4,14 @@ SchlingelInc.GuildRecruitment.inviteRequests = SchlingelInc.GuildRecruitment.inv
 
 -- Gibt eine Liste aller Officers zurück, die Einladungsrechte haben
 -- Basierend auf den in Constants.OFFICER_RANKS definierten Rängen
+-- Funktioniert nur für Spieler, die bereits in der Gilde sind!
 local function GetAuthorizedOfficers()
+	-- Prüfe ob Spieler in einer Gilde ist
+	if not IsInGuild() then
+		SchlingelInc.Debug:Print("Spieler ist nicht in der Gilde - kann keine Officers abrufen")
+		return {}
+	end
+
 	local officers = {}
 
 	-- Durchlaufe alle autorisierten Ränge
@@ -40,22 +47,36 @@ function SchlingelInc.GuildRecruitment:SendGuildRequest()
     local playerGold = GetMoneyString(GetMoney(), true)
     local message = string.format("INVITE_REQUEST:%s:%d:%d:%s:%s", playerName, playerLevel, playerExp, zone, playerGold)
 
-    -- Hole dynamisch alle online Officers mit Einladungsrechten
-    local guildOfficers = GetAuthorizedOfficers()
+    local guildOfficers = {}
+
+    -- Hybrid-System:
+    -- 1. Wenn Spieler IN der Gilde ist -> nutze dynamische Officer-Liste (GuildCache)
+    -- 2. Wenn Spieler NICHT in der Gilde ist -> nutze Fallback-Liste (Constants)
+    if IsInGuild() then
+        -- Spieler IST in der Gilde - verwende dynamische Officer-Liste
+        guildOfficers = GetAuthorizedOfficers()
+        SchlingelInc.Debug:Print("Nutze dynamische Officer-Liste (GuildCache)")
+    else
+        -- Spieler ist NICHT in der Gilde - verwende Fallback-Liste
+        guildOfficers = SchlingelInc.Constants.FALLBACK_OFFICERS
+        SchlingelInc.Debug:Print("Nutze Fallback-Officer-Liste (nicht in Gilde)")
+    end
 
     if #guildOfficers == 0 then
-        SchlingelInc:Print(SchlingelInc.Constants.COLORS.WARNING ..
-            "Keine Officers online. Deine Anfrage kann aktuell nicht gesendet werden.|r")
+        SchlingelInc:Print(SchlingelInc.Constants.COLORS.ERROR ..
+            "Keine Officers verfügbar. Bitte kontaktiere einen Officer direkt.|r")
         return
     end
 
-    -- Sendet die Anfrage an alle online Officers
+    -- Sendet die Anfrage an alle Officers per Whisper
+    local sentCount = 0
     for _, name in ipairs(guildOfficers) do
         C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, message, "WHISPER", name)
+        sentCount = sentCount + 1
     end
 
     SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS ..
-        string.format("Gildenanfrage an %d Officers gesendet.", #guildOfficers) .. "|r")
+        string.format("Gildenanfrage an %d Officers gesendet.", sentCount) .. "|r")
 end
 
 local function HandleAddonMessage(message)
