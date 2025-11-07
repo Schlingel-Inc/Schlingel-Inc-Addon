@@ -28,7 +28,8 @@ SchlingelInc.allowedGuilds = {
     "Schlingel IInc"
 }
 
--- Initialisierung von Spielzeit-Variablen (derzeit nicht weiter verwendet im Snippet).
+-- Spielzeit-Variablen werden in Main.lua per TIME_PLAYED_MSG Event aktualisiert
+-- und in SchlingelInterface.lua angezeigt.
 SchlingelInc.GameTimeTotal = 0
 SchlingelInc.GameTimePerLevel = 0
 
