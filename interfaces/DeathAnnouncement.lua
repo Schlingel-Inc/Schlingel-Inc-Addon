@@ -86,7 +86,7 @@ function SchlingelInc.DeathAnnouncement:ShowDeathMessage(message)
     animGroup:Play()
 
     if SchlingelOptionsDB["deathmessages_sound"] == true then
-        PlaySound(8192) -- Horde-Flagge zurückgebracht
+        PlaySound(SchlingelInc.Constants.SOUNDS.DEATH_ANNOUNCEMENT) -- Horde-Flagge zurückgebracht
     -- else
     --     SchlingelInc:Print("Skip DeathSound")
     end
