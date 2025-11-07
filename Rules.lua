@@ -53,24 +53,21 @@ end
 
 -- Initialisierung der Regeln
 function SchlingelInc.Rules:Initialize()
-    local frame = CreateFrame("Frame")
-    frame:RegisterEvent("MAIL_SHOW")           -- Event für Briefkasten öffnen
-    frame:RegisterEvent("AUCTION_HOUSE_SHOW")  -- Event für Auktionshaus öffnen
-    frame:RegisterEvent("TRADE_SHOW")          -- Event für Handelsfenster öffnen
-    frame:RegisterEvent("GROUP_ROSTER_UPDATE") -- Event für Gruppenitglieder aktualisieren
-    frame:RegisterEvent("RAID_ROSTER_UPDATE")  -- Event für Raidmitglieder aktualisieren
+	SchlingelInc.EventManager:RegisterHandler("MAIL_SHOW",
+		function()
+			SchlingelInc.Rules:ProhibitMailboxUsage()
+		end, 0, "RuleMailbox")
 
-    frame:SetScript("OnEvent", function(_, event, prefix, playerName)
-        if event == "MAIL_SHOW" then
-            self:ProhibitMailboxUsage()
-        elseif event == "AUCTION_HOUSE_SHOW" then
-            self:ProhibitAuctionhouseUsage()
-        elseif event == "TRADE_SHOW" then
-            self:ProhibitTradeWithNonGuildMembers()
-        elseif event == "GROUP_ROSTER_UPDATE" or event == "RAID_ROSTER_UPDATE" then
-            -- if not SchlingelInc:IsInBattleground() then
-            -- self:ProhibitGroupingWithNonGuildMembers()
-            -- end
-        end
-    end)
+	SchlingelInc.EventManager:RegisterHandler("AUCTION_HOUSE_SHOW",
+		function()
+			SchlingelInc.Rules:ProhibitAuctionhouseUsage()
+		end, 0, "RuleAuctionHouse")
+
+	SchlingelInc.EventManager:RegisterHandler("TRADE_SHOW",
+		function()
+			SchlingelInc.Rules:ProhibitTradeWithNonGuildMembers()
+		end, 0, "RuleTrade")
+
+	-- GROUP_ROSTER_UPDATE und RAID_ROSTER_UPDATE sind derzeit deaktiviert
+	-- Kann bei Bedarf wieder aktiviert werden
 end

@@ -130,16 +130,17 @@ function SchlingelInc.GuildRecruitment:HandleDeclineRequest(playerName)
     SchlingelInc:Print("Anfrage von " .. playerName .. " wurde abgelehnt.")
 end
 
-local addonMessageGlobalHandlerFrame = CreateFrame("Frame")
-addonMessageGlobalHandlerFrame:RegisterEvent("CHAT_MSG_ADDON")
-
-addonMessageGlobalHandlerFrame:SetScript("OnEvent", function(self, event, prefix, message)
-    if event == "CHAT_MSG_ADDON" and prefix == SchlingelInc.prefix then
-        if message:find("INVITE_REQUEST") or message:find("INVITE_SENT") then
-            HandleAddonMessage(message)
-        end
-    end
-end)
+-- Initialisiert das GuildRecruitment Modul
+function SchlingelInc.GuildRecruitment:Initialize()
+	SchlingelInc.EventManager:RegisterHandler("CHAT_MSG_ADDON",
+		function(_, prefix, message)
+			if prefix == SchlingelInc.prefix then
+				if message:find("INVITE_REQUEST") or message:find("INVITE_SENT") then
+					HandleAddonMessage(message)
+				end
+			end
+		end, 0, "GuildInviteHandler")
+end
 
 -- Gibt formatierten Zonennamen zurück
 function SchlingelInc.GuildRecruitment:GetPlayerZone()

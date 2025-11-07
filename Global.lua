@@ -82,13 +82,64 @@ end
 -- Speichert den Zeitpunkt der letzten PvP-Warnung für jeden Spieler.
 SchlingelInc.lastPvPAlert = {}
 
--- Erstellt einen unsichtbaren Frame, um auf CHAT_MSG_ADDON Events zu lauschen.
-local frame = CreateFrame("Frame")
-frame:RegisterEvent("CHAT_MSG_ADDON") -- Registriert das Event für Addon-Nachrichten.
+-- Global Module Initialisierung
+SchlingelInc.Global = {}
 
--- Erstellt einen unsichtbaren Frame, um auf PLAYER_TARGET_CHANGED Events zu lauschen.
-local pvpFrame = CreateFrame("Frame")
-pvpFrame:RegisterEvent("PLAYER_TARGET_CHANGED") -- Registriert das Event für Zielwechsel.
+function SchlingelInc.Global:Initialize()
+	-- CHAT_MSG_ADDON für Guild Name Requests
+	SchlingelInc.EventManager:RegisterHandler("CHAT_MSG_ADDON",
+		function(_, prefix, message)
+			if prefix == SchlingelInc.prefix and message == "GUILD_NAME_REQUEST" then
+				local guildName = GetGuildInfo("player")
+				if guildName then
+					C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "GUILD_NAME_RESPONSE:" .. guildName, "RAID")
+				end
+			end
+		end, 0, "GuildNameRequestHandler")
+
+	-- PLAYER_TARGET_CHANGED für PvP-Warnungen
+	SchlingelInc.EventManager:RegisterHandler("PLAYER_TARGET_CHANGED",
+		function()
+			if SchlingelOptionsDB["pvp_alert"] == false then
+				return
+			end
+			if not SchlingelInc:IsInBattleground() then
+				SchlingelInc:CheckTargetPvP()
+			end
+		end, 0, "PvPTargetChecker")
+
+	-- Registriere Addon Message Prefix
+	C_ChatInfo.RegisterAddonMessagePrefix(SchlingelInc.prefix)
+
+	-- Version Checking Handler
+	local highestSeenVersion = SchlingelInc.version
+	SchlingelInc.EventManager:RegisterHandler("CHAT_MSG_ADDON",
+		function(_, prefix, message)
+			if prefix == SchlingelInc.prefix then
+				local receivedVersion = message:match("^VERSION:(.+)$")
+				if receivedVersion then
+					-- Speichere Version für Guild Member Versions
+					local sender = select(4, ...)  -- Hole Sender aus varargs
+					if sender then
+						SchlingelInc.guildMemberVersions[sender] = receivedVersion
+					end
+
+					-- Prüfe ob neuere Version verfügbar
+					if SchlingelInc:CompareVersions(receivedVersion, highestSeenVersion) > 0 then
+						highestSeenVersion = receivedVersion
+						SchlingelInc:Print("Eine neuere Addon-Version wurde entdeckt: " ..
+							highestSeenVersion .. ". Bitte aktualisiere dein Addon!")
+					end
+				end
+			end
+		end, 0, "VersionChecker")
+
+	-- Sende Version bei Guild Chat
+	local major, minor, patch, channel = SchlingelInc:ParseVersion(SchlingelInc.version)
+	if IsInGuild() and channel == "stable" then
+		C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "VERSION:" .. SchlingelInc.version, "GUILD")
+	end
+end
 
 -- Gibt eine formatierte Nachricht im Chat aus.
 function SchlingelInc:Print(message)
@@ -106,66 +157,16 @@ function SchlingelInc:IsInRaid()
     return inInstance and instanceType == SchlingelInc.Constants.INSTANCE_TYPES.RAID
 end
 
--- Event-Handler für den 'frame' (lauscht auf CHAT_MSG_ADDON).
-frame:SetScript("OnEvent", function(_, event, prefix, message, channel, sender)
-    -- Verarbeitet nur Addon-Nachrichten mit dem korrekten Prefix.
-    if event == "CHAT_MSG_ADDON" and prefix == SchlingelInc.prefix then
-        -- Wenn eine Anfrage nach dem Gildennamen kommt ("GUILD_NAME_REQUEST").
-        if message == "GUILD_NAME_REQUEST" then
-            local guildName = GetGuildInfo("player") -- Holt den Gildennamen des Spielers.
-            if guildName then
-                -- Sendet den Gildennamen als Antwort im RAID-Channel (als Addon-Nachricht).
-                C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "GUILD_NAME_RESPONSE:" .. guildName, "RAID")
-            end
-        end
-    end
-end)
-
--- Event-Handler für den 'pvpFrame' (lauscht auf PLAYER_TARGET_CHANGED).
-pvpFrame:SetScript("OnEvent", function()
-    if SchlingelOptionsDB["pvp_alert"] == false then
-        --SchlingelInc:Print("Skip PvP Frame")
-        return
-    end
-    -- Führt die PvP-Zielüberprüfung nur aus, wenn der Spieler NICHT in einem Schlachtfeld ist.
-    if not SchlingelInc:IsInBattleground() then
-        SchlingelInc:CheckTargetPvP()
-    end
-end)
-
 function SchlingelInc:ParseVersion(v)
     local major, minor, patch, channel = string.match(v, "(%d+)%.(%d+)%.?(%d*)%-?(%w*)")
     return tonumber(major or 0), tonumber(minor or 0), tonumber(patch or 0), tostring(channel or "stable")
 end
 
 -- Überprüft die Addon-Versionen anderer Spieler in der Gilde.
+-- Diese Funktion wird jetzt vom EventManager gehandhabt (siehe Global:Initialize)
 function SchlingelInc:CheckAddonVersion()
-    local highestSeenVersion = SchlingelInc
-        .version                                               -- Startet mit der eigenen Version als höchster bekannter.
-    local versionFrame = CreateFrame("Frame")
-    versionFrame:RegisterEvent("CHAT_MSG_ADDON")               -- Lauscht auf Addon-Nachrichten.
-    C_ChatInfo.RegisterAddonMessagePrefix(SchlingelInc.prefix) -- Registriert den Prefix für eingehende Nachrichten.
-
-    versionFrame:SetScript("OnEvent", function(_, event, msgPrefix, message, _, sender)
-        if event == "CHAT_MSG_ADDON" and msgPrefix == SchlingelInc.prefix then
-            -- Extrahiert die Versionsnummer aus der Nachricht (Format: "VERSION:1.2.3").
-            local receivedVersion = message:match("^VERSION:(.+)$")
-            if receivedVersion then
-                -- Vergleicht die empfangene Version mit der bisher höchsten gesehenen Version.
-                if SchlingelInc:CompareVersions(receivedVersion, highestSeenVersion) > 0 then
-                    highestSeenVersion = receivedVersion -- Aktualisiert die höchste gesehene Version.
-                    SchlingelInc:Print("Eine neuere Addon-Version wurde entdeckt: " ..
-                        highestSeenVersion .. ". Bitte aktualisiere dein Addon!")
-                end
-            end
-        end
-    end)
-
-    -- Wenn der Spieler in einer Gilde ist, sendet er seine eigene Version an die Gilde.
-    local major, minor, patch, channel = SchlingelInc:ParseVersion(SchlingelInc.version)
-    if IsInGuild() and channel == "stable" then
-        C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "VERSION:" .. SchlingelInc.version, "GUILD")
-    end
+	-- Version wird bereits vom VersionChecker Event Handler gesendet
+	-- Diese Funktion bleibt für Kompatibilität, macht aber nichts mehr
 end
 
 -- Vergleicht zwei Versionsnummern (z.B. "1.2.3" mit "1.3.0").
@@ -195,27 +196,6 @@ end
 
 -- Speichert die Addon-Versionen von Gildenmitgliedern (Sendername -> Version).
 SchlingelInc.guildMemberVersions = {}
-
--- Erstellt einen Frame, um Addon-Nachrichten zu empfangen (speziell für Versionen).
-local addonMessageFrame = CreateFrame("Frame")
-addonMessageFrame:RegisterEvent("CHAT_MSG_ADDON")
-C_ChatInfo.RegisterAddonMessagePrefix(SchlingelInc.prefix) -- Wichtig, um Nachrichten zu empfangen.
-
--- Event-Handler für 'addonMessageFrame'.
-addonMessageFrame:SetScript("OnEvent", function(_, event, prefix, message, _, sender)
-    if event == "CHAT_MSG_ADDON" and prefix == SchlingelInc.prefix then
-        -- Extrahiert die Version aus der Nachricht.
-        local receivedVersion = message:match("^VERSION:(.+)$")
-        if receivedVersion then
-            -- Speichert die Version des Senders.
-            SchlingelInc.guildMemberVersions[sender] = receivedVersion
-        end
-    end
-end)
-
--- Erstellt einen Frame, um Gilden-Chat-Nachrichten abzufangen (obwohl nicht direkt verwendet, da ChatFrame_AddMessageEventFilter genutzt wird).
-local guildChatFrame = CreateFrame("Frame")
-guildChatFrame:RegisterEvent("CHAT_MSG_GUILD") -- Registriert das Event für Gilden-Chat.
 
 -- Fügt einen Filter für Gilden-Chat-Nachrichten hinzu.
 ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", function(self, event, msg, sender, ...)

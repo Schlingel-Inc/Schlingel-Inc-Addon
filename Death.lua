@@ -21,73 +21,137 @@ function SchlingelInc.Death:AddLogEntry(entry)
 	end
 end
 
-local DeathFrame = CreateFrame("Frame")
-DeathFrame:RegisterEvent("PLAYER_DEAD")
-DeathFrame:RegisterEvent("PLAYER_UNGHOST")
+-- Initialisiert das Death-Modul und registriert Events
+function SchlingelInc.Death:Initialize()
+	local playerName = UnitName("player")
 
--- Event-Handler
-DeathFrame:SetScript("OnEvent", function(self, event, ...)
-	-- Event für den Tod.
-	if event == "PLAYER_DEAD" then
-		-- Wenn der DeathCount noch nicht gesetzt wurde, setzen wir ihn auf 1.
-		if CharacterDeaths == nil then
-			CharacterDeaths = 1
-			return -- Abbruch des Eventhandlers
-		end
-		-- Vorbereiten der genutzten Variablen für die GildenNachricht
-		local name = UnitName("player")
-		if not name then return end  -- Sicherheitscheck
-
-		local _, rank = GetGuildInfo("player")
-		local class = UnitClass("player")
-		local level = UnitLevel("player")
-		local sex = UnitSex("player")
-
-		-- Sichere Zone-Abfrage mit Fehlerbehandlung
-		local zone, mapID
-		if IsInInstance() then
-			zone = GetInstanceInfo()
-		else
-			mapID = C_Map.GetBestMapForUnit("player")
-			if mapID then
-				local mapInfo = C_Map.GetMapInfo(mapID)
-				zone = mapInfo and mapInfo.name or "Unbekannt"
-			else
-				zone = "Unbekannt"
+	-- PLAYER_DEAD Event Handler
+	SchlingelInc.EventManager:RegisterHandler("PLAYER_DEAD",
+		function()
+			if CharacterDeaths == nil then
+				CharacterDeaths = 1
+				return
 			end
+
+			local name = UnitName("player")
+			if not name then return end
+
+			local _, rank = GetGuildInfo("player")
+			local class = UnitClass("player")
+			local level = UnitLevel("player")
+			local sex = UnitSex("player")
+
+			-- Sichere Zone-Abfrage mit Fehlerbehandlung
+			local zone, mapID
+			if IsInInstance() then
+				zone = GetInstanceInfo()
+			else
+				mapID = C_Map.GetBestMapForUnit("player")
+				if mapID then
+					local mapInfo = C_Map.GetMapInfo(mapID)
+					zone = mapInfo and mapInfo.name or "Unbekannt"
+				else
+					zone = "Unbekannt"
+				end
+			end
+
+			local pronoun = SchlingelInc.Constants.PRONOUNS[sex] or "der"
+
+			local messageFormat = "%s %s %s ist mit Level %s in %s gestorben. Schande!"
+			local messageFormatWithRank = "Ewiger Schlingel %s, %s %s ist mit Level %s in %s gestorben. Schande!"
+			if (rank ~= nil and rank == "EwigerSchlingel") then
+				messageFormat = messageFormatWithRank
+			end
+			local messageString = messageFormat:format(name, pronoun, class, level, zone)
+
+			if SchlingelInc.Death.lastAttackSource and SchlingelInc.Death.lastAttackSource ~= "" then
+				messageString = string.format("%s Gestorben an %s", messageString, SchlingelInc.Death.lastAttackSource)
+				SchlingelInc.Death.lastAttackSource = ""
+			end
+
+			if SchlingelInc.Death.lastChatMessage and SchlingelInc.Death.lastChatMessage ~= "" then
+				messageString = string.format('%s. Die letzten Worte: "%s"', messageString, SchlingelInc.Death.lastChatMessage)
+			end
+
+			local popupMessageFormat = "SCHLINGEL_DEATH:%s:%s:%s:%s"
+			local popupMessageString = popupMessageFormat:format(name, class, level, zone)
+
+			if not SchlingelInc:IsInBattleground() and not SchlingelInc:IsInRaid() then
+				SendChatMessage(messageString, "GUILD")
+				C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, popupMessageString, "GUILD")
+				CharacterDeaths = CharacterDeaths + 1
+			end
+		end, 0, "DeathTracker")
+
+	-- Chat Message Tracker für letzte Worte
+	SchlingelInc.EventManager:RegisterHandler("CHAT_MSG_SAY", function(_, msg, sender)
+		if sender == playerName or sender:match("^" .. playerName .. "%-") then
+			SchlingelInc.Death.lastChatMessage = msg
 		end
+	end, 0, "LastWordsSay")
 
-		local pronoun = SchlingelInc.Constants.PRONOUNS[sex] or "der"
-
-		-- Formatiert die Broadcast Nachricht
-		local messageFormat = "%s %s %s ist mit Level %s in %s gestorben. Schande!"
-		local messageFormatWithRank = "Ewiger Schlingel %s, %s %s ist mit Level %s in %s gestorben. Schande!"
-		if (rank ~= nil and rank == "EwigerSchlingel") then
-			messageFormat = messageFormatWithRank
+	SchlingelInc.EventManager:RegisterHandler("CHAT_MSG_GUILD", function(_, msg, sender)
+		if sender == playerName or sender:match("^" .. playerName .. "%-") then
+			SchlingelInc.Death.lastChatMessage = msg
 		end
-		local messageString = messageFormat:format(name, pronoun, class, level, zone)
+	end, 0, "LastWordsGuild")
 
-		if SchlingelInc.Death.lastAttackSource and SchlingelInc.Death.lastAttackSource ~= "" then
-			messageString = string.format("%s Gestorben an %s", messageString, SchlingelInc.Death.lastAttackSource)
-			SchlingelInc.Death.lastAttackSource = ""
+	SchlingelInc.EventManager:RegisterHandler("CHAT_MSG_PARTY", function(_, msg, sender)
+		if sender == playerName or sender:match("^" .. playerName .. "%-") then
+			SchlingelInc.Death.lastChatMessage = msg
 		end
+	end, 0, "LastWordsParty")
 
-		-- Letzte Worte
-		if SchlingelInc.Death.lastChatMessage and SchlingelInc.Death.lastChatMessage ~= "" then
-			messageString = string.format('%s. Die letzten Worte: "%s"', messageString, SchlingelInc.Death.lastChatMessage)
+	SchlingelInc.EventManager:RegisterHandler("CHAT_MSG_RAID", function(_, msg, sender)
+		if sender == playerName or sender:match("^" .. playerName .. "%-") then
+			SchlingelInc.Death.lastChatMessage = msg
 		end
+	end, 0, "LastWordsRaid")
 
-		local popupMessageFormat = "SCHLINGEL_DEATH:%s:%s:%s:%s"
-		local popupMessageString = popupMessageFormat:format(name, class, level, zone)
+	-- Combat Log für letzte Angriffsquelle
+	SchlingelInc.EventManager:RegisterHandler("COMBAT_LOG_EVENT_UNFILTERED",
+		function()
+			local _, subevent, _, _, sourceName, _, _, destGUID = CombatLogGetCurrentEventInfo()
 
-		-- Send broadcast text messages to guild
-		if not SchlingelInc:IsInBattleground() and not SchlingelInc:IsInRaid() then
-			SendChatMessage(messageString, "GUILD")
-			C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, popupMessageString, "GUILD")
-			CharacterDeaths = CharacterDeaths + 1
-		end
-	end
-end)
+			if destGUID ~= UnitGUID("player") then return end
+			if not subevent:match("_DAMAGE$") then return end
+
+			SchlingelInc.Death.lastAttackSource = sourceName or "Unbekannt"
+		end, 0, "LastAttackTracker")
+
+	-- Addon Message Popup Tracker
+	SchlingelInc.EventManager:RegisterHandler("CHAT_MSG_ADDON",
+		function(_, prefix, msg)
+			if prefix == SchlingelInc.prefix and msg:find("SCHLINGEL_DEATH") then
+				local success, name, class, level, zone = pcall(function()
+					return msg:match("^SCHLINGEL_DEATH:([^:]+):([^:]+):([^:]+):([^:]+)$")
+				end)
+
+				if success and name and class and level and zone then
+					local messageFormat = "%s der %s ist mit Level %s in %s gestorben."
+					local messageString = messageFormat:format(name, class, level, zone)
+					SchlingelInc.DeathAnnouncement:ShowDeathMessage(messageString)
+
+					local cause = SchlingelInc.Death.lastAttackSource or "Unbekannt"
+					local deathEntry = {
+						name = name,
+						class = class,
+						level = tonumber(level),
+						zone = zone,
+						cause = cause,
+						timestamp = time()
+					}
+
+					SchlingelInc.Death:AddLogEntry(deathEntry)
+
+					SchlingelInc.DeathLogData = SchlingelInc.DeathLogData or {}
+					table.insert(SchlingelInc.DeathLogData, deathEntry)
+
+					SchlingelInc:UpdateMiniDeathLog()
+				end
+			end
+		end, 0, "DeathAnnouncementReceiver")
+end
 
 -- Slash-Befehl definieren
 SLASH_DEATHSET1 = '/deathset'
@@ -109,81 +173,6 @@ SlashCmdList["DEATHSET"] = function(msg)
 	CharacterDeaths = inputValue
 	SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS .. "Tod-Counter wurde auf " .. CharacterDeaths .. " gesetzt.|r")
 end
-
-
--- ChatFrame und ChatHandler für letzte Worte
-local ChatTrackerFrame = CreateFrame("Frame")
-
--- Relevante Chat-Events registrieren
-ChatTrackerFrame:RegisterEvent("CHAT_MSG_SAY")
-ChatTrackerFrame:RegisterEvent("CHAT_MSG_GUILD")
-ChatTrackerFrame:RegisterEvent("CHAT_MSG_PARTY")
-ChatTrackerFrame:RegisterEvent("CHAT_MSG_RAID")
-
--- Eigener Spielername (inkl. Realm bei Bedarf)
-local playerName = UnitName("player")
-
-ChatTrackerFrame:SetScript("OnEvent", function(self, event, msg, sender, ...)
-	-- Nur speichern, wenn der Sender der eigene Spieler ist
-	if sender == playerName or sender:match("^" .. playerName .. "%-") then
-		SchlingelInc.Death.lastChatMessage = msg
-	end
-end)
-
--- CombatFrame für den letzten Angreifer
-local CombatLogFrame = CreateFrame("Frame")
-CombatLogFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-
-CombatLogFrame:SetScript("OnEvent", function()
-	local _, subevent, _, _, sourceName, _, _, destGUID = CombatLogGetCurrentEventInfo()
-
-	-- Früher Exit: Nur verarbeiten wenn Spieler das Ziel ist
-	if destGUID ~= UnitGUID("player") then return end
-
-	-- Früher Exit: Nur Schadens-Events verarbeiten
-	if not subevent:match("_DAMAGE$") then return end
-
-	-- Speichere letzte Angriffsquelle
-	SchlingelInc.Death.lastAttackSource = sourceName or "Unbekannt"
-end)
-
-local PopupTracker = CreateFrame("Frame")
-PopupTracker:RegisterEvent("CHAT_MSG_ADDON")
-PopupTracker:SetScript("OnEvent", function(self, event, prefix, msg, sender, ...)
-	if (event == "CHAT_MSG_ADDON" and prefix == SchlingelInc.prefix and msg:find("SCHLINGEL_DEATH")) then
-		-- Sichere Nachrichtenverarbeitung mit pcall
-		local success, name, class, level, zone = pcall(function()
-			return msg:match("^SCHLINGEL_DEATH:([^:]+):([^:]+):([^:]+):([^:]+)$")
-		end)
-
-		if success and name and class and level and zone then
-			local messageFormat = "%s der %s ist mit Level %s in %s gestorben."
-			local messageString = messageFormat:format(name, class, level, zone)
-			-- Zeige die Nachricht im zentralen Frame an
-			SchlingelInc.DeathAnnouncement:ShowDeathMessage(messageString)
-
-			-- Erstelle Death Entry
-			local cause = SchlingelInc.Death.lastAttackSource or "Unbekannt"
-			local deathEntry = {
-				name = name,
-				class = class,
-				level = tonumber(level),
-				zone = zone,
-				cause = cause,
-				timestamp = time()  -- Speichere Zeitstempel
-			}
-
-			-- Speichere im persistenten Log
-			SchlingelInc.Death:AddLogEntry(deathEntry)
-
-			-- Speichere auch im Runtime Log für aktuelle Session
-			SchlingelInc.DeathLogData = SchlingelInc.DeathLogData or {}
-			table.insert(SchlingelInc.DeathLogData, deathEntry)
-
-			SchlingelInc:UpdateMiniDeathLog()
-		end
-	end
-end)
 
 -- -- Slash-Befehl definieren zu Deugzwecken
 -- SLASH_DEATHFRAME1 = '/deathframe'
