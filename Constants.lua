@@ -50,7 +50,6 @@ SchlingelInc.Constants.OFFICER_RANKS = {
 	"Devschlingel",      -- Developer
 	"Pfundschlingel",    -- Officers
 	"Großschlingel",     -- Officers
-	-- Füge hier weitere Ränge hinzu, die Einladungsrechte haben sollen
 }
 
 -- Fallback Officer Character Names für Spieler außerhalb der Gilde
@@ -65,5 +64,4 @@ SchlingelInc.Constants.FALLBACK_OFFICERS = {
 	"Kurtibrown",
 	"Dörtchen",
 	"Totanka",
-	-- Füge hier die Main-Characters der aktiven Officers hinzu
 }
