@@ -1,6 +1,3 @@
-local FONT_NORMAL = "GameFontNormal"
-local FONT_SMALL = "GameFontNormalSmall"
-
 function SchlingelInc:CreateMiniDeathLog()
     if self.MiniDeathLogFrame then return end
 
@@ -17,7 +14,7 @@ function SchlingelInc:CreateMiniDeathLog()
     frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
     frame:SetFrameStrata("MEDIUM")
 
-    local title = self.UIHelpers:CreateStyledText(frame, "Letzte Tode", FONT_NORMAL, "TOP", frame, "TOP", 0, -15)
+    local title = self.UIHelpers:CreateStyledText(frame, "Letzte Tode", "GameFontNormal", "TOP", frame, "TOP", 0, -15)
     title:SetTextColor(1, 0.85, 0.1)
 
     local headers = { "Name", "Klasse", "Level" }
@@ -29,7 +26,7 @@ function SchlingelInc:CreateMiniDeathLog()
     for i, text in ipairs(headers) do
         local xOffset = 25
         for j = 1, i - 1 do xOffset = xOffset + columnWidths[j] + 10 end
-        local header = self.UIHelpers:CreateStyledText(frame, text, FONT_NORMAL, "TOPLEFT", frame, "TOPLEFT", xOffset, topPadding)
+        local header = self.UIHelpers:CreateStyledText(frame, text, "GameFontNormal", "TOPLEFT", frame, "TOPLEFT", xOffset, topPadding)
         header:SetTextColor(1, 0.8, 0.1)
     end
 
@@ -40,7 +37,7 @@ function SchlingelInc:CreateMiniDeathLog()
         local yOffset = topPadding - 20 - ((i - 1) * rowHeight)
         local xOffset = 25
         for j = 1, #headers do
-            local cell = self.UIHelpers:CreateStyledText(frame, "", FONT_SMALL, "TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
+            local cell = self.UIHelpers:CreateStyledText(frame, "", "GameFontNormalSmall", "TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
             table.insert(row, cell)
             xOffset = xOffset + columnWidths[j] + 10
         end
