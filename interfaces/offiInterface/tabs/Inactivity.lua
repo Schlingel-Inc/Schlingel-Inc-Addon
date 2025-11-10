@@ -1,209 +1,177 @@
 SchlingelInc.Tabs = SchlingelInc.Tabs or {}
 
--- Definiere das Modul für den Inactivity Tab
 SchlingelInc.Tabs.Inactivity = {
-    Frame = nil,           -- Hauptframe des Tabs
-    scrollFrame = nil,     -- ScrollFrame für die Liste
-    scrollChild = nil,     -- Inhalt des ScrollFrames
-    columnHeaders = nil,   -- Frame für Spaltenüberschriften
-    inactiveListUIElements = {}, -- Tabelle zum Speichern der UI-Elemente für jede Mitgliederzeile.
+	scrollFrame = nil,
+	scrollChild = nil,
+	inactiveListUIElements = {},
 }
 
---------------------------------------------------------------------------------
--- Erstellt den Inhalt für den "Inaktiv"-Tab (Tab 4)
--- Diese Funktion ist verantwortlich für das Layout und die Grundstruktur
--- des "Inaktiv"-Tabs.
---------------------------------------------------------------------------------
 function SchlingelInc.Tabs.Inactivity:CreateUI(parentFrame)
-    -- Zugriffe auf Konstanten über SchlingelInc Tabelle
-    local tabFrame = CreateFrame("Frame", SchlingelInc.ADDON_PREFIX .. "InactivityTabFrame", parentFrame)
-    tabFrame:SetAllPoints(true)
+	local tabFrame = CreateFrame("Frame", nil, parentFrame)
+	tabFrame:SetAllPoints()
 
-    -- Titeltext, der den Schwellenwert für Inaktivität anzeigt. Zugriffe auf Konstanten über SchlingelInc
-    local titleText = string.format("Inaktive Mitglieder (> %d Tage)", SchlingelInc.INACTIVE_DAYS_THRESHOLD)
-    -- Zugriffe auf UIHelpers über SchlingelInc
-    SchlingelInc.UIHelpers:CreateStyledText(tabFrame, titleText, SchlingelInc.FONT_NORMAL,
-        "TOPLEFT", tabFrame, "TOPLEFT", 10, -20)
+	local titleText = string.format("Inaktive Mitglieder (> %d Tage)", SchlingelInc.Constants.INACTIVE_DAYS_THRESHOLD)
+	SchlingelInc.UIHelpers:CreateStyledText(tabFrame, titleText, "GameFontNormal",
+		"TOPLEFT", tabFrame, "TOPLEFT", 10, -20)
 
-    -- ScrollFrame für die Liste der inaktiven Mitglieder. Zugriffe auf Konstanten über SchlingelInc
-    local scrollFrame = CreateFrame("ScrollFrame", SchlingelInc.ADDON_PREFIX .. "InactivityScrollFrame", tabFrame, "UIPanelScrollFrameTemplate")
-    scrollFrame:SetSize(560, 350) -- Höhe ggf. anpassen.
-    scrollFrame:SetPoint("TOPLEFT", 10, -45)
-    self.scrollFrame = scrollFrame -- Referenz im Modul speichern
+	local scrollFrame = CreateFrame("ScrollFrame", nil, tabFrame, "UIPanelScrollFrameTemplate")
+	scrollFrame:SetSize(560, 350)
+	scrollFrame:SetPoint("TOPLEFT", 10, -45)
+	self.scrollFrame = scrollFrame
 
-    -- Inhalt des ScrollFrames. Zugriffe auf Konstanten über SchlingelInc
-    local scrollChild = CreateFrame("Frame", SchlingelInc.ADDON_PREFIX .. "InactivityScrollChild", scrollFrame)
-    scrollFrame:SetScrollChild(scrollChild)
-    scrollChild:SetWidth(scrollFrame:GetWidth() - 10) -- Etwas schmaler für Scrollbalken.
-    scrollChild:SetHeight(1) -- Höhe wird dynamisch angepasst.
-    self.scrollChild = scrollChild -- Referenz im Modul speichern
+	local scrollChild = CreateFrame("Frame", nil, scrollFrame)
+	scrollFrame:SetScrollChild(scrollChild)
+	scrollChild:SetWidth(scrollFrame:GetWidth() - 10)
+	scrollChild:SetHeight(1)
+	self.scrollChild = scrollChild
 
-    -- Spaltenüberschriften.
-    local columnHeadersFrame = CreateFrame("Frame", nil, scrollChild)
-    columnHeadersFrame:SetPoint("TOPLEFT", 5, -5)
-    columnHeadersFrame:SetSize(550, 20)
-    self.columnHeaders = columnHeadersFrame -- Referenz im Modul speichern
+	-- Column Headers
+	local headers = CreateFrame("Frame", nil, scrollChild)
+	headers:SetPoint("TOPLEFT", 5, -5)
+	headers:SetSize(550, 20)
 
-    -- Zugriffe auf UIHelpers über SchlingelInc
-    SchlingelInc.UIHelpers:CreateStyledText(columnHeadersFrame, "Name", SchlingelInc.FONT_HIGHLIGHT_SMALL,
-        "TOPLEFT", columnHeadersFrame, "TOPLEFT", 0, 0, 150, nil, "LEFT")
-    SchlingelInc.UIHelpers:CreateStyledText(columnHeadersFrame, "Level", SchlingelInc.FONT_HIGHLIGHT_SMALL,
-        "LEFT", columnHeadersFrame, "LEFT", 160, 0, 40, nil, "CENTER")
-    SchlingelInc.UIHelpers:CreateStyledText(columnHeadersFrame, "Rang", SchlingelInc.FONT_HIGHLIGHT_SMALL,
-        "LEFT", columnHeadersFrame, "LEFT", 210, 0, 120, nil, "LEFT")
-    SchlingelInc.UIHelpers:CreateStyledText(columnHeadersFrame, "Offline Seit", SchlingelInc.FONT_HIGHLIGHT_SMALL,
-        "LEFT", columnHeadersFrame, "LEFT", 340, 0, 80, nil, "LEFT") -- Breite angepasst
+	SchlingelInc.UIHelpers:CreateStyledText(headers, "Name", "GameFontHighlightSmall",
+		"TOPLEFT", headers, "TOPLEFT", 0, 0, 150, nil, "LEFT")
+	SchlingelInc.UIHelpers:CreateStyledText(headers, "Level", "GameFontHighlightSmall",
+		"LEFT", headers, "LEFT", 160, 0, 40, nil, "CENTER")
+	SchlingelInc.UIHelpers:CreateStyledText(headers, "Rang", "GameFontHighlightSmall",
+		"LEFT", headers, "LEFT", 210, 0, 120, nil, "LEFT")
+	SchlingelInc.UIHelpers:CreateStyledText(headers, "Offline Seit", "GameFontHighlightSmall",
+		"LEFT", headers, "LEFT", 340, 0, 80, nil, "LEFT")
 
-    self.inactiveListUIElements = {} -- Tabelle zum Speichern der UI-Elemente für die Liste im Modul.
-    self.Frame = tabFrame -- Referenz auf den Tab-Frame im Modul speichern.
-    SchlingelInc.Tabs.Inactivity:UpdateData()
-    return tabFrame
+	self.inactiveListUIElements = {}
+	self:UpdateData()
+
+	return tabFrame
 end
 
---------------------------------------------------------------------------------
--- Funktion zum Aktualisieren des "Inaktiv"-Tabs
--- Listet Gildenmitglieder auf, die länger als INACTIVE_DAYS_THRESHOLD offline sind.
---------------------------------------------------------------------------------
 function SchlingelInc.Tabs.Inactivity:UpdateData()
-    -- Überprüfe, ob die benötigten UI-Elemente im Modul gespeichert sind
-    if not self.Frame or not self.scrollChild or not self.inactiveListUIElements or not self.scrollFrame then
-        return -- Sicherstellen, dass die UI-Elemente existieren.
-    end
+	if not self.scrollChild or not self.inactiveListUIElements or not self.scrollFrame then
+		return
+	end
 
-    -- Lokale Referenzen für klareren Code innerhalb der Funktion
-    local scrollChild = self.scrollChild
-    local uiElements = self.inactiveListUIElements
-    local scrollFrame = self.scrollFrame
+	local scrollChild = self.scrollChild
+	local uiElements = self.inactiveListUIElements
+	local scrollFrame = self.scrollFrame
 
-    -- Alte UI-Elemente (Zeilen) entfernen.
-    for _, elementGroup in ipairs(uiElements) do
-        if elementGroup.rowFrame then
-            elementGroup.rowFrame:Hide()
-            elementGroup.rowFrame:SetParent(nil) -- Wichtig zum Freigeben.
-        end
-    end
-    wipe(uiElements) -- Leert die Tabelle der UI-Elemente.
+	-- Clear old UI elements
+	for _, elementGroup in ipairs(uiElements) do
+		if elementGroup.rowFrame then
+			elementGroup.rowFrame:Hide()
+			elementGroup.rowFrame:SetParent(nil)
+		end
+	end
+	wipe(uiElements)
 
-    local totalGuildMembersClassic, _ = GetNumGuildMembers()
-    totalGuildMembersClassic = totalGuildMembersClassic or 0
+	local totalGuildMembers, _ = GetNumGuildMembers()
+	totalGuildMembers = totalGuildMembers or 0
 
-    local inactiveMembersList = {} -- Sammelt die Daten der inaktiven Mitglieder.
+	local inactiveMembers = {}
 
-    if totalGuildMembersClassic > 0 then
-        for i = 1, totalGuildMembersClassic do
-            local name, rankName, _, level, _, _, publicNote, _, isOnline, _, _, _, _, _ = GetGuildRosterInfo(i)
+	if totalGuildMembers > 0 then
+		for i = 1, totalGuildMembers do
+			local name, rankName, _, level, _, _, publicNote, _, isOnline, _, _, _, _, _ = GetGuildRosterInfo(i)
 
-            if name and not isOnline then -- Nur offline Mitglieder betrachten.
-                local yearsOffline, monthsOffline, daysOffline, hoursOffline = GetGuildRosterLastOnline(i)
+			if name and not isOnline then
+				local yearsOffline, monthsOffline, daysOffline, hoursOffline = GetGuildRosterLastOnline(i)
 
-                local isConsideredInactive = false
-                local displayOfflineDuration = "Unbekannt" -- Fallback für Anzeige.
-                local totalDaysForSorting = 0 -- Für die Sortierung.
+				local isInactive = false
+				local displayDuration = "Unbekannt"
+				local totalDays = 0
 
-                -- Stelle sicher, dass die Werte Zahlen sind.
-                yearsOffline = yearsOffline or 0
-                monthsOffline = monthsOffline or 0
-                daysOffline = daysOffline or 0
-                hoursOffline = hoursOffline or 0
+				yearsOffline = yearsOffline or 0
+				monthsOffline = monthsOffline or 0
+				daysOffline = daysOffline or 0
+				hoursOffline = hoursOffline or 0
 
-                -- Berechne die gesamte Offline-Zeit in Tagen für die Sortierung.
-                totalDaysForSorting = (yearsOffline * 365) + (monthsOffline * 30) + daysOffline + (hoursOffline / 24)
+				totalDays = (yearsOffline * 365) + (monthsOffline * 30) + daysOffline + (hoursOffline / 24)
 
-                -- Prüfen, ob die Inaktivitätsschwelle erreicht ist.
-                if yearsOffline > 0 then
-                    isConsideredInactive = true
-                    displayOfflineDuration = string.format("%d J", yearsOffline)
-                elseif monthsOffline > 0 then
-                    isConsideredInactive = true
-                    displayOfflineDuration = string.format("%d M", monthsOffline)
-                elseif daysOffline >= SchlingelInc.INACTIVE_DAYS_THRESHOLD then
-                    isConsideredInactive = true
-                    displayOfflineDuration = string.format("%d T", daysOffline)
-                elseif SchlingelInc.INACTIVE_DAYS_THRESHOLD == 0 then -- Spezialfall: Alle Offline-Mitglieder auflisten, wenn Threshold 0 ist.
-                     isConsideredInactive = true
-                     if daysOffline > 0 then
-                         displayOfflineDuration = string.format("%d T", daysOffline)
-                     elseif hoursOffline > 0 then
-                         displayOfflineDuration = string.format("%d Std", hoursOffline)
-                     else
-                         displayOfflineDuration = "<1 Std" -- Wenn alle Zeitwerte 0 sind.
-                     end
-                end
+				if yearsOffline > 0 then
+					isInactive = true
+					displayDuration = string.format("%d J", yearsOffline)
+				elseif monthsOffline > 0 then
+					isInactive = true
+					displayDuration = string.format("%d M", monthsOffline)
+				elseif daysOffline >= SchlingelInc.Constants.INACTIVE_DAYS_THRESHOLD then
+					isInactive = true
+					displayDuration = string.format("%d T", daysOffline)
+				elseif SchlingelInc.Constants.INACTIVE_DAYS_THRESHOLD == 0 then
+					isInactive = true
+					if daysOffline > 0 then
+						displayDuration = string.format("%d T", daysOffline)
+					elseif hoursOffline > 0 then
+						displayDuration = string.format("%d Std", hoursOffline)
+					else
+						displayDuration = "<1 Std"
+					end
+				end
 
-                if isConsideredInactive then
-                     table.insert(inactiveMembersList, {
-                         name = name,
-                         level = level or 0,
-                         rank = rankName or "Unbekannt",
-                         note = publicNote or "",
-                         displayDuration = displayOfflineDuration, -- Für die Anzeige.
-                         sortableOfflineDays = totalDaysForSorting -- Für die Sortierung.
-                     })
-                end
-            end
-        end
-    end
+				if isInactive then
+					table.insert(inactiveMembers, {
+						name = name,
+						level = level or 0,
+						rank = rankName or "Unbekannt",
+						note = publicNote or "",
+						displayDuration = displayDuration,
+						sortableDays = totalDays
+					})
+				end
+			end
+		end
+	end
 
-    -- Inaktive Mitglieder sortieren:
-    -- 1. Längste Offline-Zeit zuerst.
-    -- 2. Bei gleicher Offline-Zeit: Höchstes Level zuerst.
-    table.sort(inactiveMembersList, function(a, b)
-        if a.sortableOfflineDays == b.sortableOfflineDays then
-            return (a.level or 0) > (b.level or 0)
-        end
-        return a.sortableOfflineDays > b.sortableOfflineDays
-    end)
+	-- Sort: longest offline first, then by level
+	table.sort(inactiveMembers, function(a, b)
+		if a.sortableDays == b.sortableDays then
+			return (a.level or 0) > (b.level or 0)
+		end
+		return a.sortableDays > b.sortableDays
+	end)
 
-    -- UI für inaktive Mitglieder erstellen.
-    local yOffset = -25 -- Start-Y-Position unterhalb der Spaltenüberschriften.
-    local rowHeight = 20 -- Höhe jeder Zeile.
-    local colWidths = { name = 150, level = 40, rank = 120, duration = 80, kick = 80 } -- Spaltenbreiten.
-    local xOffsets = { name = 5, level = 160, rank = 210, duration = 340, kick = 430 } -- X-Positionen der Spalten.
+	local yOffset = -25
+	local rowHeight = 20
+	local xOffsets = { name = 5, level = 160, rank = 210, duration = 340, kick = 430 }
+	local colWidths = { name = 150, level = 40, rank = 120, duration = 80, kick = 80 }
 
-    if #inactiveMembersList > 0 then
-        for i, memberData in ipairs(inactiveMembersList) do
-            local rowFrame = CreateFrame("Frame", nil, scrollChild)
-            rowFrame:SetSize(scrollChild:GetWidth(), rowHeight)
-            rowFrame:SetPoint("TOPLEFT", 0, yOffset)
+	if #inactiveMembers > 0 then
+		for i, member in ipairs(inactiveMembers) do
+			local rowFrame = CreateFrame("Frame", nil, scrollChild)
+			rowFrame:SetSize(scrollChild:GetWidth(), rowHeight)
+			rowFrame:SetPoint("TOPLEFT", 0, yOffset)
 
-            -- Zugriffe auf UIHelpers über SchlingelInc
-            local nameText = memberData.name
-            if SchlingelInc and SchlingelInc.RemoveRealmFromName then
-                nameText = SchlingelInc:RemoveRealmFromName(memberData.name)
-            end
-            SchlingelInc.UIHelpers:CreateStyledText(rowFrame, nameText, SchlingelInc.FONT_NORMAL,
-                "TOPLEFT", rowFrame, "TOPLEFT", xOffsets.name, 0, colWidths.name, nil, "LEFT", "MIDDLE")
-            SchlingelInc.UIHelpers:CreateStyledText(rowFrame, memberData.level, SchlingelInc.FONT_NORMAL,
-                "TOPLEFT", rowFrame, "TOPLEFT", xOffsets.level, 0, colWidths.level, nil, "CENTER", "MIDDLE")
-            SchlingelInc.UIHelpers:CreateStyledText(rowFrame, memberData.rank, SchlingelInc.FONT_NORMAL,
-                "TOPLEFT", rowFrame, "TOPLEFT", xOffsets.rank, 0, colWidths.rank, nil, "LEFT", "MIDDLE")
-            SchlingelInc.UIHelpers:CreateStyledText(rowFrame, memberData.displayDuration, SchlingelInc.FONT_NORMAL,
-                "TOPLEFT", rowFrame, "TOPLEFT", xOffsets.duration, 0, colWidths.duration, nil, "LEFT", "MIDDLE")
+			local nameText = member.name
+			if SchlingelInc and SchlingelInc.RemoveRealmFromName then
+				nameText = SchlingelInc:RemoveRealmFromName(member.name)
+			end
 
-            -- Kick-Button hinzufügen.
-            if CanGuildRemove("player") then
-                -- Zugriffe auf UIHelpers über SchlingelInc
-                local kickButton = SchlingelInc.UIHelpers:CreateStyledButton(rowFrame, "Entfernen", colWidths.kick, rowHeight - 2,
-                "TOPLEFT", rowFrame, "TOPLEFT", xOffsets.kick, 0, "UIPanelButtonTemplate")
-            kickButton:SetScript("OnClick", function()
-                -- Zeigt einen Bestätigungsdialog vor dem Entfernen.
-                StaticPopup_Show("CONFIRM_GUILD_KICK", memberData.name, nil, { memberName = memberData.name })
-            end)
-            end
+			SchlingelInc.UIHelpers:CreateStyledText(rowFrame, nameText, "GameFontNormal",
+				"TOPLEFT", rowFrame, "TOPLEFT", xOffsets.name, 0, colWidths.name, nil, "LEFT", "MIDDLE")
+			SchlingelInc.UIHelpers:CreateStyledText(rowFrame, member.level, "GameFontNormal",
+				"TOPLEFT", rowFrame, "TOPLEFT", xOffsets.level, 0, colWidths.level, nil, "CENTER", "MIDDLE")
+			SchlingelInc.UIHelpers:CreateStyledText(rowFrame, member.rank, "GameFontNormal",
+				"TOPLEFT", rowFrame, "TOPLEFT", xOffsets.rank, 0, colWidths.rank, nil, "LEFT", "MIDDLE")
+			SchlingelInc.UIHelpers:CreateStyledText(rowFrame, member.displayDuration, "GameFontNormal",
+				"TOPLEFT", rowFrame, "TOPLEFT", xOffsets.duration, 0, colWidths.duration, nil, "LEFT", "MIDDLE")
 
-            table.insert(uiElements, { rowFrame = rowFrame }) -- Fügt den Frame der Zeile zur UI-Elemente-Liste hinzu.
-            yOffset = yOffset - rowHeight -- Nächste Zeile weiter unten.
-        end
-        -- Passt die Höhe des scrollbaren Inhalts an.
-        scrollChild:SetHeight(math.max(1, (#inactiveMembersList * rowHeight) + 30)) -- + Puffer.
-    else
-        -- Nachricht, wenn keine inaktiven Mitglieder gefunden wurden.
-        local noInactiveText = SchlingelInc.UIHelpers:CreateStyledText(scrollChild,
-            "Keine inaktiven Mitglieder (> ".. SchlingelInc.INACTIVE_DAYS_THRESHOLD .." T) gefunden.", SchlingelInc.FONT_NORMAL,
-            "TOP", scrollChild, "TOP", 0, yOffset, scrollChild:GetWidth() - 10, nil, "CENTER")
-        table.insert(uiElements, { rowFrame = noInactiveText }) -- Hier ist rowFrame der Text selbst.
-        scrollChild:SetHeight(noInactiveText:GetStringHeight() + 30)
-    end
+			if CanGuildRemove("player") then
+				local kickButton = SchlingelInc.UIHelpers:CreateStyledButton(rowFrame, "Entfernen", colWidths.kick, rowHeight - 2,
+					"TOPLEFT", rowFrame, "TOPLEFT", xOffsets.kick, 0, "UIPanelButtonTemplate")
+				kickButton:SetScript("OnClick", function()
+					StaticPopup_Show("CONFIRM_GUILD_KICK", member.name, nil, { memberName = member.name })
+				end)
+			end
 
-    scrollFrame:SetVerticalScroll(0) -- Scrollt nach ganz oben.
+			table.insert(uiElements, { rowFrame = rowFrame })
+			yOffset = yOffset - rowHeight
+		end
+		scrollChild:SetHeight(math.max(1, (#inactiveMembers * rowHeight) + 30))
+	else
+		local noInactiveText = SchlingelInc.UIHelpers:CreateStyledText(scrollChild,
+			"Keine inaktiven Mitglieder (> ".. SchlingelInc.Constants.INACTIVE_DAYS_THRESHOLD .." T) gefunden.", "GameFontNormal",
+			"TOP", scrollChild, "TOP", 0, yOffset, scrollChild:GetWidth() - 10, nil, "CENTER")
+		table.insert(uiElements, { rowFrame = noInactiveText })
+		scrollChild:SetHeight(noInactiveText:GetStringHeight() + 30)
+	end
+
+	scrollFrame:SetVerticalScroll(0)
 end

@@ -65,3 +65,16 @@ SchlingelInc.Constants.FALLBACK_OFFICERS = {
 	"Dörtchen",
 	"Totanka",
 }
+
+-- UI Backdrop Settings
+SchlingelInc.Constants.BACKDROP = {
+	bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+	edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+	tile = true,
+	tileSize = 32,
+	edgeSize = 32,
+	insets = { left = 11, right = 12, top = 12, bottom = 11 }
+}
+
+-- Inaktivitätsschwelle (Tage)
+SchlingelInc.Constants.INACTIVE_DAYS_THRESHOLD = 10
