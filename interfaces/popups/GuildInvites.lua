@@ -2,13 +2,11 @@ SchlingelInc.GuildInvites = {}
 
 -- Frame für die Nachricht
 local InviteMessageFrame = CreateFrame("Frame", "InviteMessageFrame", UIParent, "BackdropTemplate")
-InviteMessageFrame:ClearAllPoints()
 InviteMessageFrame:SetSize(350, 100)
 InviteMessageFrame:SetPoint("RIGHT", UIParent, "RIGHT", -50, -200)
 InviteMessageFrame:SetFrameStrata("FULLSCREEN_DIALOG")
 InviteMessageFrame:SetFrameLevel(1000)
 InviteMessageFrame:Hide()
-InviteMessageFrame:SetAlpha(1)
 
 -- Hintergrund
 InviteMessageFrame:SetBackdrop(SchlingelInc.Constants.POPUPBACKDROP)
@@ -35,7 +33,6 @@ InviteMessageFrame.text:SetJustifyV("TOP")
 InviteMessageFrame.text:SetTextColor(1, 1, 1, 1)
 InviteMessageFrame.text:SetShadowColor(0, 0, 0, 1)
 InviteMessageFrame.text:SetShadowOffset(1, -1)
-InviteMessageFrame.text:SetText("")
 
 -- Buttons
 local function HandleAcceptClick()
@@ -45,12 +42,12 @@ end
 SchlingelInc.UIHelpers:CreateStyledButton(InviteMessageFrame, "Annehmen", 75, 25, "CENTER", InviteMessageFrame,
     "CENTER", -50, -25, "UIPanelButtonTemplate", HandleAcceptClick)
 
-local function HandleDeclinetClick()
+local function HandleDeclineClick()
     SchlingelInc.GuildRecruitment:HandleDeclineRequest(InviteMessageFrame.playerName)
     SchlingelInc.GuildInvites:HideInviteMessage()
 end
 SchlingelInc.UIHelpers:CreateStyledButton(InviteMessageFrame, "Ablehnen", 75, 25, "CENTER", InviteMessageFrame,
-    "CENTER", 50, -25, "UIPanelButtonTemplate", HandleDeclinetClick)
+    "CENTER", 50, -25, "UIPanelButtonTemplate", HandleDeclineClick)
 
 -- Animation vorbereiten
 local animGroup = InviteMessageFrame:CreateAnimationGroup()
@@ -62,13 +59,13 @@ fadeIn:SetSmoothing("IN")
 
 -- Nachricht anzeigen
 function SchlingelInc.GuildInvites:ShowInviteMessage(message, requestData)
-if InviteMessageFrame:IsShown() then
-    print("InviteFrame already shown — skipping.")
-    return
-end
+    if InviteMessageFrame:IsShown() then return
+    end
+
     InviteMessageFrame.playerName = requestData["name"]
     InviteMessageFrame.text:SetText(message)
     InviteMessageFrame:Show()
+    animGroup:Stop()
     animGroup:Play()
 end
 
