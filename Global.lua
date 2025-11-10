@@ -112,6 +112,7 @@ function SchlingelInc.Global:Initialize()
 	if IsInGuild() and channel == "stable" then
 		C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "VERSION:" .. SchlingelInc.version, "GUILD")
 	end
+    C_GuildInfo.GuildRoster() -- Guild Roster fetchen um Cache aufzubauen.
 end
 
 -- Gibt eine formatierte Nachricht im Chat aus.

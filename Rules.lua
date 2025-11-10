@@ -17,7 +17,8 @@ end
 function SchlingelInc.Rules:ProhibitTradeWithNonGuildMembers(player)
     local tradePartner, _ = UnitName("NPC") -- Name des Handelspartners
     if tradePartner then
-        local isInGuild = SchlingelInc:IsGuildAllowed(GetGuildInfo("NPC"))
+        local isInGuild = C_GuildInfo.MemberExistsByName(tradePartner)
+        --local isInGuild = SchlingelInc:IsGuildAllowed(GetGuildInfo("NPC"))
         if not isInGuild then
             SchlingelInc:Print("Handeln mit Spielern außerhalb der Gilde ist verboten!")
             CancelTrade() -- Schließt das Handelsfenster sofort
