@@ -28,10 +28,8 @@ function SchlingelInc.Death:Initialize()
 	-- PLAYER_DEAD Event Handler
 	SchlingelInc.EventManager:RegisterHandler("PLAYER_DEAD",
 		function()
-			if CharacterDeaths == nil then
-				CharacterDeaths = 1
-				return
-			end
+			--Wenn im Raid oder Battleground, skip den ganzen Kram weil wir den Tod weder tracken noch ankündigen
+			if SchlingelInc:IsInBattleground() or SchlingelInc:IsInRaid() then return end
 
 			local name = UnitName("player")
 			if not name then return end
@@ -76,11 +74,9 @@ function SchlingelInc.Death:Initialize()
 			local popupMessageFormat = "SCHLINGEL_DEATH:%s:%s:%s:%s"
 			local popupMessageString = popupMessageFormat:format(name, class, level, zone)
 
-			if not SchlingelInc:IsInBattleground() and not SchlingelInc:IsInRaid() then
-				SendChatMessage(messageString, "GUILD")
-				C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, popupMessageString, "GUILD")
-				CharacterDeaths = CharacterDeaths + 1
-			end
+			SendChatMessage(messageString, "GUILD")
+			C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, popupMessageString, "GUILD")
+			CharacterDeaths = CharacterDeaths + 1
 		end, 0, "DeathTracker")
 
 	-- Chat Message Tracker für letzte Worte
