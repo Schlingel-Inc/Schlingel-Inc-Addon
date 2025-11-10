@@ -22,12 +22,6 @@ SchlingelInc.colorCode = "|cFFF48CBA"
 -- Lädt die Version des Addons aus der .toc-Datei. Falls nicht vorhanden, wird "Unbekannt" verwendet.
 SchlingelInc.version = GetAddOnMetadata("SchlingelInc", "Version") or "Unbekannt"
 
--- Liste der Gilden, für die bestimmte Addon-Funktionen aktiv sind.
-SchlingelInc.allowedGuilds = {
-    "Schlingel Inc",
-    "Schlingel IInc"
-}
-
 -- Spielzeit-Variablen werden in Main.lua per TIME_PLAYED_MSG Event aktualisiert
 -- und in SchlingelInterface.lua angezeigt.
 SchlingelInc.GameTimeTotal = 0
@@ -70,16 +64,6 @@ function SchlingelInc:CheckDependencies()
     end)
 end
 
--- Überprüft, ob ein Gildenname in der Liste der erlaubten Gilden ist.
-function SchlingelInc:IsGuildAllowed(guildName)
-    for _, allowedGuild in ipairs(SchlingelInc.allowedGuilds) do
-        if guildName == allowedGuild then
-            return true -- Gilde ist erlaubt.
-        end
-    end
-    return false -- Gilde ist nicht erlaubt.
-end
-
 -- Speichert den Zeitpunkt der letzten PvP-Warnung für jeden Spieler.
 SchlingelInc.lastPvPAlert = {}
 
@@ -87,16 +71,8 @@ SchlingelInc.lastPvPAlert = {}
 SchlingelInc.Global = {}
 
 function SchlingelInc.Global:Initialize()
-	-- CHAT_MSG_ADDON für Guild Name Requests
-	SchlingelInc.EventManager:RegisterHandler("CHAT_MSG_ADDON",
-		function(_, prefix, message)
-			if prefix == SchlingelInc.prefix and message == "GUILD_NAME_REQUEST" then
-				local guildName = GetGuildInfo("player")
-				if guildName then
-					C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "GUILD_NAME_RESPONSE:" .. guildName, "RAID")
-				end
-			end
-		end, 0, "GuildNameRequestHandler")
+	-- Registriere Addon Message Prefix
+	C_ChatInfo.RegisterAddonMessagePrefix(SchlingelInc.prefix)
 
 	-- PLAYER_TARGET_CHANGED für PvP-Warnungen
 	SchlingelInc.EventManager:RegisterHandler("PLAYER_TARGET_CHANGED",
@@ -108,9 +84,6 @@ function SchlingelInc.Global:Initialize()
 				SchlingelInc:CheckTargetPvP()
 			end
 		end, 0, "PvPTargetChecker")
-
-	-- Registriere Addon Message Prefix
-	C_ChatInfo.RegisterAddonMessagePrefix(SchlingelInc.prefix)
 
 	-- Version Checking Handler
 	local highestSeenVersion = SchlingelInc.version
@@ -207,27 +180,6 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", function(self, event, msg, sen
     -- 'false' bedeutet, die Nachricht wird nicht unterdrückt, sondern weiterverarbeitet (mit ggf. modifizierter Nachricht).
     return false, modifiedMessage, sender, ...
 end)
-
--- Gibt eine Tabelle formatiert (mit Einrückungen) als String zurück. Nützlich für Debugging.
-function SchlingelInc:PrintFormattedTable(tbl, indent)
-    indent = indent or 0                         -- Standard-Einrückung ist 0.
-    local indentation = string.rep("  ", indent) -- Erzeugt den Einrückungsstring.
-    local output = "{\n"
-    for key, value in pairs(tbl) do
-        if type(value) == "table" then
-            -- Rekursiver Aufruf für verschachtelte Tabellen.
-            output = output ..
-                indentation ..
-                "  " .. tostring(key) .. " = " .. SchlingelInc:PrintFormattedTable(value, indent + 1) .. ",\n"
-        elseif type(value) == "string" then
-            output = output .. indentation .. "  " .. tostring(key) .. " = \"" .. tostring(value) .. "\",\n"
-        else
-            output = output .. indentation .. "  " .. tostring(key) .. " = " .. tostring(value) .. ",\n"
-        end
-    end
-    output = output .. indentation .. "}"
-    return output
-end
 
 -- Entfernt den Realm-Namen von einem vollständigen Spielernamen (z.B. "Spieler-Realm" -> "Spieler").
 function SchlingelInc:RemoveRealmFromName(fullName)
