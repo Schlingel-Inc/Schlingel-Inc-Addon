@@ -57,10 +57,6 @@ function SchlingelInc:CreateMiniDeathLog()
         table.insert(frame.rows, row)
     end
 
-    frame:SetScript("OnMouseUp", function()
-        SchlingelInc:ShowStandaloneDeathLog()
-    end)
-
     self.MiniDeathLogFrame = frame
     frame:Hide()
 end
@@ -109,97 +105,4 @@ function SchlingelInc:ToggleDeathLogWindow()
         self:UpdateMiniDeathLog()
         self.MiniDeathLogFrame:Show()
     end
-end
-
-function SchlingelInc:ShowStandaloneDeathLog()
-    if self.StandaloneDeathLogFrame then
-        self.StandaloneDeathLogFrame:Show()
-        self.StandaloneDeathLogFrame.Update()
-        return
-    end
-
-    local frame = CreateFrame("Frame", "StandaloneDeathLog", UIParent, "BackdropTemplate")
-    frame:SetSize(600, 420)
-    frame:SetPoint("CENTER")
-    frame:SetBackdrop(BACKDROP_SETTINGS)
-    frame:SetBackdropColor(0, 0, 0, 0.85)
-    frame:SetBackdropBorderColor(0.4, 0.4, 0.4)
-    frame:SetMovable(true)
-    frame:EnableMouse(true)
-    frame:RegisterForDrag("LeftButton")
-    frame:SetScript("OnDragStart", frame.StartMoving)
-    frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
-
-    local close = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
-    close:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, -5)
-    close:SetScript("OnClick", function() frame:Hide() end)
-
-    local headers = { "Name", "Klasse", "Level", "Zone", "Todesursache" }
-    local columnWidths = { 120, 80, 40, 110, 180 }
-    local topPadding = -25
-    local rowHeight = 20
-
-    for i, text in ipairs(headers) do
-        local xOffset = 25
-        for j = 1, i - 1 do xOffset = xOffset + columnWidths[j] + 10 end
-        local header = self.UIHelpers:CreateStyledText(frame, text, FONT_NORMAL, "TOPLEFT", frame, "TOPLEFT", xOffset, topPadding)
-        header:SetTextColor(1, 0.8, 0.1)
-    end
-
-    local scrollFrame = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
-    scrollFrame:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -35)
-    scrollFrame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -30, 20)
-
-    local content = CreateFrame("Frame", nil, scrollFrame)
-    content:SetSize(1, 1)
-    scrollFrame:SetScrollChild(content)
-    frame.rows = {}
-
-    for i = 1, 100 do
-        local row = {}
-        local yOffset = -((i - 1) * rowHeight) -15
-        local xOffset = 20
-        for j = 1, #headers do
-            local cell = self.UIHelpers:CreateStyledText(content, "", FONT_SMALL, "TOPLEFT", content, "TOPLEFT", xOffset, yOffset)
-            table.insert(row, cell)
-            xOffset = xOffset + columnWidths[j] + 10
-        end
-        table.insert(frame.rows, row)
-    end
-
-    frame.Update = function()
-        local data = SchlingelInc.DeathLogData or {}
-        local localizedToToken = {}
-        for token, name in pairs(LOCALIZED_CLASS_NAMES_MALE) do localizedToToken[name] = token end
-        for token, name in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do localizedToToken[name] = token end
-
-        for i, row in ipairs(frame.rows) do
-            local entry = data[#data - i + 1]
-            if entry then
-                local classToken = localizedToToken[entry.class]
-                local color = classToken and RAID_CLASS_COLORS[classToken]
-                row[1]:SetText(entry.name or "?")
-                row[2]:SetText(color and string.format("|cff%02x%02x%02x%s|r", color.r * 255, color.g * 255, color.b * 255, entry.class) or entry.class)
-                row[3]:SetText(entry.level or "?")
-                row[4]:SetText(entry.zone or "?")
-                row[5]:SetText(entry.cause or "?")
-
-                for _, cell in ipairs(row) do
-                    cell:Show()
-                    if i % 2 == 0 then
-                        cell:SetTextColor(0.95, 0.95, 0.95)
-                    else
-                        cell:SetTextColor(0.85, 0.85, 0.85)
-                    end
-                end
-            else
-                for _, cell in ipairs(row) do cell:SetText(""); cell:Hide() end
-            end
-        end
-        content:SetHeight(math.max(#data * rowHeight, 200))
-    end
-
-    frame:Show()
-    frame.Update()
-    self.StandaloneDeathLogFrame = frame
 end
