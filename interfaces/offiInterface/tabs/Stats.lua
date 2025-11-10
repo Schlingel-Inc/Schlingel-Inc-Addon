@@ -13,8 +13,7 @@ function SchlingelInc.Tabs.Stats:CreateUI(parentFrame)
 	local tabFrame = CreateFrame("Frame", nil, parentFrame)
 	tabFrame:SetAllPoints()
 
-	SchlingelInc.UIHelpers:CreateStyledText(tabFrame, "Gildenstatistiken - Verteilungen", "GameFontNormal",
-		"TOPLEFT", tabFrame, "TOPLEFT", 10, -20)
+	SchlingelInc.UIHelpers:CreateLabel(tabFrame, "Gildenstatistiken - Verteilungen", 10, -20)
 
 	local mainScrollFrame = CreateFrame("ScrollFrame", nil, tabFrame, "UIPanelScrollFrameTemplate")
 	mainScrollFrame:SetPoint("TOPLEFT", tabFrame, "TOPLEFT", 10, -45)

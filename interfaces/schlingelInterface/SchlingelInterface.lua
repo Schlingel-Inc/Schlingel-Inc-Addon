@@ -26,73 +26,21 @@ function SchlingelInc:CreateInfoWindow()
 	mainFrame:SetFrameStrata("MEDIUM")
 	mainFrame:Hide()
 
-	SchlingelInc.UIHelpers:CreateStyledText(mainFrame, "Schlingel Inc Interface", "GameFontHighlightLarge", "TOP", mainFrame, "TOP", 0, -15)
+	SchlingelInc.UIHelpers:CreateHeader(mainFrame, "Schlingel Inc Interface")
+	SchlingelInc.UIHelpers:CreateCloseButton(mainFrame)
 
-	local closeButtonFunc = function() mainFrame:Hide() end
-	SchlingelInc.UIHelpers:CreateStyledButton(mainFrame, nil, 22, 22, "TOPRIGHT", mainFrame, "TOPRIGHT", -7, -7,
-		"UIPanelCloseButton", closeButtonFunc)
-
-	local tabContentContainer = CreateFrame("Frame", nil, mainFrame)
-	tabContentContainer:SetPoint("TOPLEFT", mainFrame, "TOPLEFT", 15, -50)
-	tabContentContainer:SetPoint("BOTTOMRIGHT", mainFrame, "BOTTOMRIGHT", -15, 45)
-
-	local tabButtons = {}
-	mainFrame.tabContentFrames = {}
-	mainFrame.selectedTab = 1
-
-	local function SelectTab(tabIndex)
-		mainFrame.selectedTab = tabIndex
-		for index, button in ipairs(tabButtons) do
-			local contentFrame = mainFrame.tabContentFrames[index]
-			if contentFrame then
-				if index == tabIndex then
-					PanelTemplates_SelectTab(button)
-					contentFrame:Show()
-					if contentFrame.Update then
-						contentFrame:Update(contentFrame)
-					end
-				else
-					PanelTemplates_DeselectTab(button)
-					contentFrame:Hide()
-				end
+	SchlingelInc.UIHelpers:CreateTabSystem(mainFrame, {
+		tabConfig = TAB_CONFIG,
+		namespace = SchlingelInc.SITabs,
+		containerBounds = {top = -50, left = 15, right = -15, bottom = 45},
+		onTabSelect = function(_, contentFrame)
+			if contentFrame.Update then
+				contentFrame:Update(contentFrame)
 			end
 		end
-	end
-
-	local tabButtonWidth = 130
-	local tabButtonSpacing = 5
-	local initialXOffsetForTabs = 20
-
-	for _, config in ipairs(TAB_CONFIG) do
-		local button = CreateFrame("Button", nil, mainFrame, "OptionsFrameTabButtonTemplate")
-		button:SetID(config.id)
-		button:SetText(config.title)
-		button:SetWidth(tabButtonWidth)
-		button:SetPoint("BOTTOMLEFT", mainFrame, "BOTTOMLEFT",
-			initialXOffsetForTabs + (config.id - 1) * (tabButtonWidth + tabButtonSpacing), 12)
-		button:GetFontString():SetPoint("CENTER", 0, 1)
-		button:SetScript("OnClick", function() SelectTab(config.id) end)
-		PanelTemplates_DeselectTab(button)
-		tabButtons[config.id] = button
-
-		local module = SchlingelInc.SITabs[config.module]
-		if module and module.CreateUI then
-			local newTab = module:CreateUI(tabContentContainer)
-			if newTab then
-				newTab:Hide()
-				mainFrame.tabContentFrames[config.id] = newTab
-			end
-		else
-			mainFrame.tabContentFrames[config.id] = CreateFrame("Frame", nil, tabContentContainer)
-			mainFrame.tabContentFrames[config.id]:SetAllPoints()
-			mainFrame.tabContentFrames[config.id]:Hide()
-		end
-	end
+	})
 
 	self.infoWindow = mainFrame
-	if #tabButtons > 0 then
-		SelectTab(1)
-	end
 	mainFrame:Show()
 end
 

@@ -12,21 +12,22 @@ function SchlingelInc.SITabs.Info:CreateUI(parentFrame)
 	local tabFrame = CreateFrame("Frame", nil, parentFrame)
 	tabFrame:SetAllPoints()
 
-	local currentY = -20
 	local leftPadding = 20
 	local contentWidth = parentFrame:GetWidth() - (leftPadding * 2)
 
-	tabFrame.motdLabel = SchlingelInc.UIHelpers:CreateStyledText(tabFrame, "Gilden-MOTD:", "GameFontNormal", "TOPLEFT", tabFrame,
-		"TOPLEFT", leftPadding, currentY)
-	currentY = currentY - tabFrame.motdLabel:GetHeight() - 7
+	tabFrame.motdLabel = SchlingelInc.UIHelpers:CreateLabel(tabFrame, "Gilden-MOTD:", leftPadding, -20)
 
-	tabFrame.motdTextDisplay = SchlingelInc.UIHelpers:CreateStyledText(tabFrame, "Lade MOTD...", "GameFontNormal", "TOPLEFT", tabFrame,
-		"TOPLEFT", leftPadding, currentY, contentWidth, 100, "LEFT", "TOP")
-	currentY = currentY - 120
+	tabFrame.motdTextDisplay = SchlingelInc.UIHelpers:CreateText(tabFrame, {
+		text = "Lade MOTD...",
+		point = {"TOPLEFT", leftPadding, -20 - tabFrame.motdLabel:GetHeight() - 7},
+		width = contentWidth,
+		height = 100,
+		justifyH = "LEFT",
+		justifyV = "TOP"
+	})
 
-	tabFrame.rulesLabel = SchlingelInc.UIHelpers:CreateStyledText(tabFrame, "Regeln der Gilden:", "GameFontNormal", "TOPLEFT",
-		tabFrame, "TOPLEFT", leftPadding, currentY)
-	currentY = currentY - tabFrame.rulesLabel:GetHeight() - 7
+	local rulesY = -20 - tabFrame.motdLabel:GetHeight() - 7 - 120
+	tabFrame.rulesLabel = SchlingelInc.UIHelpers:CreateLabel(tabFrame, "Regeln der Gilden:", leftPadding, rulesY)
 
 	local ruleTextContent = ""
 	for i, value in ipairs(Rulestext) do
@@ -37,8 +38,14 @@ function SchlingelInc.SITabs.Info:CreateUI(parentFrame)
 			ruleTextContent = ruleTextContent .. "\n"
 		end
 	end
-	tabFrame.rulesTextDisplay = SchlingelInc.UIHelpers:CreateStyledText(tabFrame, ruleTextContent, "GameFontNormal", "TOPLEFT",
-		tabFrame, "TOPLEFT", leftPadding, currentY, contentWidth, 150, "LEFT", "TOP")
+	tabFrame.rulesTextDisplay = SchlingelInc.UIHelpers:CreateText(tabFrame, {
+		text = ruleTextContent,
+		point = {"TOPLEFT", leftPadding, rulesY - tabFrame.rulesLabel:GetHeight() - 7},
+		width = contentWidth,
+		height = 150,
+		justifyH = "LEFT",
+		justifyV = "TOP"
+	})
 
 	tabFrame.Update = function(selfTab)
 		local guildMOTD = GetGuildRosterMOTD()

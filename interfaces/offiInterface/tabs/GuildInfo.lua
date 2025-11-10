@@ -8,8 +8,14 @@ function SchlingelInc.Tabs.GuildInfo:CreateUI(parentFrame)
 	local tabFrame = CreateFrame("Frame", nil, parentFrame)
 	tabFrame:SetAllPoints()
 
-	local infoText = SchlingelInc.UIHelpers:CreateStyledText(tabFrame, "Lade Gildeninfos ...", "GameFontNormal",
-		"TOPLEFT", tabFrame, "TOPLEFT", 10, -25, 560, 480, "LEFT", "TOP")
+	local infoText = SchlingelInc.UIHelpers:CreateText(tabFrame, {
+		text = "Lade Gildeninfos ...",
+		point = {"TOPLEFT", 10, -25},
+		width = 560,
+		height = 480,
+		justifyH = "LEFT",
+		justifyV = "TOP"
+	})
 
 	self.InfoText = infoText
 	self:UpdateData()

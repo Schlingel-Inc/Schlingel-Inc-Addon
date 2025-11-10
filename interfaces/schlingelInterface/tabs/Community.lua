@@ -15,63 +15,66 @@ function SchlingelInc.SITabs.Community:CreateUI(parentFrame)
 	local currentY_Buttons = currentY_Labels - 30
 
 	-- Column 1: Guild Join
-	SchlingelInc.UIHelpers:CreateStyledText(tabFrame, "Gildenbeitritt:", "GameFontNormal", "TOPLEFT", tabFrame, "TOPLEFT", col1X,
-		currentY_Labels)
+	SchlingelInc.UIHelpers:CreateLabel(tabFrame, "Gildenbeitritt:", col1X, currentY_Labels)
 	local currentY_Col1_Buttons = currentY_Buttons
 
-	local joinMainGuildBtnFunc = function()
-		SchlingelInc.GuildRecruitment:SendGuildRequest()
-	end
-	SchlingelInc.UIHelpers:CreateStyledButton(tabFrame, "Schlingel Inc beitreten", buttonWidth, buttonHeight, "TOPLEFT", tabFrame,
-		"TOPLEFT", col1X, currentY_Col1_Buttons, "UIPanelButtonTemplate", joinMainGuildBtnFunc)
+	SchlingelInc.UIHelpers:CreateActionButton(tabFrame, "Schlingel Inc beitreten",
+		function() SchlingelInc.GuildRecruitment:SendGuildRequest() end,
+		col1X, currentY_Col1_Buttons, buttonWidth, buttonHeight)
 	currentY_Col1_Buttons = currentY_Col1_Buttons - buttonHeight - buttonSpacingY
 
 	-- Column 2: Channels
-	SchlingelInc.UIHelpers:CreateStyledText(tabFrame, "Chatkanäle:", "GameFontNormal", "TOPLEFT", tabFrame, "TOPLEFT", col2X,
-		currentY_Labels)
+	SchlingelInc.UIHelpers:CreateLabel(tabFrame, "Chatkanäle:", col2X, currentY_Labels)
 	local currentY_Col2_Buttons = currentY_Buttons
 
-	local leaveChannelsBtnFunc = function()
-		local channelsToLeave = {
-			"Allgemein", "General", "Handel", "Trade",
-			"LokaleVerteidigung", "LocalDefense",
-			"SucheNachGruppe", "LookingForGroup",
-			"WeltVerteidigung", "WorldDefense"
-		}
+	SchlingelInc.UIHelpers:CreateActionButton(tabFrame, "Globale Kanäle verlassen",
+		function()
+			local channelsToLeave = {
+				"Allgemein", "General", "Handel", "Trade",
+				"LokaleVerteidigung", "LocalDefense",
+				"SucheNachGruppe", "LookingForGroup",
+				"WeltVerteidigung", "WorldDefense"
+			}
 
-		for _, channelName in ipairs(channelsToLeave) do
-			LeaveChannelByName(channelName)
-		end
+			for _, channelName in ipairs(channelsToLeave) do
+				LeaveChannelByName(channelName)
+			end
 
-		SchlingelInc:Print("Globale Kanäle verlassen.")
-	end
-
-	SchlingelInc.UIHelpers:CreateStyledButton(tabFrame, "Globale Kanäle verlassen", buttonWidth, buttonHeight, "TOPLEFT",
-		tabFrame, "TOPLEFT", col2X, currentY_Col2_Buttons, "UIPanelButtonTemplate", leaveChannelsBtnFunc)
+			SchlingelInc:Print("Globale Kanäle verlassen.")
+		end,
+		col2X, currentY_Col2_Buttons, buttonWidth, buttonHeight)
 	currentY_Col2_Buttons = currentY_Col2_Buttons - buttonHeight - buttonSpacingY
 
-	local joinChannelsBtnFunc = function()
-		if not ChatFrame1 then
-			return
-		end
-		local cID = ChatFrame1:GetID()
-		JoinChannelByName("SchlingelTrade", nil, cID, false)
-		JoinChannelByName("SchlingelGroup", nil, cID, false)
-		SchlingelInc:Print("Versuche Schlingel-Chats beizutreten.")
-	end
-	SchlingelInc.UIHelpers:CreateStyledButton(tabFrame, "Schlingel-Chats beitreten", buttonWidth, buttonHeight, "TOPLEFT",
-		tabFrame, "TOPLEFT", col2X, currentY_Col2_Buttons, "UIPanelButtonTemplate", joinChannelsBtnFunc)
+	SchlingelInc.UIHelpers:CreateActionButton(tabFrame, "Schlingel-Chats beitreten",
+		function()
+			if not ChatFrame1 then
+				return
+			end
+			local cID = ChatFrame1:GetID()
+			JoinChannelByName("SchlingelTrade", nil, cID, false)
+			JoinChannelByName("SchlingelGroup", nil, cID, false)
+			SchlingelInc:Print("Versuche Schlingel-Chats beizutreten.")
+		end,
+		col2X, currentY_Col2_Buttons, buttonWidth, buttonHeight)
 
 	-- Info section
 	local infoY = math.min(currentY_Col1_Buttons, currentY_Col2_Buttons) - buttonHeight - (buttonSpacingY * 2)
 	local infoWidth = (buttonWidth * 2) + 30
 
-	tabFrame.discordText = SchlingelInc.UIHelpers:CreateStyledText(tabFrame, "Discord: ...", "GameFontNormal",
-		"TOPLEFT", tabFrame, "TOPLEFT", col1X, infoY, infoWidth, nil, "CENTER")
+	tabFrame.discordText = SchlingelInc.UIHelpers:CreateText(tabFrame, {
+		text = "Discord: ...",
+		point = {"TOPLEFT", col1X, infoY},
+		width = infoWidth,
+		justifyH = "CENTER"
+	})
 	infoY = infoY - 25
 
-	tabFrame.versionText = SchlingelInc.UIHelpers:CreateStyledText(tabFrame, "Version: ...", "GameFontNormal",
-		"TOPLEFT", tabFrame, "TOPLEFT", col1X, infoY, infoWidth, nil, "CENTER")
+	tabFrame.versionText = SchlingelInc.UIHelpers:CreateText(tabFrame, {
+		text = "Version: ...",
+		point = {"TOPLEFT", col1X, infoY},
+		width = infoWidth,
+		justifyH = "CENTER"
+	})
 
 	tabFrame.Update = function(selfTab)
 		selfTab.discordText:SetText("Discord: " .. (SchlingelInc.discordLink or "N/A"))

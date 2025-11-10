@@ -11,18 +11,16 @@ function SchlingelInc.Tabs.Inactivity:CreateUI(parentFrame)
 	tabFrame:SetAllPoints()
 
 	local titleText = string.format("Inaktive Mitglieder (> %d Tage)", SchlingelInc.Constants.INACTIVE_DAYS_THRESHOLD)
-	SchlingelInc.UIHelpers:CreateStyledText(tabFrame, titleText, "GameFontNormal",
-		"TOPLEFT", tabFrame, "TOPLEFT", 10, -20)
+	SchlingelInc.UIHelpers:CreateLabel(tabFrame, titleText, 10, -20)
 
-	local scrollFrame = CreateFrame("ScrollFrame", nil, tabFrame, "UIPanelScrollFrameTemplate")
-	scrollFrame:SetSize(560, 350)
-	scrollFrame:SetPoint("TOPLEFT", 10, -45)
+	local scrollFrame, scrollChild = SchlingelInc.UIHelpers:CreateScrollFrame(tabFrame, {
+		width = 560,
+		height = 350,
+		point = {"TOPLEFT", 10, -45},
+		childWidth = 560 - 10,
+		childHeight = 1
+	})
 	self.scrollFrame = scrollFrame
-
-	local scrollChild = CreateFrame("Frame", nil, scrollFrame)
-	scrollFrame:SetScrollChild(scrollChild)
-	scrollChild:SetWidth(scrollFrame:GetWidth() - 10)
-	scrollChild:SetHeight(1)
 	self.scrollChild = scrollChild
 
 	-- Column Headers

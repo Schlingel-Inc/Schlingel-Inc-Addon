@@ -23,71 +23,36 @@ function SchlingelInc.SITabs.Character:CreateUI(parentFrame)
 	contentFrame:SetPoint("TOPLEFT", 20, -20)
 	contentFrame:SetPoint("BOTTOMRIGHT", -20, 20)
 
-	local xCol1 = 0
-	local xCol2 = contentFrame:GetWidth() * 0.55
-	local lineHeight = 22
-	local currentY_Col1 = 0
-	local currentY_Col2 = 0
+	local col1, col2 = SchlingelInc.UIHelpers:CreateTwoColumnLayout(contentFrame, {
+		leftX = 0,
+		rightX = contentFrame:GetWidth() * 0.55,
+		startY = 0,
+		lineHeight = 22
+	})
 
 	-- Column 1
-	tabFrame.playerNameText = SchlingelInc.UIHelpers:CreateStyledText(contentFrame, "Name: ...", "GameFontNormal", "TOPLEFT",
-		contentFrame, "TOPLEFT", xCol1, currentY_Col1)
-	currentY_Col1 = currentY_Col1 - lineHeight
-	tabFrame.levelText = SchlingelInc.UIHelpers:CreateStyledText(contentFrame, "Level: ...", "GameFontNormal", "TOPLEFT", contentFrame,
-		"TOPLEFT", xCol1, currentY_Col1)
-	currentY_Col1 = currentY_Col1 - lineHeight
-	tabFrame.classText = SchlingelInc.UIHelpers:CreateStyledText(contentFrame, "Klasse: ...", "GameFontNormal", "TOPLEFT",
-		contentFrame, "TOPLEFT", xCol1, currentY_Col1)
-	currentY_Col1 = currentY_Col1 - lineHeight
-	tabFrame.raceText = SchlingelInc.UIHelpers:CreateStyledText(contentFrame, "Rasse: ...", "GameFontNormal", "TOPLEFT", contentFrame,
-		"TOPLEFT", xCol1, currentY_Col1)
-	currentY_Col1 = currentY_Col1 - lineHeight
-	tabFrame.zoneText = SchlingelInc.UIHelpers:CreateStyledText(contentFrame, "Zone: ...", "GameFontNormal", "TOPLEFT", contentFrame,
-		"TOPLEFT", xCol1, currentY_Col1)
-	currentY_Col1 = currentY_Col1 - lineHeight
-	tabFrame.deathCountText = SchlingelInc.UIHelpers:CreateStyledText(contentFrame, "Tode: ...", "GameFontNormal", "TOPLEFT",
-		contentFrame, "TOPLEFT", xCol1, currentY_Col1)
+	tabFrame.playerNameText = col1:AddLabel("Name: ...")
+	tabFrame.levelText = col1:AddLabel("Level: ...")
+	tabFrame.classText = col1:AddLabel("Klasse: ...")
+	tabFrame.raceText = col1:AddLabel("Rasse: ...")
+	tabFrame.zoneText = col1:AddLabel("Zone: ...")
+	tabFrame.deathCountText = col1:AddLabel("Tode: ...")
 
 	-- Column 2
-	tabFrame.moneyText = SchlingelInc.UIHelpers:CreateStyledText(contentFrame, "Geld: ...", "GameFontNormal", "TOPLEFT", contentFrame,
-		"TOPLEFT", xCol2, currentY_Col2)
-	currentY_Col2 = currentY_Col2 - lineHeight
-	tabFrame.xpText = SchlingelInc.UIHelpers:CreateStyledText(contentFrame, "XP: ...", "GameFontNormal", "TOPLEFT", contentFrame,
-		"TOPLEFT", xCol2, currentY_Col2)
-	currentY_Col2 = currentY_Col2 - lineHeight
-	tabFrame.timePlayedTotalText = SchlingelInc.UIHelpers:CreateStyledText(contentFrame, "Spielzeit (Gesamt): Lade...",
-		"GameFontNormal", "TOPLEFT", contentFrame, "TOPLEFT", xCol2, currentY_Col2)
-	currentY_Col2 = currentY_Col2 - lineHeight
-	tabFrame.timePlayedLevelText = SchlingelInc.UIHelpers:CreateStyledText(contentFrame, "Spielzeit (Level): Lade...",
-		"GameFontNormal", "TOPLEFT", contentFrame, "TOPLEFT", xCol2, currentY_Col2)
+	tabFrame.moneyText = col2:AddLabel("Geld: ...")
+	tabFrame.xpText = col2:AddLabel("XP: ...")
+	tabFrame.timePlayedTotalText = col2:AddLabel("Spielzeit (Gesamt): Lade...")
+	tabFrame.timePlayedLevelText = col2:AddLabel("Spielzeit (Level): Lade...")
 
-	-- Guild Info
-	local guildYStart = math.min(currentY_Col1, currentY_Col2) - (lineHeight * 2)
-	tabFrame.guildNameText = SchlingelInc.UIHelpers:CreateStyledText(contentFrame, "Gilde: ...", "GameFontNormal", "TOPLEFT",
-		contentFrame, "TOPLEFT", xCol1, guildYStart)
-	guildYStart = guildYStart - lineHeight
-	tabFrame.guildRankText = SchlingelInc.UIHelpers:CreateStyledText(contentFrame, "Gildenrang: ...", "GameFontNormal", "TOPLEFT",
-		contentFrame, "TOPLEFT", xCol1, guildYStart)
-	guildYStart = guildYStart - lineHeight
-	tabFrame.guildMembersText = SchlingelInc.UIHelpers:CreateStyledText(contentFrame, "Mitglieder: ...", "GameFontNormal", "TOPLEFT",
-		contentFrame, "TOPLEFT", xCol1, guildYStart)
+	-- Guild Info (below both columns)
+	local guildYStart = math.min(col1:GetCurrentY(), col2:GetCurrentY()) - 22
+	tabFrame.guildNameText = SchlingelInc.UIHelpers:CreateLabel(contentFrame, "Gilde: ...", 0, guildYStart)
+	guildYStart = guildYStart - 22
+	tabFrame.guildRankText = SchlingelInc.UIHelpers:CreateLabel(contentFrame, "Gildenrang: ...", 0, guildYStart)
+	guildYStart = guildYStart - 22
+	tabFrame.guildMembersText = SchlingelInc.UIHelpers:CreateLabel(contentFrame, "Mitglieder: ...", 0, guildYStart)
 
 	tabFrame.Update = function(selfTab)
-		xCol2 = contentFrame:GetWidth() * 0.55
-		selfTab.moneyText:ClearAllPoints()
-		selfTab.moneyText:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", xCol2, 0)
-
-		local currentY_Col2_Update = 0 - lineHeight
-		selfTab.xpText:ClearAllPoints()
-		selfTab.xpText:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", xCol2, currentY_Col2_Update)
-
-		currentY_Col2_Update = currentY_Col2_Update - lineHeight
-		selfTab.timePlayedTotalText:ClearAllPoints()
-		selfTab.timePlayedTotalText:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", xCol2, currentY_Col2_Update)
-
-		currentY_Col2_Update = currentY_Col2_Update - lineHeight
-		selfTab.timePlayedLevelText:ClearAllPoints()
-		selfTab.timePlayedLevelText:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", xCol2, currentY_Col2_Update)
 
 		local pName = UnitName("player") or "Unbekannt"
 		local pLevel = UnitLevel("player") or 0
