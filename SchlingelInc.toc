@@ -29,7 +29,10 @@ interfaces\offiInterface\tabs\GuildInfo.lua
 interfaces\offiInterface\tabs\Stats.lua
 interfaces\offiInterface\tabs\Inactivity.lua
 interfaces\offiInterface\OffiInterface.lua
-interfaces\SchlingelInterface.lua
+interfaces\schlingelInterface\tabs\Character.lua
+interfaces\schlingelInterface\tabs\Info.lua
+interfaces\schlingelInterface\tabs\Community.lua
+interfaces\schlingelInterface\SchlingelInterface.lua
 interfaces\PvPFrame.lua
 Death.lua
 Main.lua
