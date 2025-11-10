@@ -17,7 +17,7 @@ function SchlingelInc:CreateMiniDeathLog()
     frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
     frame:SetFrameStrata("MEDIUM")
 
-    local title = self.UIHelpers:CreateStyledText(frame, "Letzte Tode (Klick für Details)", FONT_NORMAL, "TOP", frame, "TOP", 0, -15)
+    local title = self.UIHelpers:CreateStyledText(frame, "Letzte Tode", FONT_NORMAL, "TOP", frame, "TOP", 0, -15)
     title:SetTextColor(1, 0.85, 0.1)
 
     local headers = { "Name", "Klasse", "Level" }
