@@ -76,5 +76,13 @@ SchlingelInc.Constants.BACKDROP = {
 	insets = { left = 11, right = 12, top = 12, bottom = 11 }
 }
 
+--Pop Up Backdrop Settings
+SchlingelInc.Constans.POPUPBACKDROP = {
+	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+	tile = true, tileSize = 16, edgeSize = 16,
+	insets = { left = 4, right = 4, top = 4, bottom = 4 }
+}
+
 -- Inaktivitätsschwelle (Tage)
 SchlingelInc.Constants.INACTIVE_DAYS_THRESHOLD = 10

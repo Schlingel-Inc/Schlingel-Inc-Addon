@@ -1,15 +1,5 @@
 local FONT_NORMAL = "GameFontNormal"
 local FONT_SMALL = "GameFontNormalSmall"
-local FONT_HIGHLIGHT_LARGE = "GameFontHighlightLarge"
-
--- Standard-Hintergrundeinstellungen für Frames
-local BACKDROP_SETTINGS = {
-    bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-    tile = true,
-    tileSize = 32,
-    edgeSize = 32,
-    insets = { left = 11, right = 12, top = 12, bottom = 11 }
-}
 
 function SchlingelInc:CreateMiniDeathLog()
     if self.MiniDeathLogFrame then return end
@@ -17,7 +7,7 @@ function SchlingelInc:CreateMiniDeathLog()
     local frame = CreateFrame("Frame", "MiniDeathLog", UIParent, "BackdropTemplate")
     frame:SetSize(360, 200)
     frame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 40, 60)
-    frame:SetBackdrop(BACKDROP_SETTINGS)
+    frame:SetBackdrop(SchlingelInc.Constants.BACKDROP)
     frame:SetBackdropColor(0, 0, 0, 0.8)
     frame:SetBackdropBorderColor(0.4, 0.4, 0.4)
     frame:SetMovable(true)
