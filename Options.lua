@@ -27,12 +27,6 @@ local UIOptions =
         value = true,
     },
     {
-        label = "Todeslog",
-        description = "Aktiviert den Todeslog",
-        variable = "deathlog",
-        value = false,
-    },
-    {
         label = "Version anzeigen",
         description = "Zeigt die Versionen der Spieler:innen im Gildenchat an",
         variable = "show_version",

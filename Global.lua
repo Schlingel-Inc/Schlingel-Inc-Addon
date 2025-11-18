@@ -215,11 +215,9 @@ if LDB then                                                                -- F�
                 end
             elseif button == "RightButton" then
                 if CanGuildInvite() then
-                    if SchlingelInc.ToggleOffiWindow then
-                        SchlingelInc:ToggleOffiWindow()
+                    if SchlingelInc.ToggleInactivityWindow then
+                        SchlingelInc:ToggleInactivityWindow()
                     end
-                else
-                    return
                 end
             end
         end,
@@ -232,7 +230,7 @@ if LDB then                                                                -- F�
             GameTooltip:AddLine("Linksklick: Info anzeigen", 1, 1, 1)                          -- Hinweis für Linksklick.
             GameTooltip:AddLine("Shift + Linksklick: Deathlog", 1, 1, 1)                       -- Hinweis für Shift + Linksklick.
             if CanGuildInvite() then
-                GameTooltip:AddLine("Rechtsklick: Offi-Fenster", 0.8, 0.8, 0.8)                -- Hinweis für Rechtsklick.
+                GameTooltip:AddLine("Rechtsklick: Inaktive Mitglieder", 0.8, 0.8, 0.8)         -- Hinweis für Rechtsklick.
             end
             GameTooltip:Show()                                                                 -- Zeigt den Tooltip an.
         end,
