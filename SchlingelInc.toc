@@ -24,8 +24,8 @@ LevelUp.lua
 interfaces\popups\DeathAnnouncement.lua
 interfaces\Deathlog.lua
 interfaces\popups\GuildInvites.lua
-interfaces\offiInterface\OffiInterface.lua
-interfaces\schlingelInterface\SchlingelInterface.lua
+interfaces\OffiInterface.lua
+interfaces\SchlingelInterface.lua
 interfaces\popups\PvPFrame.lua
 Death.lua
 Main.lua

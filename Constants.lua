@@ -77,7 +77,7 @@ SchlingelInc.Constants.BACKDROP = {
 }
 
 --Pop Up Backdrop Settings
-SchlingelInc.Constans.POPUPBACKDROP = {
+SchlingelInc.Constants.POPUPBACKDROP = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 	tile = true, tileSize = 16, edgeSize = 16,

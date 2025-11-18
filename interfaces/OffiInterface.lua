@@ -339,10 +339,12 @@ function SchlingelInc:CreateOffiWindow()
 		end
 
 		-- Calculate total scroll height
-		local totalHeight = math.max(
+		-- Account for: avg level (60) + stats header (30) + stats content + inactive header (30) + inactive table header (20) + inactive rows + padding (50)
+		local statsHeight = math.max(
 			offiFrame.classStatsText:GetStringHeight(),
 			offiFrame.levelRankStatsText:GetStringHeight()
-		) + offiFrame.inactiveContainer:GetHeight() + 500
+		)
+		local totalHeight = 60 + 30 + statsHeight + 30 + 20 + offiFrame.inactiveContainer:GetHeight() + 50
 
 		scrollChild:SetHeight(math.max(scrollFrame:GetHeight(), totalHeight))
 		scrollFrame:SetVerticalScroll(0)
