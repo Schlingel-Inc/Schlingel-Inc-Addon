@@ -39,15 +39,21 @@ local function HandleAcceptClick()
     SchlingelInc.GuildRecruitment:HandleAcceptRequest(InviteMessageFrame.playerName)
     SchlingelInc.GuildInvites:HideInviteMessage()
 end
-SchlingelInc.UIHelpers:CreateStyledButton(InviteMessageFrame, "Annehmen", 75, 25, "CENTER", InviteMessageFrame,
-    "CENTER", -50, -25, "UIPanelButtonTemplate", HandleAcceptClick)
+local acceptBtn = CreateFrame("Button", nil, InviteMessageFrame, "UIPanelButtonTemplate")
+acceptBtn:SetSize(75, 25)
+acceptBtn:SetPoint("CENTER", InviteMessageFrame, "CENTER", -50, -25)
+acceptBtn:SetText("Annehmen")
+acceptBtn:SetScript("OnClick", HandleAcceptClick)
 
 local function HandleDeclineClick()
     SchlingelInc.GuildRecruitment:HandleDeclineRequest(InviteMessageFrame.playerName)
     SchlingelInc.GuildInvites:HideInviteMessage()
 end
-SchlingelInc.UIHelpers:CreateStyledButton(InviteMessageFrame, "Ablehnen", 75, 25, "CENTER", InviteMessageFrame,
-    "CENTER", 50, -25, "UIPanelButtonTemplate", HandleDeclineClick)
+local declineBtn = CreateFrame("Button", nil, InviteMessageFrame, "UIPanelButtonTemplate")
+declineBtn:SetSize(75, 25)
+declineBtn:SetPoint("CENTER", InviteMessageFrame, "CENTER", 50, -25)
+declineBtn:SetText("Ablehnen")
+declineBtn:SetScript("OnClick", HandleDeclineClick)
 
 -- Animation vorbereiten
 local animGroup = InviteMessageFrame:CreateAnimationGroup()

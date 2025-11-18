@@ -23,15 +23,8 @@ GuildRecruitment.lua
 LevelUp.lua
 interfaces\popups\DeathAnnouncement.lua
 interfaces\Deathlog.lua
-interfaces\UIHelpers.lua
 interfaces\popups\GuildInvites.lua
-interfaces\offiInterface\tabs\GuildInfo.lua
-interfaces\offiInterface\tabs\Stats.lua
-interfaces\offiInterface\tabs\Inactivity.lua
 interfaces\offiInterface\OffiInterface.lua
-interfaces\schlingelInterface\tabs\Character.lua
-interfaces\schlingelInterface\tabs\Info.lua
-interfaces\schlingelInterface\tabs\Community.lua
 interfaces\schlingelInterface\SchlingelInterface.lua
 interfaces\popups\PvPFrame.lua
 Death.lua
