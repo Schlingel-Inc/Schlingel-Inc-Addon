@@ -16,11 +16,14 @@ end
 function SchlingelInc:CreateInfoWindow()
 	if self.infoWindow then
 		self.infoWindow:Show()
+		if self.infoWindow.Update then
+			self.infoWindow:Update()
+		end
 		return
 	end
 
 	local mainFrame = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
-	mainFrame:SetSize(600, 500)
+	mainFrame:SetSize(500, 320)
 	mainFrame:SetPoint("CENTER")
 	mainFrame:SetBackdrop(SchlingelInc.Constants.BACKDROP)
 	mainFrame:SetMovable(true)
@@ -42,98 +45,75 @@ function SchlingelInc:CreateInfoWindow()
 	closeBtn:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -7, -7)
 	closeBtn:SetScript("OnClick", function() mainFrame:Hide() end)
 
-	-- Create scroll frame
-	local scrollFrame = CreateFrame("ScrollFrame", nil, mainFrame, "UIPanelScrollFrameTemplate")
-	scrollFrame:SetPoint("TOPLEFT", mainFrame, "TOPLEFT", 20, -50)
-	scrollFrame:SetPoint("BOTTOMRIGHT", mainFrame, "BOTTOMRIGHT", -30, 20)
+	-- Content Frame
+	local contentFrame = CreateFrame("Frame", nil, mainFrame)
+	contentFrame:SetPoint("TOPLEFT", 15, -45)
+	contentFrame:SetPoint("BOTTOMRIGHT", -15, 15)
 
-	local scrollChild = CreateFrame("Frame", nil, scrollFrame)
-	scrollChild:SetWidth(scrollFrame:GetWidth() - 20)
-	scrollChild:SetHeight(1)
-	scrollFrame:SetScrollChild(scrollChild)
+	local yOffset = -5
 
-	local yOffset = -10
-
-	-- Statistics Section
-	local statsHeader = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-	statsHeader:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 0, yOffset)
-	statsHeader:SetText("|cffffff00Statistiken|r")
-	yOffset = yOffset - 25
-
-	mainFrame.deathCountText = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	mainFrame.deathCountText:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 10, yOffset)
-	mainFrame.deathCountText:SetText("Tode: ...")
-	yOffset = yOffset - 20
-
-	mainFrame.timePlayedTotalText = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	mainFrame.timePlayedTotalText:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 10, yOffset)
-	mainFrame.timePlayedTotalText:SetText("Spielzeit (Gesamt): Lade...")
-	yOffset = yOffset - 20
-
-	mainFrame.timePlayedLevelText = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	mainFrame.timePlayedLevelText:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 10, yOffset)
-	mainFrame.timePlayedLevelText:SetText("Spielzeit (Level): Lade...")
-	yOffset = yOffset - 30
-
-	-- Guild Rules Section
-	local rulesHeader = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-	rulesHeader:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 0, yOffset)
+	-- Guild Rules Section (at top)
+	local rulesHeader = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+	rulesHeader:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", 0, yOffset)
 	rulesHeader:SetText("|cffffff00Gildenregeln|r")
-	yOffset = yOffset - 25
+	yOffset = yOffset - 20
 
-	local rulesText = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	rulesText:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 10, yOffset)
-	rulesText:SetWidth(scrollChild:GetWidth() - 20)
+	local rulesText = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	rulesText:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", 5, yOffset)
+	rulesText:SetWidth(contentFrame:GetWidth() - 10)
 	rulesText:SetJustifyH("LEFT")
 	rulesText:SetJustifyV("TOP")
 	rulesText:SetText(
-		"• Die Nutzung des Briefkastens ist verboten!\n\n" ..
-		"• Die Nutzung des Auktionshauses ist verboten!\n\n" ..
-		"• Handeln mit Spielern außerhalb der Gilden ist verboten!"
+		"• Briefkasten verboten\n" ..
+		"• Auktionshaus verboten\n" ..
+		"• Handeln außerhalb der Gilden verboten"
 	)
-	yOffset = yOffset - rulesText:GetStringHeight() - 30
+	yOffset = yOffset - rulesText:GetStringHeight() - 20
 
 	-- Guild MOTD Section
-	local motdHeader = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-	motdHeader:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 0, yOffset)
+	local motdHeader = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+	motdHeader:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", 0, yOffset)
 	motdHeader:SetText("|cffffff00Gilden-MOTD|r")
-	yOffset = yOffset - 25
+	yOffset = yOffset - 20
 
-	mainFrame.motdText = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	mainFrame.motdText:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 10, yOffset)
-	mainFrame.motdText:SetWidth(scrollChild:GetWidth() - 20)
+	mainFrame.motdText = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	mainFrame.motdText:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", 5, yOffset)
+	mainFrame.motdText:SetWidth(contentFrame:GetWidth() - 10)
 	mainFrame.motdText:SetJustifyH("LEFT")
 	mainFrame.motdText:SetJustifyV("TOP")
 	mainFrame.motdText:SetText("Lade MOTD...")
-	yOffset = yOffset - 60
+	yOffset = yOffset - 35
 
-	-- Community Buttons Section
-	local communityHeader = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-	communityHeader:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 0, yOffset)
+	-- Two-column layout: Buttons (left) and Statistics (right)
+	local leftColumnX = 5
+	local rightColumnX = 245
+	local columnStartY = yOffset
+
+	-- Left Column: Community Buttons
+	local communityHeader = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+	communityHeader:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", leftColumnX, columnStartY)
 	communityHeader:SetText("|cffffff00Community|r")
-	yOffset = yOffset - 30
+	yOffset = columnStartY - 25
 
-	local buttonWidth = 250
-	local buttonHeight = 30
-	local buttonSpacing = 10
-	local centerX = (scrollChild:GetWidth() - buttonWidth) / 2
+	local buttonWidth = 220
+	local buttonHeight = 26
+	local buttonSpacing = 8
 
-	-- Guild Join Button
-	local guildJoinBtn = CreateFrame("Button", nil, scrollChild, "UIPanelButtonTemplate")
-	guildJoinBtn:SetSize(buttonWidth, buttonHeight)
-	guildJoinBtn:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", centerX, yOffset)
-	guildJoinBtn:SetText("Schlingel Inc beitreten")
-	guildJoinBtn:SetScript("OnClick", function()
+	-- Guild Join Button (only show if not in guild)
+	mainFrame.guildJoinBtn = CreateFrame("Button", nil, contentFrame, "UIPanelButtonTemplate")
+	mainFrame.guildJoinBtn:SetSize(buttonWidth, buttonHeight)
+	mainFrame.guildJoinBtn:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", leftColumnX, yOffset)
+	mainFrame.guildJoinBtn:SetText("Schlingel Inc beitreten")
+	mainFrame.guildJoinBtn:SetScript("OnClick", function()
 		SchlingelInc.GuildRecruitment:SendGuildRequest()
 	end)
-	yOffset = yOffset - buttonHeight - buttonSpacing
 
-	-- Leave Global Channels Button
-	local leaveChannelsBtn = CreateFrame("Button", nil, scrollChild, "UIPanelButtonTemplate")
-	leaveChannelsBtn:SetSize(buttonWidth, buttonHeight)
-	leaveChannelsBtn:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", centerX, yOffset)
-	leaveChannelsBtn:SetText("Globale Kanäle verlassen")
-	leaveChannelsBtn:SetScript("OnClick", function()
+	-- Leave Global Channels Button (only show if in guild)
+	mainFrame.leaveChannelsBtn = CreateFrame("Button", nil, contentFrame, "UIPanelButtonTemplate")
+	mainFrame.leaveChannelsBtn:SetSize(buttonWidth, buttonHeight)
+	mainFrame.leaveChannelsBtn:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", leftColumnX, yOffset)
+	mainFrame.leaveChannelsBtn:SetText("Globale Kanäle verlassen")
+	mainFrame.leaveChannelsBtn:SetScript("OnClick", function()
 		local channelsToLeave = {
 			"Allgemein", "General", "Handel", "Trade",
 			"LokaleVerteidigung", "LocalDefense",
@@ -147,37 +127,40 @@ function SchlingelInc:CreateInfoWindow()
 	end)
 	yOffset = yOffset - buttonHeight - buttonSpacing
 
-	-- Join Schlingel Channels Button
-	local joinSchlingelBtn = CreateFrame("Button", nil, scrollChild, "UIPanelButtonTemplate")
-	joinSchlingelBtn:SetSize(buttonWidth, buttonHeight)
-	joinSchlingelBtn:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", centerX, yOffset)
-	joinSchlingelBtn:SetText("Schlingel-Chats beitreten")
-	joinSchlingelBtn:SetScript("OnClick", function()
+	-- Join Schlingel Channels Button (only show if in guild)
+	mainFrame.joinSchlingelBtn = CreateFrame("Button", nil, contentFrame, "UIPanelButtonTemplate")
+	mainFrame.joinSchlingelBtn:SetSize(buttonWidth, buttonHeight)
+	mainFrame.joinSchlingelBtn:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", leftColumnX, yOffset)
+	mainFrame.joinSchlingelBtn:SetText("Schlingel-Chats beitreten")
+	mainFrame.joinSchlingelBtn:SetScript("OnClick", function()
 		if not ChatFrame1 then return end
 		local cID = ChatFrame1:GetID()
 		JoinChannelByName("SchlingelTrade", nil, cID, false)
 		JoinChannelByName("SchlingelGroup", nil, cID, false)
 		SchlingelInc:Print("Versuche Schlingel-Chats beizutreten.")
 	end)
-	yOffset = yOffset - buttonHeight - 20
 
-	-- Info Section (Discord and Version)
-	mainFrame.discordText = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	mainFrame.discordText:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", centerX, yOffset)
-	mainFrame.discordText:SetWidth(scrollChild:GetWidth() - (centerX * 2))
-	mainFrame.discordText:SetJustifyH("CENTER")
-	mainFrame.discordText:SetText("Discord: ...")
-	yOffset = yOffset - 20
+	-- Right Column: Statistics
+	local statsYOffset = columnStartY
 
-	mainFrame.versionText = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	mainFrame.versionText:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", centerX, yOffset)
-	mainFrame.versionText:SetWidth(scrollChild:GetWidth() - (centerX * 2))
-	mainFrame.versionText:SetJustifyH("CENTER")
-	mainFrame.versionText:SetText("Version: ...")
-	yOffset = yOffset - 20
+	local statsHeader = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+	statsHeader:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", rightColumnX, statsYOffset)
+	statsHeader:SetText("|cffffff00Statistiken|r")
+	statsYOffset = statsYOffset - 20
 
-	-- Set scroll child height based on content
-	scrollChild:SetHeight(math.abs(yOffset) + 20)
+	mainFrame.deathCountText = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	mainFrame.deathCountText:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", rightColumnX, statsYOffset)
+	mainFrame.deathCountText:SetText("Tode: ...")
+	statsYOffset = statsYOffset - 18
+
+	mainFrame.timePlayedTotalText = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	mainFrame.timePlayedTotalText:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", rightColumnX, statsYOffset)
+	mainFrame.timePlayedTotalText:SetText("Spielzeit (Gesamt): Lade...")
+	statsYOffset = statsYOffset - 18
+
+	mainFrame.timePlayedLevelText = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	mainFrame.timePlayedLevelText:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", rightColumnX, statsYOffset)
+	mainFrame.timePlayedLevelText:SetText("Spielzeit (Level): Lade...")
 
 	-- Update function
 	local function UpdateWindow()
@@ -199,12 +182,21 @@ function SchlingelInc:CreateInfoWindow()
 			mainFrame.motdText:SetText("Keine Gilden-MOTD festgelegt.")
 		end
 
-		-- Discord and Version
-		mainFrame.discordText:SetText("Discord: " .. (SchlingelInc.discordLink or "N/A"))
-		mainFrame.versionText:SetText("Version: " .. (SchlingelInc.version or "N/A"))
-
-		-- Reset scroll position to top
-		scrollFrame:SetVerticalScroll(0)
+		-- Show/hide buttons and resize window based on guild membership
+		local guildName = GetGuildInfo("player")
+		if guildName then
+			-- In guild: show chat buttons, hide join button
+			mainFrame.guildJoinBtn:Hide()
+			mainFrame.leaveChannelsBtn:Show()
+			mainFrame.joinSchlingelBtn:Show()
+			mainFrame:SetSize(500, 320)
+		else
+			-- Not in guild: show join button, hide chat buttons
+			mainFrame.guildJoinBtn:Show()
+			mainFrame.leaveChannelsBtn:Hide()
+			mainFrame.joinSchlingelBtn:Hide()
+			mainFrame:SetSize(500, 260)
+		end
 	end
 
 	mainFrame.Update = UpdateWindow
