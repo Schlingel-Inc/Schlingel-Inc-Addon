@@ -3,11 +3,11 @@
 
 SchlingelInc.Constants = {}
 
--- Maximales Level (TBC = 70)
-SchlingelInc.Constants.MAX_LEVEL = 70
+-- Maximales Level (Classic Era = 60)
+SchlingelInc.Constants.MAX_LEVEL = 60
 
 -- Level Meilensteine für Ankündigungen
-SchlingelInc.Constants.LEVEL_MILESTONES = {10, 20, 30, 40, 50, 60, 70}
+SchlingelInc.Constants.LEVEL_MILESTONES = {10, 20, 30, 40, 50, 60}
 
 -- Instanz-Typen
 SchlingelInc.Constants.INSTANCE_TYPES = {
