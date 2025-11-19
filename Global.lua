@@ -134,11 +134,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", function(self, event, msg, sen
 end)
 
 -- Entfernt den Realm-Namen von einem vollständigen Spielernamen (z.B. "Spieler-Realm" -> "Spieler").
+-- Verwendet die Blizzard API Funktion Ambiguate.
 function SchlingelInc:RemoveRealmFromName(fullName)
-    local dashPosition = string.find(fullName, "-")      -- Findet die Position des Bindestrichs.
-    if dashPosition then
-        return string.sub(fullName, 1, dashPosition - 1) -- Gibt den Teil vor dem Bindestrich zurück.
-    else
-        return fullName                                  -- Kein Bindestrich gefunden, gibt den vollen Namen zurück.
-    end
+    return Ambiguate(fullName, "short")
 end
