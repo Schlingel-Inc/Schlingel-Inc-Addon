@@ -1,13 +1,18 @@
 -- SchlingelInc:OnLoad() Funktion - wird ausgeführt, wenn das Addon selbst geladen wird.
 function SchlingelInc:OnLoad()
+    -- Initialisiere EventManager zuerst
+    SchlingelInc.EventManager:Initialize()
+
     -- Initialisiert Kernmodule des Addons.
+    SchlingelInc.Global:Initialize()
+    SchlingelInc.GuildCache:Initialize()
+    SchlingelInc.Death:Initialize()
     SchlingelInc.Rules:Initialize()
     SchlingelInc.LevelUps:Initialize()
+    SchlingelInc.GuildRecruitment:Initialize()
+    SchlingelInc.Debug:Initialize()
 
     SchlingelInc:InitializeOptionsDB()
-
-    -- Slash-Befehle für Gildenrekrutierung (derzeit für Produktion auskommentiert).
-    --SchlingelInc.GuildRecruitment:InitializeSlashCommands()
 
     -- Erstellt und initialisiert den PvP-Warn-Frame.
     SchlingelInc:CreatePvPWarningFrame()
@@ -19,71 +24,47 @@ function SchlingelInc:OnLoad()
     SchlingelInc:Print("Addon version " .. SchlingelInc.version .. " geladen")
 end
 
--- --- Event-Handler, die separate Frames verwenden ---
+-- --- Event-Registrierungen über den zentralen EventManager ---
 
--- 1. ADDON_LOADED Event-Handler
--- Dieser Frame lauscht auf das ADDON_LOADED Event, um die Hauptinitialisierung unseres Addons auszulösen.
+-- ADDON_LOADED wird noch manuell behandelt, da EventManager erst danach initialisiert wird
 local addonLoadedFrame = CreateFrame("Frame", "SchlingelIncAddonLoadedFrame")
 addonLoadedFrame:RegisterEvent("ADDON_LOADED")
 addonLoadedFrame:SetScript("OnEvent", function(self, event, addonName)
-    -- Überprüft, ob das geladene Addon 'SchlingelInc' selbst ist.
     if addonName == SchlingelInc.name then
-        SchlingelInc:OnLoad() -- Ruft die Haupt-OnLoad-Funktion auf.
+        SchlingelInc:OnLoad()
+
+        -- Registriere alle anderen Events nach der Initialisierung
+        SchlingelInc.EventManager:RegisterHandler("PLAYER_ENTERING_WORLD",
+            function()
+                SchlingelInc:CheckDependencies()
+
+                if not SchlingelInc.initialPlayTimeRequested then
+                    RequestTimePlayed()
+                    SchlingelInc.initialPlayTimeRequested = true
+                end
+            end, 100, "MainAddonInit")
+
+        SchlingelInc.EventManager:RegisterHandler("TIME_PLAYED_MSG",
+            function(_, totalTimeSeconds, levelTimeSeconds)
+                SchlingelInc.GameTimeTotal = totalTimeSeconds or 0
+                SchlingelInc.GameTimePerLevel = levelTimeSeconds or 0
+
+                local charTabIndex = 1
+                if SchlingelInc.infoWindow and SchlingelInc.infoWindow:IsShown() then
+                    if SchlingelInc.infoWindow.tabContentFrames and
+                        SchlingelInc.infoWindow.tabContentFrames[charTabIndex] and
+                        SchlingelInc.infoWindow.tabContentFrames[charTabIndex]:IsShown() and
+                        SchlingelInc.infoWindow.tabContentFrames[charTabIndex].Update then
+                        SchlingelInc.infoWindow.tabContentFrames[charTabIndex]:Update(
+                            SchlingelInc.infoWindow.tabContentFrames[charTabIndex])
+                    end
+                end
+            end, 0, "TimePlayedUpdate")
+
+        SchlingelInc.EventManager:RegisterHandler("PLAYER_LEVEL_UP",
+            function()
+                SchlingelInc.CharacterPlaytimeLevel = 0
+                RequestTimePlayed()
+            end, 50, "PlaytimeReset")
     end
 end)
-
--- 2. PLAYER_ENTERING_WORLD Event-Handler
--- Dieser Frame lauscht auf PLAYER_ENTERING_WORLD, um Überprüfungen durchzuführen,
--- die erfordern, dass der Spieler sich in der Spielwelt befindet.
-local playerEnteringWorldFrame = CreateFrame("Frame", "SchlingelIncPlayerEnteringWorldFrame")
-playerEnteringWorldFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-playerEnteringWorldFrame:SetScript("OnEvent", function(self, event, isInitialLogin, isReloadingUi)
-    -- Überprüft auf benötigte Addon-Abhängigkeiten (z.B. alte Versionen).
-    SchlingelInc:CheckDependencies()
-
-    -- Überprüft die Addon-Version mit anderen Gildenmitgliedern.
-    SchlingelInc:CheckAddonVersion()
-
-    -- Fordert die Gesamtspielzeit des Spielers an, falls dies noch nicht geschehen ist (erster Login).
-    if not SchlingelInc.initialPlayTimeRequested then
-        RequestTimePlayed()
-        SchlingelInc.initialPlayTimeRequested = true
-    end
-end)
-
--- 3. TIME_PLAYED_MSG Event-Handler
--- Dieser Frame lauscht auf TIME_PLAYED_MSG, um Spielzeitstatistiken zu aktualisieren.
-local timePlayedFrame = CreateFrame("Frame", "SchlingelIncTimePlayedFrame")
-timePlayedFrame:RegisterEvent("TIME_PLAYED_MSG")
-timePlayedFrame:SetScript("OnEvent", function(self, event, totalTimeSeconds, levelTimeSeconds)
-    -- Aktualisiert globale Spielzeitvariablen.
-    SchlingelInc.GameTimeTotal = totalTimeSeconds or 0
-    SchlingelInc.GameTimePerLevel = levelTimeSeconds or 0
-
-    -- Wenn das Info-Fenster geöffnet ist und den Charakter-Tab anzeigt, aktualisiere dessen Anzeige.
-    local charTabIndex = 1
-    if SchlingelInc.infoWindow and SchlingelInc.infoWindow:IsShown() then
-        if SchlingelInc.infoWindow.tabContentFrames and
-            SchlingelInc.infoWindow.tabContentFrames[charTabIndex] and
-            SchlingelInc.infoWindow.tabContentFrames[charTabIndex]:IsShown() and
-            SchlingelInc.infoWindow.tabContentFrames[charTabIndex].Update then
-            -- Ruft die Update-Funktion des entsprechenden Tab-Inhaltsframes auf.
-            SchlingelInc.infoWindow.tabContentFrames[charTabIndex]:Update(SchlingelInc.infoWindow.tabContentFrames
-                [charTabIndex])
-        end
-    end
-end)
-
--- 4. PLAYER_LEVEL_UP Event-Handler
--- Dieser Frame lauscht auf PLAYER_LEVEL_UP, um die level-spezifische Spielzeit zurückzusetzen
--- und die Gesamtspielzeit erneut anzufordern.
-local playerLevelUpFrame = CreateFrame("Frame", "SchlingelIncPlayerLevelUpFrame")
-playerLevelUpFrame:RegisterEvent("PLAYER_LEVEL_UP")
-playerLevelUpFrame:SetScript("OnEvent",
-    function(self, event, newLevel, ...) -- '...' fängt weitere Argumente ab, falls vorhanden.
-        -- Setzt die Spielzeit-Verfolgung für das neue Level zurück.
-        SchlingelInc.CharacterPlaytimeLevel = 0
-
-        -- Fordert aktualisierte Spielzeitdaten nach dem Levelaufstieg an.
-        RequestTimePlayed()
-    end)

@@ -17,7 +17,8 @@ end
 function SchlingelInc.Rules:ProhibitTradeWithNonGuildMembers(player)
     local tradePartner, _ = UnitName("NPC") -- Name des Handelspartners
     if tradePartner then
-        local isInGuild = SchlingelInc:IsGuildAllowed(GetGuildInfo("NPC"))
+        local isInGuild = C_GuildInfo.MemberExistsByName(tradePartner)
+        --local isInGuild = SchlingelInc:IsGuildAllowed(GetGuildInfo("NPC"))
         if not isInGuild then
             SchlingelInc:Print("Handeln mit Spielern außerhalb der Gilde ist verboten!")
             CancelTrade() -- Schließt das Handelsfenster sofort
@@ -27,25 +28,17 @@ end
 
 -- Regel: Gruppen mit Spielern außerhalb der Gilde verbieten
 function SchlingelInc.Rules:ProhibitGroupingWithNonGuildMembers()
-    C_GuildInfo.GuildRoster()
-    local guildMembers = {}
-    local numTotalGuildMembers = GetNumGuildMembers()
-    for i = 1, numTotalGuildMembers do
-        local name = GetGuildRosterInfo(i)
-        if name then
-            table.insert(guildMembers, SchlingelInc:RemoveRealmFromName(name))
-        end
-    end
-
+    -- Nutze gecachte Guild Members statt direktem API-Call
     local numGroupMembers = GetNumGroupMembers()
     for i = 1, numGroupMembers do
         local memberName = UnitName("party" .. i) or UnitName("raid" .. i)
         local connected = UnitIsConnected("party" .. i) or UnitIsConnected("raid" .. i)
         if memberName and connected then
-            local isInGuild = tContains(guildMembers, SchlingelInc:RemoveRealmFromName(memberName))
-            if not isInGuild then
+            -- Verwende GuildCache für schnellen Lookup
+            if not SchlingelInc.GuildCache:IsGuildMember(memberName) then
                 SchlingelInc:Print("Gruppen mit Spielern außerhalb der Gilde sind verboten!")
                 LeaveParty() -- Verlasse die Gruppe
+                return
             end
         end
     end
@@ -53,24 +46,21 @@ end
 
 -- Initialisierung der Regeln
 function SchlingelInc.Rules:Initialize()
-    local frame = CreateFrame("Frame")
-    frame:RegisterEvent("MAIL_SHOW")           -- Event für Briefkasten öffnen
-    frame:RegisterEvent("AUCTION_HOUSE_SHOW")  -- Event für Auktionshaus öffnen
-    frame:RegisterEvent("TRADE_SHOW")          -- Event für Handelsfenster öffnen
-    frame:RegisterEvent("GROUP_ROSTER_UPDATE") -- Event für Gruppenitglieder aktualisieren
-    frame:RegisterEvent("RAID_ROSTER_UPDATE")  -- Event für Raidmitglieder aktualisieren
+	SchlingelInc.EventManager:RegisterHandler("MAIL_SHOW",
+		function()
+			SchlingelInc.Rules:ProhibitMailboxUsage()
+		end, 0, "RuleMailbox")
 
-    frame:SetScript("OnEvent", function(_, event, prefix, playerName)
-        if event == "MAIL_SHOW" then
-            self:ProhibitMailboxUsage()
-        elseif event == "AUCTION_HOUSE_SHOW" then
-            self:ProhibitAuctionhouseUsage()
-        elseif event == "TRADE_SHOW" then
-            self:ProhibitTradeWithNonGuildMembers()
-        elseif event == "GROUP_ROSTER_UPDATE" or event == "RAID_ROSTER_UPDATE" then
-            -- if not SchlingelInc:IsInBattleground() then
-            -- self:ProhibitGroupingWithNonGuildMembers()
-            -- end
-        end
-    end)
+	SchlingelInc.EventManager:RegisterHandler("AUCTION_HOUSE_SHOW",
+		function()
+			SchlingelInc.Rules:ProhibitAuctionhouseUsage()
+		end, 0, "RuleAuctionHouse")
+
+	SchlingelInc.EventManager:RegisterHandler("TRADE_SHOW",
+		function()
+			SchlingelInc.Rules:ProhibitTradeWithNonGuildMembers()
+		end, 0, "RuleTrade")
+
+	-- GROUP_ROSTER_UPDATE und RAID_ROSTER_UPDATE sind derzeit deaktiviert
+	-- Kann bei Bedarf wieder aktiviert werden
 end

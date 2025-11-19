@@ -7,15 +7,9 @@ DeathMessageFrame:SetPoint("TOP", UIParent, "TOP", 0, 0)
 DeathMessageFrame:SetFrameStrata("FULLSCREEN_DIALOG")
 DeathMessageFrame:SetFrameLevel(1000)
 DeathMessageFrame:Hide()
-DeathMessageFrame:SetAlpha(0)
 
 -- Hintergrund
-DeathMessageFrame:SetBackdrop({
-	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-	tile = true, tileSize = 16, edgeSize = 16,
-	insets = { left = 4, right = 4, top = 4, bottom = 4 }
-})
+DeathMessageFrame:SetBackdrop(SchlingelInc.Constants.POPUPBACKDROP)
 DeathMessageFrame:SetBackdropColor(0, 0, 0, 0.8)
 
 -- Icon
@@ -39,7 +33,6 @@ DeathMessageFrame.text:SetJustifyV("TOP")
 DeathMessageFrame.text:SetTextColor(1, 0.1, 0.1, 1)
 DeathMessageFrame.text:SetShadowColor(0, 0, 0, 1)
 DeathMessageFrame.text:SetShadowOffset(1, -1)
-DeathMessageFrame.text:SetText("")
 
 -- Animation vorbereiten
 local animGroup = DeathMessageFrame:CreateAnimationGroup()
@@ -74,20 +67,17 @@ end)
 
 -- Nachricht anzeigen
 function SchlingelInc.DeathAnnouncement:ShowDeathMessage(message)
-    if SchlingelOptionsDB["deathmessages"] == false then
-        --SchlingelInc:Print("Skip DeathAnnouncement")
+    if not SchlingelOptionsDB["deathmessages"] then
         return
     end
+
     DeathMessageFrame.text:SetText(message)
     DeathMessageFrame:SetAlpha(0)
-    DeathMessageFrame:SetPoint("TOP", UIParent, "TOP", 0, 0)
     DeathMessageFrame:Show()
     animGroup:Stop()
     animGroup:Play()
 
-    if SchlingelOptionsDB["deathmessages_sound"] == true then
-        PlaySound(8192) -- Horde-Flagge zurückgebracht
-    -- else
-    --     SchlingelInc:Print("Skip DeathSound")
+    if SchlingelOptionsDB["deathmessages_sound"] then
+        PlaySound(SchlingelInc.Constants.SOUNDS.DEATH_ANNOUNCEMENT)
     end
 end

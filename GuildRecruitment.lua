@@ -2,62 +2,36 @@
 SchlingelInc.GuildRecruitment = SchlingelInc.GuildRecruitment or {}
 SchlingelInc.GuildRecruitment.inviteRequests = SchlingelInc.GuildRecruitment.inviteRequests or {}
 
-local guildOfficers =
-{
-    -- Gildenleitung/Mods
-    -- Kurti
-    "Kurtibrown",
-    "Schmurt",
-    "Schmurti",
-    -- Dörte
-    "Dörtchen",
-    "Siegdörty",
-    -- Fihlo
-    "Syluri",
-    "Syltank",
-    -- Hauke
-    "Totanka",
-    -- Hauke Bankaccount
-    "Schlingbank",
-    "Schlinglbank",
-    -- Dev-Schlingel
-    "Luminette",
-    "Cricksumage",
-    "Devschlingel",
-    "Pudidev",
-    -- alte Offiziere
-    "Fenriic",
-    "Totärztin",
-    -- neue Offiziere
-    "Coldchase",
-    "Coltchase",
-    "Raixxen",
-    "Peirithoos",
-    -- Ab hier kommen PfundsSchlingel
-    "Akimah",
-    "Automatix",
-    "Bartzmorak",
-    "Cowihendrixs",
-    "Eowendra",
-    "Ganadorian",
-    "Hufgeruch",
-    "Kalterwalter",
-    "Kipptum",
-    "Knubbsi",
-    "Kritze",
-    "Lucifia",
-    "Lünda",
-    "Meltfacê",
-    "Naikjin",
-    "Pfarrer",
-    "Pfeilgiftfro",
-    "Treeguard",
-    "Tuskdoc",
-    "Tötemir",
-    "Vindicætor",
-    "Wujujade",
-    "Ûshnotz"
-}
+-- Gibt eine Liste aller Officers zurück, die Einladungsrechte haben
+-- Basierend auf den in Constants.OFFICER_RANKS definierten Rängen
+-- Funktioniert nur für Spieler, die bereits in der Gilde sind!
+local function GetAuthorizedOfficers()
+	-- Prüfe ob Spieler in einer Gilde ist
+	if not IsInGuild() then
+		SchlingelInc.Debug:Print("Spieler ist nicht in der Gilde - kann keine Officers abrufen")
+		return {}
+	end
+
+	local officers = {}
+
+	-- Durchlaufe alle autorisierten Ränge
+	for _, rankName in ipairs(SchlingelInc.Constants.OFFICER_RANKS) do
+		local membersWithRank = SchlingelInc.GuildCache:GetMembersByRank(rankName)
+
+		-- Füge alle Online-Mitglieder dieses Rangs zur Officer-Liste hinzu
+		for _, member in ipairs(membersWithRank) do
+			if member.isOnline then
+				table.insert(officers, member.name)
+			end
+		end
+	end
+
+	SchlingelInc.Debug:Print(string.format(
+		"Gefundene online Officers mit Einladungsrechten: %d", #officers
+	))
+
+	return officers
+end
 
 function SchlingelInc.GuildRecruitment:SendGuildRequest()
     local playerName = UnitName("player")
@@ -73,14 +47,25 @@ function SchlingelInc.GuildRecruitment:SendGuildRequest()
     local playerGold = GetMoneyString(GetMoney(), true)
     local message = string.format("INVITE_REQUEST:%s:%d:%d:%s:%s", playerName, playerLevel, playerExp, zone, playerGold)
 
-    -- --Debug Aufruf zum testen. debugTarget mit dem gewünschten Character initialisieren, der die Nachricht erhalten soll
-    -- local debugTarget = "Pudidev"
-    -- C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, message, "WHISPER", debugTarget)
+    -- Level 1 Spieler sind IMMER außerhalb der Gilde
+    -- Nutze die Fallback-Officer-Liste aus Constants
+    local guildOfficers = SchlingelInc.Constants.FALLBACK_OFFICERS
 
-    -- Sendet die Anfrage an alle Officer.
+    if #guildOfficers == 0 then
+        SchlingelInc:Print(SchlingelInc.Constants.COLORS.ERROR ..
+            "Keine Officers konfiguriert. Bitte kontaktiere einen Officer direkt.|r")
+        return
+    end
+
+    -- Sendet die Anfrage an alle Officers per Whisper
+    local sentCount = 0
     for _, name in ipairs(guildOfficers) do
         C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, message, "WHISPER", name)
+        sentCount = sentCount + 1
     end
+
+    SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS ..
+        string.format("Gildenanfrage an %d Officers gesendet.", sentCount) .. "|r")
 end
 
 local function HandleAddonMessage(message)
@@ -114,6 +99,9 @@ function SchlingelInc.GuildRecruitment:HandleAcceptRequest(playerName)
     if CanGuildInvite() then
         SchlingelInc:Print("Versuche, " .. playerName .. " in die Gilde einzuladen...")
         C_GuildInfo.Invite(playerName)
+
+        -- Benachrichtige alle online Officers über die gesendete Einladung
+        local guildOfficers = GetAuthorizedOfficers()
         for _, name in ipairs(guildOfficers) do
             C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "INVITE_SENT:" .. playerName, "WHISPER", name)
         end
@@ -124,22 +112,27 @@ end
 
 function SchlingelInc.GuildRecruitment:HandleDeclineRequest(playerName)
     if not playerName then return end
+
+    -- Benachrichtige alle online Officers über die abgelehnte Anfrage
+    local guildOfficers = GetAuthorizedOfficers()
     for _, name in ipairs(guildOfficers) do
         C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "INVITE_DECLINED:" .. playerName, "WHISPER", name)
     end
+
     SchlingelInc:Print("Anfrage von " .. playerName .. " wurde abgelehnt.")
 end
 
-local addonMessageGlobalHandlerFrame = CreateFrame("Frame")
-addonMessageGlobalHandlerFrame:RegisterEvent("CHAT_MSG_ADDON")
-
-addonMessageGlobalHandlerFrame:SetScript("OnEvent", function(self, event, prefix, message)
-    if event == "CHAT_MSG_ADDON" and prefix == SchlingelInc.prefix then
-        if message:find("INVITE_REQUEST") or message:find("INVITE_SENT") then
-            HandleAddonMessage(message)
-        end
-    end
-end)
+-- Initialisiert das GuildRecruitment Modul
+function SchlingelInc.GuildRecruitment:Initialize()
+	SchlingelInc.EventManager:RegisterHandler("CHAT_MSG_ADDON",
+		function(_, prefix, message)
+			if prefix == SchlingelInc.prefix then
+				if message:find("INVITE_REQUEST") or message:find("INVITE_SENT") then
+					HandleAddonMessage(message)
+				end
+			end
+		end, 0, "GuildInviteHandler")
+end
 
 -- Gibt formatierten Zonennamen zurück
 function SchlingelInc.GuildRecruitment:GetPlayerZone()

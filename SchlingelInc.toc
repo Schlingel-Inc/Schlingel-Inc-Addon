@@ -13,19 +13,20 @@ libs\LibDBIcon-1.0\LibDBIcon-1.0\LibDBIcon-1.0.lua
 
 # Unsere lua files.
 Global.lua
+MiniMapIcon.lua
+Constants.lua
+EventManager.lua
+GuildCache.lua
+Debug.lua
 Options.lua
 Rules.lua
 GuildRecruitment.lua
 LevelUp.lua
-interfaces\DeathAnnouncement.lua
+interfaces\popups\DeathAnnouncement.lua
 interfaces\Deathlog.lua
-interfaces\UIHelpers.lua
-interfaces\GuildInvites.lua
-interfaces\offiInterface\tabs\GuildInfo.lua
-interfaces\offiInterface\tabs\Stats.lua
-interfaces\offiInterface\tabs\Inactivity.lua
-interfaces\offiInterface\OffiInterface.lua
+interfaces\popups\GuildInvites.lua
+interfaces\InactivityWindow.lua
 interfaces\SchlingelInterface.lua
-interfaces\PvPFrame.lua
+interfaces\popups\PvPFrame.lua
 Death.lua
 Main.lua
