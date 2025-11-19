@@ -85,6 +85,11 @@ function SchlingelInc:CreateInactivityWindow()
 		end
 		wipe(inactiveFrame.inactiveRows)
 
+		-- Safety check: Ensure player is in a guild
+		if not IsInGuild() then
+			return
+		end
+
 		local totalGuildMembers, _ = GetNumGuildMembers()
 		totalGuildMembers = totalGuildMembers or 0
 
@@ -186,6 +191,12 @@ function SchlingelInc:CreateInactivityWindow()
 					kickBtn:SetPoint("TOPLEFT", rowFrame, "TOPLEFT", 430, 0)
 					kickBtn:SetText("Entfernen")
 					kickBtn:SetScript("OnClick", function()
+						-- Recheck permission at click time in case it changed
+						if not CanGuildRemove() then
+							SchlingelInc:Print(SchlingelInc.Constants.COLORS.ERROR ..
+								"Du hast keine Berechtigung mehr, Spieler zu entfernen.|r")
+							return
+						end
 						StaticPopup_Show("CONFIRM_GUILD_KICK", member.fullName, nil, { memberName = member.fullName })
 					end)
 				end

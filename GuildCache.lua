@@ -32,14 +32,19 @@ function SchlingelInc.GuildCache:Update(force)
 
 	self.isUpdating = true
 
-	-- Fordere Roster-Daten vom Server an
-	C_GuildInfo.GuildRoster()
+	-- Registriere einen einmaligen Event Handler für GUILD_ROSTER_UPDATE
+	local handlerName = "GuildCacheUpdate_" .. GetTime()
+	SchlingelInc.EventManager:RegisterHandler("GUILD_ROSTER_UPDATE",
+		function()
+			-- Unregister handler to ensure it only runs once
+			SchlingelInc.EventManager:UnregisterHandler("GUILD_ROSTER_UPDATE", handlerName)
+			self:ProcessRosterData()
+			self.isUpdating = false
+		end, 100, handlerName)
 
-	-- Warte auf Daten und verarbeite sie
-	C_Timer.After(0.5, function()
-		self:ProcessRosterData()
-		self.isUpdating = false
-	end)
+	-- Fordere Roster-Daten vom Server an
+	-- Der Event Handler oben wird aufgerufen, sobald die Daten verfügbar sind
+	C_GuildInfo.GuildRoster()
 
 	SchlingelInc.Debug:Print("Guild Cache Update gestartet")
 	return true

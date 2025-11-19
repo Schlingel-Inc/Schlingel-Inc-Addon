@@ -67,13 +67,12 @@ end
 Settings.RegisterAddOnCategory(category)
 
 function SchlingelInc:InitializeOptionsDB()
+    -- Initialize all options with default values if not present
     for _, setting in ipairs(UIOptions) do
-        local optionToRead = SchlingelOptionsDB[setting.variable]
-        if optionToRead ~= nil then
-            --SchlingelInc:Print("Setze die Value von: " .. tostring(setting.value) .. " auf: " .. tostring(optionToRead))
+        if SchlingelOptionsDB[setting.variable] == nil then
+            SchlingelOptionsDB[setting.variable] = setting.value
+        else
             setting.value = SchlingelOptionsDB[setting.variable]
-        -- else
-        --     SchlingelInc:Print("SchlingelOptionsDB enthält diesen Wert nicht: " .. setting.variable)
         end
     end
     SchlingelInc:InitializeOptionsUI()
