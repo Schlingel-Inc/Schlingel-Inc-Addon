@@ -129,13 +129,15 @@ function SchlingelInc.Death:Initialize()
 					local messageString = messageFormat:format(name, class, level, zone)
 					SchlingelInc.DeathAnnouncement:ShowDeathMessage(messageString)
 
-					local cause = SchlingelInc.Death.lastAttackSource or "Unbekannt"
+					-- Capture the current lastAttackSource for this specific death
+					-- Note: This is the attack source from the SENDER's death, not the receiver's
+					-- Since this is an addon message about someone else's death, we use "Unbekannt"
 					local deathEntry = {
 						name = name,
 						class = class,
 						level = tonumber(level),
 						zone = zone,
-						cause = cause,
+						cause = "Unbekannt",  -- Remote death, we don't know the actual cause
 						timestamp = time()
 					}
 
