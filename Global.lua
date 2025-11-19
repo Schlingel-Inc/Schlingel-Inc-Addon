@@ -51,22 +51,22 @@ function SchlingelInc.Global:Initialize()
 		end, 0, "PvPTargetChecker")
 
 	-- Version Checking Handler
-	local highestSeenVersion = SchlingelInc.version
+	local newestVersionSeen = SchlingelInc.version
 	SchlingelInc.EventManager:RegisterHandler("CHAT_MSG_ADDON",
 		function(_, prefix, message, _, sender)
 			if prefix == SchlingelInc.prefix then
-				local receivedVersion = message:match("^VERSION:(.+)$")
-				if receivedVersion then
-					-- Speichere Version für Guild Member Versions
+				local incomingVersion = message:match("^VERSION:(.+)$")
+				if incomingVersion then
+					-- Speichere Version des Gildenmitglieds
 					if sender then
-						SchlingelInc.guildMemberVersions[sender] = receivedVersion
+						SchlingelInc.guildMemberVersions[sender] = incomingVersion
 					end
 
-					-- Prüfe ob neuere Version verfügbar
-					if SchlingelInc:CompareVersions(receivedVersion, highestSeenVersion) > 0 then
-						highestSeenVersion = receivedVersion
+					-- Prüfe ob eingehende Version neuer ist als die aktuell neueste bekannte Version
+					if SchlingelInc:CompareVersions(incomingVersion, newestVersionSeen) > 0 then
+						newestVersionSeen = incomingVersion
 						SchlingelInc:Print("Eine neuere Addon-Version wurde entdeckt: " ..
-							highestSeenVersion .. ". Bitte aktualisiere dein Addon!")
+							newestVersionSeen .. ". Bitte aktualisiere dein Addon!")
 					end
 				end
 			end
@@ -101,14 +101,14 @@ function SchlingelInc:ParseVersion(v)
 end
 
 -- Vergleicht zwei Versionsnummern (z.B. "1.2.3" mit "1.3.0").
--- Gibt >0 zurück, wenn v1 > v2; <0 wenn v1 < v2; 0 wenn v1 == v2.
-function SchlingelInc:CompareVersions(v1, v2)
-    local a1, a2, a3 = SchlingelInc:ParseVersion(v1)
-    local b1, b2, b3 = SchlingelInc:ParseVersion(v2)
+-- Gibt >0 zurück, wenn version1 > version2; <0 wenn version1 < version2; 0 wenn gleich.
+function SchlingelInc:CompareVersions(version1, version2)
+    local major1, minor1, patch1 = SchlingelInc:ParseVersion(version1)
+    local major2, minor2, patch2 = SchlingelInc:ParseVersion(version2)
 
-    if a1 ~= b1 then return a1 - b1 end -- Vergleiche Major-Version.
-    if a2 ~= b2 then return a2 - b2 end -- Vergleiche Minor-Version.
-    return a3 - b3                      -- Vergleiche Patch-Version.
+    if major1 ~= major2 then return major1 - major2 end -- Vergleiche Major-Version.
+    if minor1 ~= minor2 then return minor1 - minor2 end -- Vergleiche Minor-Version.
+    return patch1 - patch2                              -- Vergleiche Patch-Version.
 end
 
 
