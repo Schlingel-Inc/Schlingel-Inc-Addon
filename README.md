@@ -29,7 +29,7 @@ Wenn du Probleme mit dem Addon hast, melde dich bitte im Probleme-Channel im Dis
 - **Todeszähler**: Verfolgt, wie oft dein Charakter gestorben ist
 - **Todesmeldungen**: Postet automatisch Todesnachrichten im Gildenchat mit deinem Level, Standort, letzten Worten und was dich getötet hat
 - **Todes-Popup**: Zeigt eine visuelle Benachrichtigung an, wenn Gildenmitglieder sterben
-- **Todeslog**: Zeigt die neuesten Tode von Gildenmitgliedern in einem Mini-Fenster an
+- **Todeslog**: Zeigt die neuesten Tode von Gildenmitgliedern in einem Mini-Fenster an (Shift + Linksklick auf Minimap-Icon)
 
 ## Level-Fortschritt
 - **Meilenstein-Feiern**: Kündigt automatisch im Gildenchat an, wenn du Level 10, 20, 30, 40, 50 oder 60 erreichst
@@ -44,14 +44,11 @@ Wenn du Probleme mit dem Addon hast, melde dich bitte im Probleme-Channel im Dis
 - **Minimap-Symbol**: Schnellzugriff auf alle Addon-Funktionen über das rosa "SI"-Symbol
 
 ## Offiziers-Werkzeuge
-- **Gildeninfo-Tab**: Übersicht über Gildeninformationen
-- **Statistik-Tab**: Gildenweite Statistiken
-- **Inaktivitäts-Tracker**: Zeigt, welche Mitglieder sich seit 10+ Tagen nicht mehr eingeloggt haben
+- **Inaktivitäts-Tracker**: Zeigt, welche Mitglieder sich seit 10+ Tagen nicht mehr eingeloggt haben (Rechtsklick auf Minimap-Icon)
 
 ## Einstellungen
 - PvP-Warnungen ein-/ausschalten
 - PvP-Warnungs-Töne ein-/ausschalten
 - Todesmeldungen ein-/ausschalten
 - Todesmeldungs-Töne ein-/ausschalten
-- Todeslog-Anzeige ein-/ausschalten
 - Addon-Version im Gildenchat anzeigen/verbergen
