@@ -148,18 +148,6 @@ function SchlingelInc:CompareVersions(v1, v2)
     return a3 - b3                                            -- Vergleiche Patch-Version.
 end
 
--- Speichert die originale SendChatMessage Funktion, um sie später aufrufen zu können.
-local originalSendChatMessage = SendChatMessage
--- Überschreibt die globale SendChatMessage Funktion (Hooking).
-function SendChatMessage(msg, chatType, language, channel)
-    -- Wenn eine Nachricht in den Gildenchat gesendet wird...
-    if chatType == "GUILD" then
-        -- ...sende zusätzlich die eigene Addon-Version als Addon-Nachricht an die Gilde.
-        C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "VERSION:" .. SchlingelInc.version, "GUILD")
-    end
-    -- Ruft die ursprüngliche SendChatMessage Funktion auf, damit die Nachricht normal gesendet wird.
-    originalSendChatMessage(msg, chatType, language, channel)
-end
 
 -- Speichert die Addon-Versionen von Gildenmitgliedern (Sendername -> Version).
 SchlingelInc.guildMemberVersions = {}
