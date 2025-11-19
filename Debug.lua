@@ -7,7 +7,7 @@ SchlingelInc.Debug = {}
 -- Prüft, ob der Spieler Debug-Berechtigung hat
 function SchlingelInc.Debug:HasPermission()
 	local _, rank = GetGuildInfo("player")
-	return rank == "Devschlingel"
+	return rank == "DevSchlingel"
 end
 
 -- Zeigt eine Berechtigung-Fehlermeldung an
