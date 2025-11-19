@@ -45,7 +45,13 @@ function SchlingelInc.GuildRecruitment:SendGuildRequest()
 
     local zone = SchlingelInc.GuildRecruitment:GetPlayerZone()
     local playerGold = GetMoneyString(GetMoney(), true)
-    local message = string.format("INVITE_REQUEST:%s:%d:%d:%s:%s", playerName, playerLevel, playerExp, zone, playerGold)
+
+    -- Sanitize inputs by replacing delimiters with safe characters
+    -- This prevents zone names with colons from breaking the message parsing
+    local safeZone = zone:gsub(":", "-"):gsub("|", "-")
+    local safePlayerGold = playerGold:gsub(":", "-"):gsub("|", "-")
+
+    local message = string.format("INVITE_REQUEST:%s:%d:%d:%s:%s", playerName, playerLevel, playerExp, safeZone, safePlayerGold)
 
     -- Level 1 Spieler sind IMMER außerhalb der Gilde
     -- Nutze die Fallback-Officer-Liste aus Constants
@@ -72,24 +78,47 @@ local function HandleAddonMessage(message)
     if message:find("^INVITE_REQUEST:") then
         local name, level, xp, zone, money = message:match("^INVITE_REQUEST:([^:]+):(%d+):(%d+):([^:]+):(.+)$")
         if name and level and xp and zone and money then
+            -- Validate data before using
+            local levelNum = tonumber(level)
+            local xpNum = tonumber(xp)
+
+            -- Ensure values are reasonable
+            if not levelNum or levelNum < 1 or levelNum > 60 then
+                SchlingelInc.Debug:Print("Ungültige Level-Angabe in Guild Request: " .. tostring(level))
+                return
+            end
+
+            if not xpNum or xpNum < 0 then
+                SchlingelInc.Debug:Print("Ungültige XP-Angabe in Guild Request: " .. tostring(xp))
+                return
+            end
+
+            -- Ensure strings are not empty
+            if name == "" or zone == "" or money == "" then
+                SchlingelInc.Debug:Print("Leere Felder in Guild Request empfangen")
+                return
+            end
+
             local requestData = {
                 name = name,
                 level = level,
-                xp = tonumber(xp),
+                xp = xpNum,
                 zone = zone,
                 money = money,
             }
-            local message = string.format("Neue Gildenanfrage von %s (Level %s) mit %s in der Tasche aus %s erhalten.",
+            local displayMessage = string.format("Neue Gildenanfrage von %s (Level %s) mit %s in der Tasche aus %s erhalten.",
                 name, level, money, zone)
-            SchlingelInc:Print(message)
-            SchlingelInc.GuildInvites:ShowInviteMessage(message, requestData)
+            SchlingelInc:Print(displayMessage)
+            SchlingelInc.GuildInvites:ShowInviteMessage(displayMessage, requestData)
         end
     elseif message:find("^INVITE_SENT:") and CanGuildInvite() then
         SchlingelInc.GuildInvites:HideInviteMessage()
     elseif message:find("^INVITE_DECLINED:") then
         local name = message:match("^INVITE_DECLINED:(.+)$")
-        SchlingelInc:Print("Ein Officer hat die Anfrage von " .. name .. " abgelehnt.")
-        SchlingelInc.GuildInvites:HideInviteMessage()
+        if name and name ~= "" then
+            SchlingelInc:Print("Ein Officer hat die Anfrage von " .. name .. " abgelehnt.")
+            SchlingelInc.GuildInvites:HideInviteMessage()
+        end
     end
 end
 
