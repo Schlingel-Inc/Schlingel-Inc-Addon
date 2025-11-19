@@ -1,3 +1,7 @@
+# 2.3.0
+
+-- Major code cleanup and optimizations
+
 # 2.2.8
 
 -- Fixed invite whitelist
