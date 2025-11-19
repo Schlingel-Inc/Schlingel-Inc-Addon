@@ -35,35 +35,6 @@ function SchlingelInc:CountTable(table)
     return count
 end
 
--- Überprüft Abhängigkeiten und warnt bei Problemen.
-function SchlingelInc:CheckDependencies()
-    -- Definition eines Popup-Dialogs für die Warnung vor veralteten Addons.
-    StaticPopupDialogs["SCHLINGEL_HARDCOREUNLOCKED_WARNING"] = {
-        text = "Du hast das veraltete Addon aktiv.\nBitte entferne es, da es zu Problemen mit SchlingelInc führt!",
-        button1 = "OK",
-        timeout = 0,
-        whileDead = true,
-        hideOnEscape = true,
-        preferredIndex = 3,
-    }
-
-    -- Startet eine Überprüfung nach 30 Sekunden.
-    C_Timer.After(30, function()
-        local numAddons = GetNumAddOns()
-
-        -- Durchläuft alle installierten Addons.
-        for i = 1, numAddons do
-            local name, _, _, enabled = GetAddOnInfo(i)
-            -- Prüft auf veraltete Addons ("HardcoreUnlocked" oder "SchlingelAddon").
-            if (name == "HardcoreUnlocked" and IsAddOnLoaded("HardcoreUnlocked")) or (name == "SchlingelAddon" and IsAddOnLoaded("SchlingelAddon")) then
-                SchlingelInc:Print(
-                    "|cffff0000Warnung: Du hast das veraltete Addon aktiv. Bitte entferne es, da es zu Problemen mit SchlingelInc führt!|r")
-                StaticPopup_Show("SCHLINGEL_HARDCOREUNLOCKED_WARNING") -- Zeigt das Popup an.
-            end
-        end
-    end)
-end
-
 -- Speichert den Zeitpunkt der letzten PvP-Warnung für jeden Spieler.
 SchlingelInc.lastPvPAlert = {}
 
