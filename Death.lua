@@ -8,16 +8,17 @@ SchlingelInc.Death = {
 -- Initialisiere CharacterDeaths um einen Nil Verweis zu vermeiden
 CharacterDeaths = CharacterDeaths or 0
 
--- Initialisiere persistentes Death Log (wird in SavedVariables gespeichert)
-SchlingelDeathLog = SchlingelDeathLog or {}
+-- Session-basiertes Death Log (wird NICHT persistiert, nur während der Session)
+-- Dies verhindert Out-of-Sync Probleme wenn Spieler offline sind
+SchlingelInc.DeathLogData = {}
 
 -- Funktion zum Hinzufügen eines Eintrags zum Death Log mit Rotation
 function SchlingelInc.Death:AddLogEntry(entry)
-	table.insert(SchlingelDeathLog, 1, entry)
+	table.insert(SchlingelInc.DeathLogData, 1, entry)
 
 	-- Rotation: Behalte nur die letzten MAX_LOG_ENTRIES Einträge
-	while #SchlingelDeathLog > SchlingelInc.Death.MAX_LOG_ENTRIES do
-		table.remove(SchlingelDeathLog)
+	while #SchlingelInc.DeathLogData > SchlingelInc.Death.MAX_LOG_ENTRIES do
+		table.remove(SchlingelInc.DeathLogData)
 	end
 end
 
@@ -138,11 +139,10 @@ function SchlingelInc.Death:Initialize()
 						timestamp = time()
 					}
 
+					-- Füge Eintrag zum persistenten Log hinzu (wird automatisch zu DeathLogData)
 					SchlingelInc.Death:AddLogEntry(deathEntry)
 
-					SchlingelInc.DeathLogData = SchlingelInc.DeathLogData or {}
-					table.insert(SchlingelInc.DeathLogData, deathEntry)
-
+					-- Aktualisiere UI falls geöffnet
 					SchlingelInc:UpdateMiniDeathLog()
 				end
 			end
