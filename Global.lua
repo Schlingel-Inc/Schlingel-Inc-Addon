@@ -4,12 +4,6 @@ SchlingelInc = {}
 -- Addon-Name
 SchlingelInc.name = "SchlingelInc"
 
--- Gildenmitglieder
-SchlingelInc.guildMembers = {}
-
--- Discord Link
-SchlingelInc.discordLink = "https://discord.gg/KXkyUZW"
-
 -- Chat-Nachrichten-Prefix
 -- Dieser Prefix wird verwendet, um Addon-interne Nachrichten zu identifizieren.
 SchlingelInc.prefix = "SchlingelInc"
@@ -79,8 +73,7 @@ function SchlingelInc.Global:Initialize()
 		end, 0, "VersionChecker")
 
 	-- Sende Version bei Guild Chat
-	local major, minor, patch, channel = SchlingelInc:ParseVersion(SchlingelInc.version)
-	if IsInGuild() and channel == "stable" then
+	if IsInGuild() then
 		C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "VERSION:" .. SchlingelInc.version, "GUILD")
 	end
     C_GuildInfo.GuildRoster() -- Guild Roster fetchen um Cache aufzubauen.
@@ -103,20 +96,19 @@ function SchlingelInc:IsInRaid()
 end
 
 function SchlingelInc:ParseVersion(v)
-    local major, minor, patch, channel = string.match(v, "(%d+)%.(%d+)%.?(%d*)%-?(%w*)")
-    return tonumber(major or 0), tonumber(minor or 0), tonumber(patch or 0), tostring(channel or "stable")
+    local major, minor, patch = string.match(v, "(%d+)%.(%d+)%.?(%d*)")
+    return tonumber(major or 0), tonumber(minor or 0), tonumber(patch or 0)
 end
 
 -- Vergleicht zwei Versionsnummern (z.B. "1.2.3" mit "1.3.0").
 -- Gibt >0 zurück, wenn v1 > v2; <0 wenn v1 < v2; 0 wenn v1 == v2.
 function SchlingelInc:CompareVersions(v1, v2)
-    -- Hilfsfunktion, um einen Versionsstring in Major, Minor, Patch Zahlen zu zerlegen.
-    local a1, a2, a3, channel = SchlingelInc:ParseVersion(v1) -- Parsed v1.
-    local b1, b2, b3, channel = SchlingelInc:ParseVersion(v2) -- Parsed v2.
+    local a1, a2, a3 = SchlingelInc:ParseVersion(v1)
+    local b1, b2, b3 = SchlingelInc:ParseVersion(v2)
 
-    if a1 ~= b1 then return a1 - b1 end                       -- Vergleiche Major-Version.
-    if a2 ~= b2 then return a2 - b2 end                       -- Vergleiche Minor-Version.
-    return a3 - b3                                            -- Vergleiche Patch-Version.
+    if a1 ~= b1 then return a1 - b1 end -- Vergleiche Major-Version.
+    if a2 ~= b2 then return a2 - b2 end -- Vergleiche Minor-Version.
+    return a3 - b3                      -- Vergleiche Patch-Version.
 end
 
 
@@ -130,11 +122,11 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", function(self, event, msg, sen
         return false, msg, sender, ... -- Nachricht unverändert durchlassen.
     end
 
-    local version = SchlingelInc.guildMemberVersions[sender] or nil -- Holt die gespeicherte Version des Senders.
+    local version = SchlingelInc.guildMemberVersions[sender] -- Holt die gespeicherte Version des Senders.
     local modifiedMessage = msg                                     -- Standardmäßig die Originalnachricht.
 
     -- Wenn eine Version für den Sender bekannt ist, füge sie der Nachricht hinzu.
-    if version ~= nil then
+    if version then
         modifiedMessage = SchlingelInc.colorCode .. "[" .. version .. "]|r " .. msg
     end
     -- 'false' bedeutet, die Nachricht wird nicht unterdrückt, sondern weiterverarbeitet (mit ggf. modifizierter Nachricht).
