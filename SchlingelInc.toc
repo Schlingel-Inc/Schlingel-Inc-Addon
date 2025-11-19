@@ -13,6 +13,7 @@ libs\LibDBIcon-1.0\LibDBIcon-1.0\LibDBIcon-1.0.lua
 
 # Unsere lua files.
 Global.lua
+MiniMapIcon.lua
 Constants.lua
 EventManager.lua
 GuildCache.lua
