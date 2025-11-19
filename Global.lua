@@ -115,8 +115,8 @@ end
 -- Speichert die Addon-Versionen von Gildenmitgliedern (Sendername -> Version).
 SchlingelInc.guildMemberVersions = {}
 
--- Fügt einen Filter für Gilden-Chat-Nachrichten hinzu.
-ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", function(self, event, msg, sender, ...)
+-- Chat filter function (defined once, reused if already registered)
+local function GuildChatVersionFilter(_, _, msg, sender, ...)
     -- Funktion wird nur ausgeführt, wenn der Spieler Gildenmitglieder einladen darf (eine Art Berechtigungsprüfung).
     if SchlingelOptionsDB["show_version"] == false then
         return false, msg, sender, ... -- Nachricht unverändert durchlassen.
@@ -131,7 +131,13 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", function(self, event, msg, sen
     end
     -- 'false' bedeutet, die Nachricht wird nicht unterdrückt, sondern weiterverarbeitet (mit ggf. modifizierter Nachricht).
     return false, modifiedMessage, sender, ...
-end)
+end
+
+-- Fügt einen Filter für Gilden-Chat-Nachrichten hinzu (nur einmal).
+if not SchlingelInc.guildChatFilterRegistered then
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", GuildChatVersionFilter)
+    SchlingelInc.guildChatFilterRegistered = true
+end
 
 -- Entfernt den Realm-Namen von einem vollständigen Spielernamen (z.B. "Spieler-Realm" -> "Spieler").
 -- Verwendet die Blizzard API Funktion Ambiguate.
