@@ -36,8 +36,6 @@ addonLoadedFrame:SetScript("OnEvent", function(self, event, addonName)
         -- Registriere alle anderen Events nach der Initialisierung
         SchlingelInc.EventManager:RegisterHandler("PLAYER_ENTERING_WORLD",
             function()
-                SchlingelInc:CheckDependencies()
-
                 if not SchlingelInc.initialPlayTimeRequested then
                     RequestTimePlayed()
                     SchlingelInc.initialPlayTimeRequested = true
