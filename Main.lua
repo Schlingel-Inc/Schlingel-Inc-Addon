@@ -39,6 +39,7 @@ function SchlingelInc:OnLoad()
     SchlingelInc.LevelUps:Initialize()
     SchlingelInc.GuildRecruitment:Initialize()
     SchlingelInc.Debug:Initialize()
+    SchlingelInc:InitializeDiscordHandlePrompt()
 
     SchlingelInc:InitializeOptionsDB()
 

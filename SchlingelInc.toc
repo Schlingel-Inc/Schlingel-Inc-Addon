@@ -4,6 +4,7 @@
 ## Author: Cricksu, Pudi, Canasterzaster
 ## Version: 2.3.0
 ## SavedVariablesPerCharacter: CharacterDeaths, SchlingelOptionsDB
+## SavedVariables: DiscordHandle
 
 # Notwendiges externe Abhängigkeiten aus dem Lib Folder
 ## OptionalDeps: LibStub, LibDataBroker-1.1, LibDBIcon-1.0
@@ -30,5 +31,6 @@ interfaces\popups\GuildInvites.lua
 interfaces\InactivityWindow.lua
 interfaces\SchlingelInterface.lua
 interfaces\popups\PvPFrame.lua
+interfaces\DiscordHandlePrompt.lua
 Death.lua
 Main.lua

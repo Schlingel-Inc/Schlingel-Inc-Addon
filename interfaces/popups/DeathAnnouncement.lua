@@ -5,7 +5,7 @@ SchlingelInc.DeathAnnouncement = {}
 
 -- Frame for the message
 local DeathMessageFrame = CreateFrame("Frame", "DeathMessageFrame", UIParent, "BackdropTemplate")
-DeathMessageFrame:SetSize(300, 75)
+DeathMessageFrame:SetSize(300, 150)
 DeathMessageFrame:SetPoint("TOP", UIParent, "TOP", 0, 0)
 DeathMessageFrame:SetFrameStrata("FULLSCREEN_DIALOG")
 DeathMessageFrame:SetFrameLevel(1000)
@@ -15,23 +15,24 @@ DeathMessageFrame:Hide()
 DeathMessageFrame:SetBackdrop(SchlingelInc.Constants.POPUPBACKDROP)
 DeathMessageFrame:SetBackdropColor(0, 0, 0, 0.8)
 
--- Icon
+-- Icon (centered at top)
 local icon = DeathMessageFrame:CreateTexture(nil, "ARTWORK")
-icon:SetSize(32, 32)
-icon:SetPoint("TOPLEFT", DeathMessageFrame, "TOPLEFT", 10, -10)
-icon:SetTexture("Interface\\Icons\\Ability_Rogue_FeignDeath")
+icon:SetSize(64, 64)
+icon:SetPoint("TOP", DeathMessageFrame, "TOP", 0, -15)
+icon:SetTexture("Interface\\AddOns\\SchlingelInc\\media\\Wappenrock.tga")
 
--- Header
+-- Header (centered below icon)
 local header = DeathMessageFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-header:SetPoint("TOPLEFT", icon, "TOPRIGHT", 10, -2)
+header:SetPoint("TOP", icon, "BOTTOM", 0, -8)
 header:SetText("Schande!")
 header:SetTextColor(1, 0.2, 0.2, 1)
 
--- Text
+-- Text (centered below header)
 DeathMessageFrame.text = DeathMessageFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-DeathMessageFrame.text:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -4)
-DeathMessageFrame.text:SetPoint("RIGHT", DeathMessageFrame, -10, 0)
-DeathMessageFrame.text:SetJustifyH("LEFT")
+DeathMessageFrame.text:SetPoint("TOP", header, "BOTTOM", 0, -6)
+DeathMessageFrame.text:SetPoint("LEFT", DeathMessageFrame, "LEFT", 10, 0)
+DeathMessageFrame.text:SetPoint("RIGHT", DeathMessageFrame, "RIGHT", -10, 0)
+DeathMessageFrame.text:SetJustifyH("CENTER")
 DeathMessageFrame.text:SetJustifyV("TOP")
 DeathMessageFrame.text:SetTextColor(1, 0.1, 0.1, 1)
 DeathMessageFrame.text:SetShadowColor(0, 0, 0, 1)
@@ -65,22 +66,22 @@ fadeOut:SetSmoothing("OUT")
 
 -- Hide frame after animation completes
 animGroup:SetScript("OnFinished", function()
-    DeathMessageFrame:Hide()
+	DeathMessageFrame:Hide()
 end)
 
 -- Shows the death message with animation
 function SchlingelInc.DeathAnnouncement:ShowDeathMessage(message)
-    if not SchlingelOptionsDB["deathmessages"] then
-        return
-    end
+	if not SchlingelOptionsDB["deathmessages"] then
+		return
+	end
 
-    DeathMessageFrame.text:SetText(message)
-    DeathMessageFrame:SetAlpha(0)
-    DeathMessageFrame:Show()
-    animGroup:Stop()
-    animGroup:Play()
+	DeathMessageFrame.text:SetText(SchlingelInc:SanitizeText(message))
+	DeathMessageFrame:SetAlpha(0)
+	DeathMessageFrame:Show()
+	animGroup:Stop()
+	animGroup:Play()
 
-    if SchlingelOptionsDB["deathmessages_sound"] then
-        PlaySound(SchlingelInc.Constants.SOUNDS.DEATH_ANNOUNCEMENT)
-    end
+	if SchlingelOptionsDB["deathmessages_sound"] then
+		PlaySound(SchlingelInc.Constants.SOUNDS.DEATH_ANNOUNCEMENT)
+	end
 end

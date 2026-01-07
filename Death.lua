@@ -78,6 +78,11 @@ function SchlingelInc.Death:Initialize()
 			SendChatMessage(messageString, "GUILD")
 			C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, popupMessageString, "GUILD")
 			CharacterDeaths = CharacterDeaths + 1
+			-- Update guild note with new death count
+			local handle = SchlingelInc:GetDiscordHandle()
+			if handle and handle ~= "" then
+				SchlingelInc:UpdateGuildNote(handle, CharacterDeaths)
+			end
 		end, 0, "DeathTracker")
 
 	-- Chat message tracker for last words

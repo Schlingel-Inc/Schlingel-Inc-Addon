@@ -315,7 +315,7 @@ function SchlingelInc:UpdateMiniDeathLog()
         local row = frame.rows[i]
         local rowFrame = frame.rowFrames[i]
         local highlight = frame.rowHighlights[i]
-        local entry = data[#data - i + 1]
+        local entry = data[i]
 
         if entry and rowFrame:IsShown() then
             local classToken = localizedToToken[entry.class]
