@@ -144,3 +144,20 @@ end
 function SchlingelInc:RemoveRealmFromName(fullName)
     return Ambiguate(fullName, "short")
 end
+
+-- Sanitizes text to prevent UI injection via escape codes
+-- Removes texture, color, and hyperlink escape sequences
+function SchlingelInc:SanitizeText(text)
+    if not text or type(text) ~= "string" then
+        return text
+    end
+    -- Remove texture escape sequences |Tpath:height:width:...|t
+    text = text:gsub("|T[^|]*|t", "")
+    -- Remove color escape sequences |cFFFFFFFF...|r
+    text = text:gsub("|c%x%x%x%x%x%x%x%x", "")
+    text = text:gsub("|r", "")
+    -- Remove hyperlink escape sequences |Htype:data|h...|h
+    text = text:gsub("|H[^|]*|h", "")
+    text = text:gsub("|h", "")
+    return text
+end
