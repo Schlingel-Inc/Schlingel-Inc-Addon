@@ -16,37 +16,15 @@ function SchlingelInc.GuildCache:IsValid()
 	return age < SchlingelInc.Constants.COOLDOWNS.GUILD_ROSTER_CACHE
 end
 
--- Aktualisiert den Guild Roster Cache
-function SchlingelInc.GuildCache:Update(force)
-	-- Prüfe ob Update nötig ist
-	if not force and self:IsValid() then
-		SchlingelInc.Debug:Print("Guild Cache ist noch gültig, überspringe Update")
-		return false
-	end
-
-	-- Verhindere parallele Updates
+-- Fordert ein Roster-Update vom Server an
+-- Die Daten werden automatisch über den GUILD_ROSTER_UPDATE Handler verarbeitet
+function SchlingelInc.GuildCache:RequestUpdate()
 	if self.isUpdating then
-		SchlingelInc.Debug:Print("Guild Cache Update läuft bereits")
 		return false
 	end
 
 	self.isUpdating = true
-
-	-- Registriere einen einmaligen Event Handler für GUILD_ROSTER_UPDATE
-	local handlerName = "GuildCacheUpdate_" .. GetTime()
-	SchlingelInc.EventManager:RegisterHandler("GUILD_ROSTER_UPDATE",
-		function()
-			-- Unregister handler to ensure it only runs once
-			SchlingelInc.EventManager:UnregisterHandler("GUILD_ROSTER_UPDATE", handlerName)
-			self:ProcessRosterData()
-			self.isUpdating = false
-		end, 100, handlerName)
-
-	-- Fordere Roster-Daten vom Server an
-	-- Der Event Handler oben wird aufgerufen, sobald die Daten verfügbar sind
 	C_GuildInfo.GuildRoster()
-
-	SchlingelInc.Debug:Print("Guild Cache Update gestartet")
 	return true
 end
 
@@ -69,6 +47,15 @@ function SchlingelInc.GuildCache:ProcessRosterData()
 			-- Speichere in schneller Lookup-Tabelle
 			self.members[shortName] = true
 
+			-- Berechne Last Online Daten
+			local yearsOffline, monthsOffline, daysOffline, hoursOffline = GetGuildRosterLastOnline(i)
+			yearsOffline = yearsOffline or 0
+			monthsOffline = monthsOffline or 0
+			daysOffline = daysOffline or 0
+			hoursOffline = hoursOffline or 0
+
+			local totalDaysOffline = (yearsOffline * 365) + (monthsOffline * 30) + daysOffline + (hoursOffline / 24)
+
 			-- Speichere vollständige Daten
 			table.insert(self.fullRoster, {
 				name = shortName,
@@ -82,34 +69,23 @@ function SchlingelInc.GuildCache:ProcessRosterData()
 				publicNote = publicNote,
 				officerNote = officerNote,
 				isOnline = isOnline,
-				status = status
+				status = status,
+				yearsOffline = yearsOffline,
+				monthsOffline = monthsOffline,
+				daysOffline = daysOffline,
+				hoursOffline = hoursOffline,
+				totalDaysOffline = totalDaysOffline
 			})
 		end
 	end
 
 	self.lastUpdate = GetTime()
-
-	SchlingelInc.Debug:Print(string.format(
-		"Guild Cache aktualisiert: %d Mitglieder geladen",
-		#self.fullRoster
-	))
-end
-
--- Gibt die gecachte Mitgliederliste zurück (als Dictionary für schnellen Lookup)
--- @return table Dictionary mit Spielernamen als Keys (ohne Realm)
-function SchlingelInc.GuildCache:GetMembers()
-	if not self:IsValid() then
-		self:Update()
-	end
-	return self.members
+	self.isUpdating = false
 end
 
 -- Gibt die vollständige Roster-Liste zurück (als Array mit allen Details)
 -- @return table Array mit vollständigen Mitgliederdaten
 function SchlingelInc.GuildCache:GetFullRoster()
-	if not self:IsValid() then
-		self:Update()
-	end
 	return self.fullRoster
 end
 
@@ -122,10 +98,8 @@ function SchlingelInc.GuildCache:IsGuildMember(playerName)
 	-- Entferne Realm-Namen falls vorhanden
 	local shortName = SchlingelInc:RemoveRealmFromName(playerName)
 
-	-- Hole gecachte Daten
-	local members = self:GetMembers()
-
-	return members[shortName] == true
+	-- Prüfe direkt im Cache
+	return self.members[shortName] == true
 end
 
 -- Gibt detaillierte Informationen über ein Gildenmitglied zurück
@@ -179,8 +153,7 @@ end
 
 -- Erzwingt eine Aktualisierung des Caches
 function SchlingelInc.GuildCache:ForceRefresh()
-	SchlingelInc.Debug:Print("Erzwinge Guild Cache Refresh")
-	return self:Update(true)
+	return self:RequestUpdate()
 end
 
 -- Gibt Cache-Statistiken zurück
@@ -201,24 +174,19 @@ end
 
 -- Initialisiert das GuildCache Modul
 function SchlingelInc.GuildCache:Initialize()
+	-- Update bei Guild Roster Updates (wird automatisch beim Login gefeuert)
+	-- Verarbeitet Roster-Daten immer wenn das Event feuert - hält Cache immer aktuell
+	SchlingelInc.EventManager:RegisterHandler("GUILD_ROSTER_UPDATE",
+		function()
+			SchlingelInc.GuildCache:ProcessRosterData()
+		end, 0, "GuildCacheAutoUpdate")
+
 	-- Initial update beim Login
 	SchlingelInc.EventManager:RegisterHandler("PLAYER_ENTERING_WORLD",
 		function()
-			-- Warte kurz nach dem Login, dann lade Roster
+			-- Warte kurz nach dem Login, dann fordere Roster an
 			C_Timer.After(2, function()
-				SchlingelInc.GuildCache:Update()
+				SchlingelInc.GuildCache:RequestUpdate()
 			end)
 		end, 90, "GuildCacheInit")
-
-	-- Update bei Guild Roster Updates
-	SchlingelInc.EventManager:RegisterHandler("GUILD_ROSTER_UPDATE",
-		function()
-			-- Markiere Cache als ungültig, wird beim nächsten Zugriff aktualisiert
-			if SchlingelInc.GuildCache:IsValid() then
-				SchlingelInc.Debug:Print("GUILD_ROSTER_UPDATE empfangen, markiere Cache als ungültig")
-				SchlingelInc.GuildCache.lastUpdate = 0
-			end
-		end, 0, "GuildCacheInvalidate")
-
-	SchlingelInc.Debug:Print("GuildCache Modul initialisiert")
 end
