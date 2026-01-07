@@ -6,8 +6,7 @@ function SchlingelInc.Rules.ProhibitMailboxUsage()
     CloseMail()
     SchlingelInc.Popup:Show({
         title = "Briefkasten gesperrt!",
-        message = "Die Nutzung des Briefkastens ist nicht erlaubt.",
-        displayTime = 3
+        message = "Die Nutzung des Briefkastens ist nicht erlaubt."
     })
 end
 
@@ -21,8 +20,7 @@ function SchlingelInc.Rules.ProhibitAuctionhouseUsage()
     end
     SchlingelInc.Popup:Show({
         title = "Auktionshaus gesperrt!",
-        message = "Die Nutzung des Auktionshauses ist nicht erlaubt.",
-        displayTime = 3
+        message = "Die Nutzung des Auktionshauses ist nicht erlaubt."
     })
 end
 
@@ -35,8 +33,7 @@ function SchlingelInc.Rules:ProhibitTradeWithNonGuildMembers()
             CancelTrade()
             SchlingelInc.Popup:Show({
                 title = "Handel blockiert!",
-                message = "Du kannst nur mit Gildenmitgliedern handeln.",
-                displayTime = 3
+                message = "Du kannst nur mit Gildenmitgliedern handeln."
             })
         end
     end

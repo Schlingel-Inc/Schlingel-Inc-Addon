@@ -41,7 +41,6 @@ function SchlingelInc:ShowPvPWarning(text)
     SchlingelInc.pvpWarningName:SetText(text)
     SchlingelInc.pvpWarningFrame:SetAlpha(1)
     SchlingelInc.pvpWarningFrame:Show()
-    SchlingelInc:RumbleFrame(SchlingelInc.pvpWarningFrame)
 
     if SchlingelOptionsDB["pvp_alert_sound"] then
         PlaySound(SchlingelInc.Constants.SOUNDS.PVP_ALERT)
@@ -96,28 +95,4 @@ function SchlingelInc:CreatePvPWarningFrame()
     SchlingelInc.pvpWarningFrame = pvpFrame
     SchlingelInc.pvpWarningText = text
     SchlingelInc.pvpWarningName = nameText
-end
-
--- Creates a brief rumble/shake effect on a frame
-function SchlingelInc:RumbleFrame(frame)
-    if not frame then return end
-
-    local duration = 0.3
-    local startTime = GetTime()
-    local point, relativeTo, relativePoint, xOfs, yOfs = frame:GetPoint()
-
-    frame:SetScript("OnUpdate", function()
-        local elapsed = GetTime() - startTime
-
-        if elapsed < duration then
-            local offsetX = math.random(-4, 4)
-            local offsetY = math.random(-4, 4)
-            frame:ClearAllPoints()
-            frame:SetPoint("CENTER", UIParent, "CENTER", offsetX, offsetY)
-        else
-            frame:ClearAllPoints()
-            frame:SetPoint(point or "CENTER", relativeTo or UIParent, relativePoint or "CENTER", xOfs or 0, yOfs or 0)
-            frame:SetScript("OnUpdate", nil)
-        end
-    end)
 end

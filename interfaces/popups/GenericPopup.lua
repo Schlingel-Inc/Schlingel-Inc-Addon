@@ -9,12 +9,6 @@ SchlingelInc.Popup = {
 -- @param options table with fields:
 --   - title: title text (required)
 --   - message: message text (required)
---   - titleColor: {r, g, b} table (optional, defaults to pink)
---   - messageColor: {r, g, b} table (optional, defaults to gold)
---   - borderColor: {r, g, b, a} table (optional, defaults to pink)
---   - displayTime: seconds to show popup (optional, defaults to 3)
---   - playSound: sound ID to play (optional)
---   - rumble: whether to rumble the frame (optional, defaults to true)
 function SchlingelInc.Popup:Show(options)
 	if not options or not options.title or not options.message then
 		return
@@ -23,12 +17,10 @@ function SchlingelInc.Popup:Show(options)
 	-- Set defaults
 	local title = options.title
 	local message = options.message
-	local titleColor = options.titleColor or {1, 0.55, 0.73}
-	local messageColor = options.messageColor or {1, 0.82, 0}
-	local borderColor = options.borderColor or {1, 0.55, 0.73, 1}
-	local displayTime = options.displayTime or 3
-	local playSound = options.playSound
-	local rumble = options.rumble ~= false -- default true
+	local titleColor = {1, 0.55, 0.73}
+	local messageColor = {1, 0.82, 0}
+	local borderColor = {1, 0.55, 0.73, 1}
+	local displayTime = 3
 
 	-- Create the frame
 	local frame = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate")
@@ -44,9 +36,6 @@ function SchlingelInc.Popup:Show(options)
 	frame:SetScript("OnDragStart", frame.StartMoving)
 	frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
 
-	-- Store original position for rumble reset
-	frame.originalPoint = { "TOP", UIParent, "TOP", 0, -150 }
-
 	-- Skull icon
 	local iconFrame = CreateFrame("Frame", nil, frame)
 	iconFrame:SetSize(40, 40)
@@ -54,7 +43,7 @@ function SchlingelInc.Popup:Show(options)
 
 	local icon = iconFrame:CreateTexture(nil, "ARTWORK")
 	icon:SetAllPoints(iconFrame)
-	icon:SetTexture("Interface\\AddOns\\SchlingelInc\\media\\DeathFrameIcon.png")
+	icon:SetTexture("Interface\\AddOns\\SchlingelInc\\media\\icon-minimap.tga")
 	icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
 
 	-- Title
@@ -74,16 +63,6 @@ function SchlingelInc.Popup:Show(options)
 	-- Show the frame
 	frame:SetAlpha(1)
 	frame:Show()
-
-	-- Play sound if specified
-	if playSound then
-		PlaySound(playSound)
-	end
-
-	-- Rumble effect if enabled
-	if rumble then
-		SchlingelInc:RumbleFrame(frame)
-	end
 
 	-- Store in active popups
 	table.insert(self.activePopups, frame)
