@@ -1,27 +1,43 @@
 -- Globale Tabelle für Regeln
 SchlingelInc.Rules = {}
 
--- Regel: Briefkasten-Nutzung verbieten
+-- Regel: Briefkasten-Nutzung komplett verbieten
 function SchlingelInc.Rules.ProhibitMailboxUsage()
-    SchlingelInc:Print("Die Nutzung des Briefkastens ist verboten!")
-    CloseMail() -- Schließt den Briefkasten
+    CloseMail()
+    SchlingelInc.Popup:Show({
+        title = "Briefkasten gesperrt!",
+        message = "Die Nutzung des Briefkastens ist nicht erlaubt.",
+        displayTime = 3
+    })
 end
 
 -- Regel: Auktionshaus-Nutzung verbieten
 function SchlingelInc.Rules.ProhibitAuctionhouseUsage()
-    SchlingelInc:Print("Die Nutzung des Auktionshauses ist verboten!")
-    CloseAuctionHouse() -- Schließt das Auktionshaus
+    if CloseAuctionHouse then
+        CloseAuctionHouse()
+    end
+    if AuctionFrame and AuctionFrame:IsShown() then
+        AuctionFrame:Hide()
+    end
+    SchlingelInc.Popup:Show({
+        title = "Auktionshaus gesperrt!",
+        message = "Die Nutzung des Auktionshauses ist nicht erlaubt.",
+        displayTime = 3
+    })
 end
 
 -- Regel: Handeln mit Spielern außerhalb der Gilde verbieten
-function SchlingelInc.Rules:ProhibitTradeWithNonGuildMembers(player)
-    local tradePartner, _ = UnitName("NPC") -- Name des Handelspartners
+function SchlingelInc.Rules:ProhibitTradeWithNonGuildMembers()
+    local tradePartner = UnitName("NPC")
     if tradePartner then
         local isInGuild = C_GuildInfo.MemberExistsByName(tradePartner)
-        --local isInGuild = SchlingelInc:IsGuildAllowed(GetGuildInfo("NPC"))
         if not isInGuild then
-            SchlingelInc:Print("Handeln mit Spielern außerhalb der Gilde ist verboten!")
-            CancelTrade() -- Schließt das Handelsfenster sofort
+            CancelTrade()
+            SchlingelInc.Popup:Show({
+                title = "Handel blockiert!",
+                message = "Du kannst nur mit Gildenmitgliedern handeln.",
+                displayTime = 3
+            })
         end
     end
 end
