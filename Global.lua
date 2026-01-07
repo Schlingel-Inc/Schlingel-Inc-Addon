@@ -161,3 +161,11 @@ function SchlingelInc:SanitizeText(text)
     text = text:gsub("|h", "")
     return text
 end
+
+-- Validates that an addon message sender is a guild member
+-- Uses GuildCache for fast lookup to prevent spoofed messages
+function SchlingelInc:IsValidGuildSender(sender)
+    if not sender then return false end
+    local shortName = self:RemoveRealmFromName(sender)
+    return SchlingelInc.GuildCache:IsGuildMember(shortName)
+end
