@@ -48,14 +48,12 @@ if LDB then -- Only proceeds if LibDataBroker is available
     })
 else
     -- Output message if LibDataBroker was not found
-    SchlingelInc:Print("LibDataBroker-1.1 not found. Minimap icon will not be created.")
 end
 
 -- Initializes the minimap icon
 function SchlingelInc:InitMinimapIcon()
     -- Abort if LibDBIcon or the LDB data object are not available
     if not DBIcon or not SchlingelInc.minimapDataObject then
-        SchlingelInc:Print("LibDBIcon-1.0 or LDB data object not found. Minimap icon will not be initialized.")
         return
     end
 
@@ -68,6 +66,5 @@ function SchlingelInc:InitMinimapIcon()
         -- Register the icon with LibDBIcon
         DBIcon:Register(SchlingelInc.name, SchlingelInc.minimapDataObject, SchlingelInc.db.minimap)
         SchlingelInc.minimapRegistered = true -- Mark icon as registered
-        SchlingelInc:Print("Minimap icon registered.")
     end
 end

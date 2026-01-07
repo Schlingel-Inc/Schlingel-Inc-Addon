@@ -13,7 +13,7 @@ end
 -- Shows a permission error message
 local function ShowPermissionError()
 	SchlingelInc:Print(SchlingelInc.Constants.COLORS.ERROR ..
-		"This command is only available for Devschlingel.|r")
+		"Der Debugmodus ist den Devschlingeln vorbehalten.|r")
 end
 
 -- Initializes the debug module

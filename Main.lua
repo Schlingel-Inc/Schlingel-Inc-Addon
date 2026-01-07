@@ -48,9 +48,6 @@ function SchlingelInc:OnLoad()
     -- Initialize minimap icon functionality.
     SchlingelInc:InitMinimapIcon()
 
-    -- Output confirmation message that addon was loaded, including version.
-    SchlingelInc:Print("Addon version " .. SchlingelInc.version .. " loaded")
-
     -- QoL: Hide mail icon and mute annoying sounds
     HideMinimapMail()
     MuteGroupInviteSounds()

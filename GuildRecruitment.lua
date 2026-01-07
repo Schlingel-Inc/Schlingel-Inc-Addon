@@ -39,7 +39,7 @@ function SchlingelInc.GuildRecruitment:SendGuildRequest()
     local playerExp = UnitXP("player")
 
     if playerLevel > 1 then
-        SchlingelInc:Print("You can only send a guild request at level 1.")
+        SchlingelInc:Print("Du kannst nur auf Level 1 eine Anfrage an die Gilde abschicken.")
         return
     end
 
@@ -58,8 +58,6 @@ function SchlingelInc.GuildRecruitment:SendGuildRequest()
     local guildOfficers = SchlingelInc.Constants.FALLBACK_OFFICERS
 
     if #guildOfficers == 0 then
-        SchlingelInc:Print(SchlingelInc.Constants.COLORS.ERROR ..
-            "No officers configured. Please contact an officer directly.|r")
         return
     end
 
@@ -69,9 +67,6 @@ function SchlingelInc.GuildRecruitment:SendGuildRequest()
         C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, message, "WHISPER", name)
         sentCount = sentCount + 1
     end
-
-    SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS ..
-        string.format("Guild request sent to %d officers.", sentCount) .. "|r")
 end
 
 local function HandleAddonMessage(message)
@@ -106,7 +101,7 @@ local function HandleAddonMessage(message)
                 zone = zone,
                 money = money,
             }
-            local displayMessage = string.format("New guild request from %s (Level %s) with %s in their pocket from %s received.",
+            local displayMessage = string.format("Neue Anfrage von %s (Level %s) mit %s in den Taschen aus %s erhalten.",
                 name, level, money, zone)
             SchlingelInc:Print(displayMessage)
             SchlingelInc.GuildInvites:ShowInviteMessage(displayMessage, requestData)
@@ -116,7 +111,7 @@ local function HandleAddonMessage(message)
     elseif message:find("^INVITE_DECLINED:") then
         local name = message:match("^INVITE_DECLINED:(.+)$")
         if name and name ~= "" then
-            SchlingelInc:Print("An officer has declined the request from " .. name .. ".")
+            SchlingelInc:Print("Ein Offi hat die Anfrage von " .. name .. " abgelehnt.")
             SchlingelInc.GuildInvites:HideInviteMessage()
         end
     end
@@ -134,8 +129,6 @@ function SchlingelInc.GuildRecruitment:HandleAcceptRequest(playerName)
         for _, name in ipairs(guildOfficers) do
             C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "INVITE_SENT:" .. playerName, "WHISPER", name)
         end
-    else
-        SchlingelInc:Print("You don't have permission to invite players to the guild.")
     end
 end
 
@@ -148,7 +141,7 @@ function SchlingelInc.GuildRecruitment:HandleDeclineRequest(playerName)
         C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "INVITE_DECLINED:" .. playerName, "WHISPER", name)
     end
 
-    SchlingelInc:Print("Request from " .. playerName .. " was declined.")
+    SchlingelInc:Print("Anfrage von " .. playerName .. " wurde abgelehnt.")
 end
 
 -- Initializes the GuildRecruitment module
