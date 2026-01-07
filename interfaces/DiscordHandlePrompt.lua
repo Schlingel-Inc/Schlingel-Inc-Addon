@@ -97,6 +97,8 @@ local function CreateDiscordHandlePrompt()
         if handle and handle ~= "" then
             SchlingelInc:SetDiscordHandle(handle)
             frame:Hide()
+            -- Check if player needs guild invite prompt
+            SchlingelInc:CheckAndShowGuildJoinPrompt()
         end
     end
 
@@ -120,9 +122,11 @@ function SchlingelInc:ShowDiscordHandlePromptIfNeeded()
 
     local handle = SchlingelInc:GetDiscordHandle()
 
-    -- If handle is set and not empty, update guild note silently
+    -- If handle is set and not empty, update guild note silently and check for guild
     if handle and handle ~= "" then
         SchlingelInc:UpdateGuildNote(handle, CharacterDeaths or 0)
+        -- Check if player needs guild invite prompt (handle set but not in guild)
+        SchlingelInc:CheckAndShowGuildJoinPrompt()
     -- Show prompt if no handle is set (nil means never asked)
     elseif handle == nil then
         DiscordPromptFrame = DiscordPromptFrame or CreateDiscordHandlePrompt()

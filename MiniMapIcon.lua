@@ -13,32 +13,29 @@ if LDB then -- Only proceeds if LibDataBroker is available
         icon = "Interface\\AddOns\\SchlingelInc\\media\\icon-minimap.tga", -- Path to icon
         OnClick = function(clickedFrame, button)
             if button == "LeftButton" then
-                if IsShiftKeyDown() then
-                    SchlingelInc:ToggleDeathLogWindow()
-                    return
-                end
-                if SchlingelInc.ToggleInfoWindow then
-                    SchlingelInc:ToggleInfoWindow()
-                    return
-                end
+                SchlingelInc:ToggleDeathLogWindow()
             elseif button == "RightButton" then
                 if CanGuildInvite() then
                     if SchlingelInc.ToggleInactivityWindow then
                         SchlingelInc:ToggleInactivityWindow()
                     end
+                else
+                    -- Not in guild - show guild join prompt
+                    SchlingelInc:ShowGuildJoinPrompt()
                 end
             end
         end,
 
         -- Tooltip shown when hovering over the icon
         OnEnter = function(selfFrame)
-            GameTooltip:SetOwner(selfFrame, "ANCHOR_RIGHT")                                    -- Position tooltip to the right of icon
-            GameTooltip:AddLine(SchlingelInc.name, 1, 0.7, 0.9)                                -- Addon name in tooltip
-            GameTooltip:AddLine("Version: " .. (SchlingelInc.version or "Unknown"), 1, 1, 1)  -- Version in tooltip
-            GameTooltip:AddLine("Left-click: Show info", 1, 1, 1)                              -- Left-click hint
-            GameTooltip:AddLine("Shift + Left-click: Death log", 1, 1, 1)                      -- Shift + Left-click hint
+            GameTooltip:SetOwner(selfFrame, "ANCHOR_RIGHT")
+            GameTooltip:AddLine(SchlingelInc.name, 1, 0.7, 0.9)
+            GameTooltip:AddLine("Version: " .. (SchlingelInc.version or "Unknown"), 1, 1, 1)
+            GameTooltip:AddLine("Linksklick: Tode anzeigen", 1, 1, 1)
             if CanGuildInvite() then
-                GameTooltip:AddLine("Right-click: Inactive members", 0.8, 0.8, 0.8)            -- Right-click hint
+                GameTooltip:AddLine("Rechtsklick: Inaktive Mitglieder", 0.8, 0.8, 0.8)
+            elseif not IsInGuild() then
+                GameTooltip:AddLine("Rechtsklick: Gilde beitreten", 1, 1, 1)
             end
             GameTooltip:Show()
         end,
