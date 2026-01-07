@@ -68,7 +68,7 @@ SchlingelInc.Constants.FALLBACK_OFFICERS = {
 
 -- UI Backdrop Settings
 SchlingelInc.Constants.BACKDROP = {
-	bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+	bgFile = "Interface\\BUTTONS\\WHITE8X8",
 	edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
 	tile = true,
 	tileSize = 32,

@@ -203,7 +203,7 @@ function SchlingelInc:CreateMiniDeathLog()
         UpdateDeathLogLayout(frame)
     end)
 
-    -- Skull Icon (top left corner) - using in-game icon
+    -- SI icon top left corner
     local iconFrame = CreateFrame("Frame", nil, frame)
     iconFrame:SetSize(24, 24)
     iconFrame:SetPoint("TOPLEFT", frame, "TOPLEFT", -6, 6)
@@ -223,7 +223,7 @@ function SchlingelInc:CreateMiniDeathLog()
     local iconBg = iconFrame:CreateTexture(nil, "ARTWORK")
     iconBg:SetPoint("CENTER")
     iconBg:SetSize(20, 20)
-    iconBg:SetTexture("Interface\\Icons\\Ability_Rogue_FeignDeath")
+    iconBg:SetTexture("Interface\\AddOns\\SchlingelInc\\media\\icon-minimap.tga")
 
     -- Create circular mask for icon
     local mask = iconFrame:CreateMaskTexture()
