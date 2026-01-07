@@ -17,6 +17,7 @@ MiniMapIcon.lua
 Constants.lua
 EventManager.lua
 GuildCache.lua
+Tooltip.lua
 Debug.lua
 Options.lua
 Rules.lua
