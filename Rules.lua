@@ -1,8 +1,16 @@
 -- Global table for rules
 SchlingelInc.Rules = {}
 
+local text = GetGuildInfoText() or "Schlingel:1111"
+local mailRule,auctionHouseRule,tradeRule,groupingRule = text:match("Schlingel:%s*(%d+)%s*,?%s*(%d+)%s*,?%s*(%d+)%s*,?%s*(%d+)")
+mailRule,auctionHouseRule,tradeRule,groupingRule = tonumber(mailRule), tonumber(auctionHouseRule), tonumber(tradeRule), tonumber(groupingRule)
+
 -- Rule: Completely prohibit mailbox usage
 function SchlingelInc.Rules.ProhibitMailboxUsage()
+    if mailRule == 0 then
+        return
+    end
+
     CloseMail()
     SchlingelInc.Popup:Show({
         title = "Briefkasten gesperrt!",
@@ -12,6 +20,10 @@ end
 
 -- Rule: Prohibit auction house usage
 function SchlingelInc.Rules.ProhibitAuctionhouseUsage()
+    if auctionHouseRule == 0 then
+        return
+    end
+
     if CloseAuctionHouse then
         CloseAuctionHouse()
     end
@@ -26,6 +38,10 @@ end
 
 -- Rule: Prohibit trading with players outside the guild
 function SchlingelInc.Rules:ProhibitTradeWithNonGuildMembers()
+    if tradeRule == 0 then
+        return
+    end
+
     local tradePartner = UnitName("NPC")
     if tradePartner then
         local isInGuild = C_GuildInfo.MemberExistsByName(tradePartner)
@@ -41,6 +57,10 @@ end
 
 -- Rule: Prohibit grouping with players outside the guild
 function SchlingelInc.Rules:ProhibitGroupingWithNonGuildMembers()
+    if groupingRule == 0 then
+        return
+    end
+
     -- Request fresh guild roster data
     C_GuildInfo.GuildRoster()
 
