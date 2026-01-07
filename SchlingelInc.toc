@@ -22,6 +22,7 @@ Options.lua
 Rules.lua
 GuildRecruitment.lua
 LevelUp.lua
+interfaces\popups\GenericPopup.lua
 interfaces\popups\DeathAnnouncement.lua
 interfaces\Deathlog.lua
 interfaces\popups\GuildInvites.lua
