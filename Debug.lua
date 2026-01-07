@@ -106,9 +106,9 @@ function SchlingelInc.Debug:TestDeathFrame()
 	SchlingelInc.DeathAnnouncement:ShowDeathMessage(
 		string.format("%s der %s ist mit Level %s in %s gestorben.", name, class, level, zone))
 
-	-- Add to death log
+	-- Add to death log (insert at position 1 so newest is first)
 	SchlingelInc.DeathLogData = SchlingelInc.DeathLogData or {}
-	table.insert(SchlingelInc.DeathLogData, {
+	table.insert(SchlingelInc.DeathLogData, 1, {
 		name = name,
 		class = class,
 		level = level,
