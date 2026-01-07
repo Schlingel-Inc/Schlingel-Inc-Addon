@@ -18,16 +18,16 @@ function SchlingelInc.Popup:Show(options)
 	local title = options.title
 	local message = options.message
 	local titleColor = {1, 0.55, 0.73}
-	local messageColor = {1, 0.82, 0}
-	local borderColor = {1, 0.55, 0.73, 1}
+	local messageColor = {1, 1, 1}
+	local borderColor = {1, 0.55, 0.73, 0}
 	local displayTime = 3
 
 	-- Create the frame
 	local frame = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate")
-	frame:SetSize(350, 140)
+	frame:SetSize(370, 160)
 	frame:SetPoint("TOP", UIParent, "TOP", 0, -150)
 	frame:SetBackdrop(SchlingelInc.Constants.BACKDROP)
-	frame:SetBackdropColor(0, 0, 0, 1)
+	frame:SetBackdropColor(0, 0, 0, 0.50)
 	frame:SetBackdropBorderColor(borderColor[1], borderColor[2], borderColor[3], borderColor[4])
 	frame:SetFrameStrata("DIALOG")
 	frame:SetMovable(true)
@@ -39,11 +39,11 @@ function SchlingelInc.Popup:Show(options)
 	-- Skull icon
 	local iconFrame = CreateFrame("Frame", nil, frame)
 	iconFrame:SetSize(40, 40)
-	iconFrame:SetPoint("TOP", frame, "TOP", 0, -20)
+	iconFrame:SetPoint("TOP", frame, "TOP", 0, -30)
 
 	local icon = iconFrame:CreateTexture(nil, "ARTWORK")
 	icon:SetAllPoints(iconFrame)
-	icon:SetTexture("Interface\\AddOns\\SchlingelInc\\media\\icon-minimap.tga")
+	icon:SetTexture("Interface\\AddOns\\SchlingelInc\\media\\SI_Transp_512_x_512_px.tga")
 	icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
 
 	-- Title
