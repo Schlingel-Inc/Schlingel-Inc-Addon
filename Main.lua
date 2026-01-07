@@ -1,3 +1,33 @@
+local function MuteGroupInviteSounds()
+	-- Mute party invite sound (the "whoosh" when receiving/sending invites)
+	MuteSoundFile(567275) -- IG_PLAYER_INVITE file ID
+	-- Mute LFG role check sound
+	MuteSoundFile(567478) -- ReadyCheck/RoleCheck "wom wom wommm" sound
+end
+
+local function HideMinimapMail()
+	local mail = MiniMapMailFrame or MiniMapMailIcon
+	if not mail then return end
+
+	-- Stop Blizzard from updating/showing it
+	if mail.UnregisterAllEvents then
+		mail:UnregisterAllEvents()
+	end
+
+	-- Hide it now
+	mail:Hide()
+
+	-- Make it non-interactive
+	mail:SetAlpha(0)
+	mail:SetScript("OnEnter", nil)
+	mail:SetScript("OnLeave", nil)
+
+	-- Prevent future :Show() calls
+	if mail.Show then
+		mail.Show = function() end
+	end
+end
+
 -- SchlingelInc:OnLoad() Funktion - wird ausgeführt, wenn das Addon selbst geladen wird.
 function SchlingelInc:OnLoad()
     -- Initialisiere EventManager zuerst
@@ -22,6 +52,10 @@ function SchlingelInc:OnLoad()
 
     -- Gibt eine Bestätigungsnachricht aus, dass das Addon geladen wurde, inklusive Version.
     SchlingelInc:Print("Addon version " .. SchlingelInc.version .. " geladen")
+
+    -- QoL: Verstecke Mail-Icon und mute störende Sounds
+    HideMinimapMail()
+    MuteGroupInviteSounds()
 end
 
 -- --- Event-Registrierungen über den zentralen EventManager ---
