@@ -1,13 +1,16 @@
--- Lädt benötigte Bibliotheken für das Minimap-Icon. 'true' unterdrückt Fehler, falls nicht gefunden.
+-- MiniMapIcon.lua
+-- Creates and manages the minimap icon for the addon
+
+-- Load required libraries for the minimap icon. 'true' suppresses errors if not found.
 local LDB = LibStub("LibDataBroker-1.1", true)
 local DBIcon = LibStub("LibDBIcon-1.0", true)
 
--- Datenobjekt für das Minimap Icon (OnClick wird später gesetzt, falls benötigt).
-if LDB then                                                                -- Fährt nur fort, wenn LibDataBroker verfügbar ist.
+-- Data object for the minimap icon
+if LDB then -- Only proceeds if LibDataBroker is available
     SchlingelInc.minimapDataObject = LDB:NewDataObject(SchlingelInc.name, {
-        type = "launcher",                                                 -- Typ des LDB-Objekts: Startet eine UI oder Funktion.
-        label = SchlingelInc.name,                                         -- Text neben dem Icon (oft nur im LDB Display Addon sichtbar).
-        icon = "Interface\\AddOns\\SchlingelInc\\media\\icon-minimap.tga", -- Pfad zum Icon.
+        type = "launcher",                                                 -- LDB object type: Launches a UI or function
+        label = SchlingelInc.name,                                         -- Text next to icon (often only visible in LDB display addons)
+        icon = "Interface\\AddOns\\SchlingelInc\\media\\icon-minimap.tga", -- Path to icon
         OnClick = function(clickedFrame, button)
             if button == "LeftButton" then
                 if IsShiftKeyDown() then
@@ -27,44 +30,44 @@ if LDB then                                                                -- F�
             end
         end,
 
-        -- OnClick = function... (WURDE HIER ENTFERNT, kann später hinzugefügt werden)
-        OnEnter = function(selfFrame)                                                          -- Wird ausgeführt, wenn die Maus über das Icon fährt.
-            GameTooltip:SetOwner(selfFrame, "ANCHOR_RIGHT")                                    -- Positioniert den Tooltip rechts vom Icon.
-            GameTooltip:AddLine(SchlingelInc.name, 1, 0.7, 0.9)                                -- Addon-Name im Tooltip.
-            GameTooltip:AddLine("Version: " .. (SchlingelInc.version or "Unbekannt"), 1, 1, 1) -- Version im Tooltip.
-            GameTooltip:AddLine("Linksklick: Info anzeigen", 1, 1, 1)                          -- Hinweis für Linksklick.
-            GameTooltip:AddLine("Shift + Linksklick: Deathlog", 1, 1, 1)                       -- Hinweis für Shift + Linksklick.
+        -- Tooltip shown when hovering over the icon
+        OnEnter = function(selfFrame)
+            GameTooltip:SetOwner(selfFrame, "ANCHOR_RIGHT")                                    -- Position tooltip to the right of icon
+            GameTooltip:AddLine(SchlingelInc.name, 1, 0.7, 0.9)                                -- Addon name in tooltip
+            GameTooltip:AddLine("Version: " .. (SchlingelInc.version or "Unknown"), 1, 1, 1)  -- Version in tooltip
+            GameTooltip:AddLine("Left-click: Show info", 1, 1, 1)                              -- Left-click hint
+            GameTooltip:AddLine("Shift + Left-click: Death log", 1, 1, 1)                      -- Shift + Left-click hint
             if CanGuildInvite() then
-                GameTooltip:AddLine("Rechtsklick: Inaktive Mitglieder", 0.8, 0.8, 0.8)         -- Hinweis für Rechtsklick.
+                GameTooltip:AddLine("Right-click: Inactive members", 0.8, 0.8, 0.8)            -- Right-click hint
             end
-            GameTooltip:Show()                                                                 -- Zeigt den Tooltip an.
+            GameTooltip:Show()
         end,
-        OnLeave = function()                                                                   -- Wird ausgeführt, wenn die Maus das Icon verlässt.
-            GameTooltip:Hide()                                                                 -- Versteckt den Tooltip.
+        OnLeave = function()
+            GameTooltip:Hide()
         end
     })
 else
-    -- Gibt eine Meldung aus, falls LibDataBroker nicht gefunden wurde.
-    SchlingelInc:Print("LibDataBroker-1.1 nicht gefunden. Minimap-Icon wird nicht erstellt.")
+    -- Output message if LibDataBroker was not found
+    SchlingelInc:Print("LibDataBroker-1.1 not found. Minimap icon will not be created.")
 end
 
--- Initialisierung des Minimap Icons.
+-- Initializes the minimap icon
 function SchlingelInc:InitMinimapIcon()
-    -- Bricht ab, falls LibDBIcon oder das LDB Datenobjekt nicht vorhanden sind.
+    -- Abort if LibDBIcon or the LDB data object are not available
     if not DBIcon or not SchlingelInc.minimapDataObject then
-        SchlingelInc:Print("LibDBIcon-1.0 oder LDB-Datenobjekt nicht gefunden. Minimap-Icon wird nicht initialisiert.")
+        SchlingelInc:Print("LibDBIcon-1.0 or LDB data object not found. Minimap icon will not be initialized.")
         return
     end
 
-    -- Registriert das Icon nur einmal.
+    -- Register the icon only once
     if not SchlingelInc.minimapRegistered then
-        -- Initialisiert die Datenbank für Minimap-Einstellungen, falls nicht vorhanden.
+        -- Initialize the database for minimap settings if not present
         SchlingelInc.db = SchlingelInc.db or {}
-        SchlingelInc.db.minimap = SchlingelInc.db.minimap or { hide = false } -- Standardmäßig nicht versteckt.
+        SchlingelInc.db.minimap = SchlingelInc.db.minimap or { hide = false } -- Not hidden by default
 
-        -- Registriert das Icon bei LibDBIcon.
+        -- Register the icon with LibDBIcon
         DBIcon:Register(SchlingelInc.name, SchlingelInc.minimapDataObject, SchlingelInc.db.minimap)
-        SchlingelInc.minimapRegistered = true -- Markiert das Icon als registriert.
-        SchlingelInc:Print("Minimap-Icon registriert.")
+        SchlingelInc.minimapRegistered = true -- Mark icon as registered
+        SchlingelInc:Print("Minimap icon registered.")
     end
 end

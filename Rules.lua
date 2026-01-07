@@ -1,7 +1,7 @@
--- Globale Tabelle für Regeln
+-- Global table for rules
 SchlingelInc.Rules = {}
 
--- Regel: Briefkasten-Nutzung komplett verbieten
+-- Rule: Completely prohibit mailbox usage
 function SchlingelInc.Rules.ProhibitMailboxUsage()
     CloseMail()
     SchlingelInc.Popup:Show({
@@ -11,7 +11,7 @@ function SchlingelInc.Rules.ProhibitMailboxUsage()
     })
 end
 
--- Regel: Auktionshaus-Nutzung verbieten
+-- Rule: Prohibit auction house usage
 function SchlingelInc.Rules.ProhibitAuctionhouseUsage()
     if CloseAuctionHouse then
         CloseAuctionHouse()
@@ -26,7 +26,7 @@ function SchlingelInc.Rules.ProhibitAuctionhouseUsage()
     })
 end
 
--- Regel: Handeln mit Spielern außerhalb der Gilde verbieten
+-- Rule: Prohibit trading with players outside the guild
 function SchlingelInc.Rules:ProhibitTradeWithNonGuildMembers()
     local tradePartner = UnitName("NPC")
     if tradePartner then
@@ -42,7 +42,7 @@ function SchlingelInc.Rules:ProhibitTradeWithNonGuildMembers()
     end
 end
 
--- Regel: Gruppen mit Spielern außerhalb der Gilde verbieten
+-- Rule: Prohibit grouping with players outside the guild
 function SchlingelInc.Rules:ProhibitGroupingWithNonGuildMembers()
     -- Request fresh guild roster data
     C_GuildInfo.GuildRoster()
@@ -89,7 +89,7 @@ function SchlingelInc.Rules:ProhibitGroupingWithNonGuildMembers()
     end
 end
 
--- Initialisierung der Regeln
+-- Initialize rules
 function SchlingelInc.Rules:Initialize()
 	SchlingelInc.EventManager:RegisterHandler("MAIL_SHOW",
 		function()

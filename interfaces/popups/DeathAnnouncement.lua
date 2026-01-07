@@ -1,6 +1,9 @@
+-- DeathAnnouncement.lua
+-- Displays animated death announcements when guild members die
+
 SchlingelInc.DeathAnnouncement = {}
 
--- Frame für die Nachricht
+-- Frame for the message
 local DeathMessageFrame = CreateFrame("Frame", "DeathMessageFrame", UIParent, "BackdropTemplate")
 DeathMessageFrame:SetSize(300, 75)
 DeathMessageFrame:SetPoint("TOP", UIParent, "TOP", 0, 0)
@@ -8,7 +11,7 @@ DeathMessageFrame:SetFrameStrata("FULLSCREEN_DIALOG")
 DeathMessageFrame:SetFrameLevel(1000)
 DeathMessageFrame:Hide()
 
--- Hintergrund
+-- Background
 DeathMessageFrame:SetBackdrop(SchlingelInc.Constants.POPUPBACKDROP)
 DeathMessageFrame:SetBackdropColor(0, 0, 0, 0.8)
 
@@ -34,7 +37,7 @@ DeathMessageFrame.text:SetTextColor(1, 0.1, 0.1, 1)
 DeathMessageFrame.text:SetShadowColor(0, 0, 0, 1)
 DeathMessageFrame.text:SetShadowOffset(1, -1)
 
--- Animation vorbereiten
+-- Prepare animation
 local animGroup = DeathMessageFrame:CreateAnimationGroup()
 local moveDown = animGroup:CreateAnimation("Translation")
 moveDown:SetDuration(0.6)
@@ -60,12 +63,12 @@ fadeOut:SetFromAlpha(1)
 fadeOut:SetToAlpha(0)
 fadeOut:SetSmoothing("OUT")
 
--- Nach Animation Frame verstecken
+-- Hide frame after animation completes
 animGroup:SetScript("OnFinished", function()
     DeathMessageFrame:Hide()
 end)
 
--- Nachricht anzeigen
+-- Shows the death message with animation
 function SchlingelInc.DeathAnnouncement:ShowDeathMessage(message)
     if not SchlingelOptionsDB["deathmessages"] then
         return

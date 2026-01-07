@@ -1,35 +1,35 @@
--- Initialisiere das Death-Modul im SchlingelInc Namespace
+-- Initialize the Death module in the SchlingelInc namespace
 SchlingelInc.Death = {
 	lastChatMessage = "",
 	lastAttackSource = "",
-	MAX_LOG_ENTRIES = 50  -- Maximale Anzahl gespeicherter Tode
+	MAX_LOG_ENTRIES = 50  -- Maximum number of stored deaths
 }
 
--- Initialisiere CharacterDeaths um einen Nil Verweis zu vermeiden
+-- Initialize CharacterDeaths to avoid nil reference
 CharacterDeaths = CharacterDeaths or 0
 
--- Session-basiertes Death Log (wird NICHT persistiert, nur während der Session)
--- Dies verhindert Out-of-Sync Probleme wenn Spieler offline sind
+-- Session-based death log (NOT persisted, only during session)
+-- This prevents out-of-sync issues when players are offline
 SchlingelInc.DeathLogData = {}
 
--- Funktion zum Hinzufügen eines Eintrags zum Death Log mit Rotation
+-- Function to add an entry to the death log with rotation
 function SchlingelInc.Death:AddLogEntry(entry)
 	table.insert(SchlingelInc.DeathLogData, 1, entry)
 
-	-- Rotation: Behalte nur die letzten MAX_LOG_ENTRIES Einträge
+	-- Rotation: Keep only the last MAX_LOG_ENTRIES entries
 	while #SchlingelInc.DeathLogData > SchlingelInc.Death.MAX_LOG_ENTRIES do
 		table.remove(SchlingelInc.DeathLogData)
 	end
 end
 
--- Initialisiert das Death-Modul und registriert Events
+-- Initializes the Death module and registers events
 function SchlingelInc.Death:Initialize()
 	local playerName = UnitName("player")
 
-	-- PLAYER_DEAD Event Handler
+	-- PLAYER_DEAD event handler
 	SchlingelInc.EventManager:RegisterHandler("PLAYER_DEAD",
 		function()
-			--Wenn im Raid oder Battleground, skip den ganzen Kram weil wir den Tod weder tracken noch ankündigen
+			-- If in raid or battleground, skip everything because we neither track nor announce the death
 			if SchlingelInc:IsInBattleground() or SchlingelInc:IsInRaid() then return end
 
 			local name = UnitName("player")
@@ -40,7 +40,7 @@ function SchlingelInc.Death:Initialize()
 			local level = UnitLevel("player")
 			local sex = UnitSex("player")
 
-			-- Sichere Zone-Abfrage mit Fehlerbehandlung
+			-- Safe zone query with error handling
 			local zone, mapID
 			if IsInInstance() then
 				zone = GetInstanceInfo()
@@ -48,9 +48,9 @@ function SchlingelInc.Death:Initialize()
 				mapID = C_Map.GetBestMapForUnit("player")
 				if mapID then
 					local mapInfo = C_Map.GetMapInfo(mapID)
-					zone = mapInfo and mapInfo.name or "Unbekannt"
+					zone = mapInfo and mapInfo.name or "Unknown"
 				else
-					zone = "Unbekannt"
+					zone = "Unknown"
 				end
 			end
 
@@ -80,7 +80,7 @@ function SchlingelInc.Death:Initialize()
 			CharacterDeaths = CharacterDeaths + 1
 		end, 0, "DeathTracker")
 
-	-- Chat Message Tracker für letzte Worte
+	-- Chat message tracker for last words
 	SchlingelInc.EventManager:RegisterHandler("CHAT_MSG_SAY", function(_, msg, sender)
 		if sender == playerName or sender:match("^" .. playerName .. "%-") then
 			SchlingelInc.Death.lastChatMessage = msg
@@ -105,7 +105,7 @@ function SchlingelInc.Death:Initialize()
 		end
 	end, 0, "LastWordsRaid")
 
-	-- Combat Log für letzte Angriffsquelle
+	-- Combat log for last attack source
 	SchlingelInc.EventManager:RegisterHandler("COMBAT_LOG_EVENT_UNFILTERED",
 		function()
 			local _, subevent, _, _, sourceName, _, _, destGUID = CombatLogGetCurrentEventInfo()
@@ -113,10 +113,10 @@ function SchlingelInc.Death:Initialize()
 			if destGUID ~= UnitGUID("player") then return end
 			if not subevent:match("_DAMAGE$") then return end
 
-			SchlingelInc.Death.lastAttackSource = sourceName or "Unbekannt"
+			SchlingelInc.Death.lastAttackSource = sourceName or "Unknown"
 		end, 0, "LastAttackTracker")
 
-	-- Addon Message Popup Tracker
+	-- Addon message popup tracker
 	SchlingelInc.EventManager:RegisterHandler("CHAT_MSG_ADDON",
 		function(_, prefix, msg)
 			if prefix == SchlingelInc.prefix and msg:find("SCHLINGEL_DEATH") then
@@ -131,43 +131,43 @@ function SchlingelInc.Death:Initialize()
 
 					-- Capture the current lastAttackSource for this specific death
 					-- Note: This is the attack source from the SENDER's death, not the receiver's
-					-- Since this is an addon message about someone else's death, we use "Unbekannt"
+					-- Since this is an addon message about someone else's death, we use "Unknown"
 					local deathEntry = {
 						name = name,
 						class = class,
 						level = tonumber(level),
 						zone = zone,
-						cause = "Unbekannt",  -- Remote death, we don't know the actual cause
+						cause = "Unknown",  -- Remote death, we don't know the actual cause
 						timestamp = time()
 					}
 
-					-- Füge Eintrag zum persistenten Log hinzu (wird automatisch zu DeathLogData)
+					-- Add entry to persistent log (automatically added to DeathLogData)
 					SchlingelInc.Death:AddLogEntry(deathEntry)
 
-					-- Aktualisiere UI falls geöffnet
+					-- Update UI if open
 					SchlingelInc:UpdateMiniDeathLog()
 				end
 			end
 		end, 0, "DeathAnnouncementReceiver")
 end
 
--- Slash-Befehl definieren
+-- Define slash command
 SLASH_DEATHSET1 = '/deathset'
 SlashCmdList["DEATHSET"] = function(msg)
 	local inputValue = tonumber(msg)
 
-	-- Kommt keine Zahl vom User, gibt es eine Fehlermeldung plus Anleitung.
+	-- If user didn't provide a number, show error message with instructions
 	if not inputValue then
-		SchlingelInc:Print(SchlingelInc.Constants.COLORS.ERROR .. "Ungültiger Input. Benutze: /deathset <Zahl>|r")
+		SchlingelInc:Print(SchlingelInc.Constants.COLORS.ERROR .. "Invalid input. Use: /deathset <number>|r")
 		return
 	end
 
-	-- Validierung: Zahl muss im sinnvollen Bereich liegen
+	-- Validation: Number must be in a reasonable range
 	if inputValue < 0 or inputValue > 999999 then
-		SchlingelInc:Print(SchlingelInc.Constants.COLORS.ERROR .. "Der Wert muss zwischen 0 und 999999 liegen|r")
+		SchlingelInc:Print(SchlingelInc.Constants.COLORS.ERROR .. "Value must be between 0 and 999999|r")
 		return
 	end
 
 	CharacterDeaths = inputValue
-	SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS .. "Tod-Counter wurde auf " .. CharacterDeaths .. " gesetzt.|r")
+	SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS .. "Death counter set to " .. CharacterDeaths .. "|r")
 end

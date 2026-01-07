@@ -1,3 +1,7 @@
+-- PvPFrame.lua
+-- Displays PvP warning popup when targeting PvP-flagged players
+
+-- Checks if the current target is PvP-flagged and shows a warning
 function SchlingelInc:CheckTargetPvP()
     local unit = "target"
     if not UnitExists(unit) or not UnitIsPVP(unit) then return end
@@ -25,6 +29,7 @@ function SchlingelInc:CheckTargetPvP()
     end
 end
 
+-- Shows the PvP warning popup with the given text
 function SchlingelInc:ShowPvPWarning(text)
     if not SchlingelInc.pvpWarningFrame then
         SchlingelInc:CreatePvPWarningFrame()
@@ -54,6 +59,7 @@ function SchlingelInc:ShowPvPWarning(text)
     end)
 end
 
+-- Creates the PvP warning frame
 function SchlingelInc:CreatePvPWarningFrame()
     if SchlingelInc.pvpWarningFrame and SchlingelInc.pvpWarningFrame:IsObjectType("Frame") then
         return
@@ -92,6 +98,7 @@ function SchlingelInc:CreatePvPWarningFrame()
     SchlingelInc.pvpWarningName = nameText
 end
 
+-- Creates a brief rumble/shake effect on a frame
 function SchlingelInc:RumbleFrame(frame)
     if not frame then return end
 

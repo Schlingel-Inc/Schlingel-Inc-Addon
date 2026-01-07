@@ -1,3 +1,6 @@
+-- GenericPopup.lua
+-- Reusable popup framework for displaying notifications
+
 SchlingelInc.Popup = {
 	activePopups = {}
 }

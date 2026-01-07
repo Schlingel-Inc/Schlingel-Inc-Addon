@@ -1,15 +1,15 @@
 -- Constants.lua
--- Zentrale Konstanten für das SchlingelInc Addon
+-- Central constants for the SchlingelInc addon
 
 SchlingelInc.Constants = {}
 
--- Maximales Level (TBC Classic = 70)
+-- Maximum level (TBC Classic = 70)
 SchlingelInc.Constants.MAX_LEVEL = 70
 
--- Level Meilensteine für Ankündigungen
+-- Level milestones for announcements
 SchlingelInc.Constants.LEVEL_MILESTONES = {10, 20, 30, 40, 50, 60, 70}
 
--- Instanz-Typen
+-- Instance types
 SchlingelInc.Constants.INSTANCE_TYPES = {
 	PVP = "pvp",
 	RAID = "raid",
@@ -22,7 +22,7 @@ SchlingelInc.Constants.SOUNDS = {
 	DEATH_ANNOUNCEMENT = 8192
 }
 
--- Farben für Nachrichten
+-- Colors for messages
 SchlingelInc.Constants.COLORS = {
 	ADDON_PREFIX = "|cFFF48CBA",
 	ERROR = "|cffff0000",
@@ -31,36 +31,36 @@ SchlingelInc.Constants.COLORS = {
 	INFO = "|cff88ccff"
 }
 
--- Cooldowns (in Sekunden)
+-- Cooldowns (in seconds)
 SchlingelInc.Constants.COOLDOWNS = {
 	PVP_ALERT = 10,
-	INVITE_REQUEST = 300,  -- 5 Minuten
-	GUILD_ROSTER_CACHE = 60  -- 1 Minute
+	INVITE_REQUEST = 300,  -- 5 minutes
+	GUILD_ROSTER_CACHE = 60  -- 1 minute
 }
 
--- Pronomen für Geschlechter
+-- Pronouns for genders (German articles)
 SchlingelInc.Constants.PRONOUNS = {
 	[2] = "der",  -- Male
 	[3] = "die"   -- Female
 }
 
--- Gildenränge mit Einladungsrechten (für Guild Recruitment)
--- Diese Ränge erhalten Guild Invite Requests per Addon Message
+-- Guild ranks with invite permissions (for Guild Recruitment)
+-- These ranks receive guild invite requests via addon message
 SchlingelInc.Constants.OFFICER_RANKS = {
 	"Devschlingel",      -- Developer
 	"Pfundschlingel",    -- Officers
 	"Großschlingel",     -- Officers
 }
 
--- Fallback Officer Character Names für Spieler außerhalb der Gilde
--- Wird verwendet, wenn der Spieler noch nicht in der Gilde ist (Level 1 Requests)
--- Diese Liste sollte die Haupt-Charaktere der aktiven Officers enthalten
+-- Fallback officer character names for players outside the guild
+-- Used when the player is not yet in the guild (Level 1 requests)
+-- This list should contain the main characters of active officers
 SchlingelInc.Constants.FALLBACK_OFFICERS = {
 	-- Dev-Schlingel
 	"Pudidev",
 	"Cricksumage",
 	"Devschlingel",
-	-- Gildenleitung
+	-- Guild leadership
 	"Kurtibrown",
 	"Dörtchen",
 	"Totanka",
@@ -76,7 +76,7 @@ SchlingelInc.Constants.BACKDROP = {
 	insets = { left = 11, right = 12, top = 12, bottom = 11 }
 }
 
---Pop Up Backdrop Settings
+-- Popup Backdrop Settings
 SchlingelInc.Constants.POPUPBACKDROP = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -84,5 +84,5 @@ SchlingelInc.Constants.POPUPBACKDROP = {
 	insets = { left = 4, right = 4, top = 4, bottom = 4 }
 }
 
--- Inaktivitätsschwelle (Tage)
+-- Inactivity threshold (days)
 SchlingelInc.Constants.INACTIVE_DAYS_THRESHOLD = 10

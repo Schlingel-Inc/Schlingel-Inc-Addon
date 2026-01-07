@@ -1,5 +1,10 @@
+-- LevelUp.lua
+-- Handles level-up milestone announcements to guild chat
+
 SchlingelInc.LevelUps = {}
 
+-- Registers level-up event handler
+-- Announces to guild when player reaches a milestone level
 function SchlingelInc.LevelUps:Initialize()
 	SchlingelInc.EventManager:RegisterHandler("PLAYER_LEVEL_UP",
 		function(_, level)

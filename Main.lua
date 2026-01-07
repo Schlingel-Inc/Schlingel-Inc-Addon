@@ -1,8 +1,6 @@
 local function MuteGroupInviteSounds()
 	-- Mute party invite sound (the "whoosh" when receiving/sending invites)
 	MuteSoundFile(567275) -- IG_PLAYER_INVITE file ID
-	-- Mute LFG role check sound
-	MuteSoundFile(567478) -- ReadyCheck/RoleCheck "wom wom wommm" sound
 end
 
 local function HideMinimapMail()
@@ -28,12 +26,12 @@ local function HideMinimapMail()
 	end
 end
 
--- SchlingelInc:OnLoad() Funktion - wird ausgeführt, wenn das Addon selbst geladen wird.
+-- SchlingelInc:OnLoad() function - executes when the addon is loaded.
 function SchlingelInc:OnLoad()
-    -- Initialisiere EventManager zuerst
+    -- Initialize EventManager first
     SchlingelInc.EventManager:Initialize()
 
-    -- Initialisiert Kernmodule des Addons.
+    -- Initialize core addon modules.
     SchlingelInc.Global:Initialize()
     SchlingelInc.GuildCache:Initialize()
     SchlingelInc.Death:Initialize()
@@ -44,30 +42,30 @@ function SchlingelInc:OnLoad()
 
     SchlingelInc:InitializeOptionsDB()
 
-    -- Erstellt und initialisiert den PvP-Warn-Frame.
+    -- Create and initialize the PvP warning frame.
     SchlingelInc:CreatePvPWarningFrame()
 
-    -- Initialisiert die Minimap-Icon-Funktionalität.
+    -- Initialize minimap icon functionality.
     SchlingelInc:InitMinimapIcon()
 
-    -- Gibt eine Bestätigungsnachricht aus, dass das Addon geladen wurde, inklusive Version.
-    SchlingelInc:Print("Addon version " .. SchlingelInc.version .. " geladen")
+    -- Output confirmation message that addon was loaded, including version.
+    SchlingelInc:Print("Addon version " .. SchlingelInc.version .. " loaded")
 
-    -- QoL: Verstecke Mail-Icon und mute störende Sounds
+    -- QoL: Hide mail icon and mute annoying sounds
     HideMinimapMail()
     MuteGroupInviteSounds()
 end
 
--- --- Event-Registrierungen über den zentralen EventManager ---
+-- --- Event registrations via the central EventManager ---
 
--- ADDON_LOADED wird noch manuell behandelt, da EventManager erst danach initialisiert wird
+-- ADDON_LOADED is still handled manually since EventManager is initialized after it
 local addonLoadedFrame = CreateFrame("Frame", "SchlingelIncAddonLoadedFrame")
 addonLoadedFrame:RegisterEvent("ADDON_LOADED")
 addonLoadedFrame:SetScript("OnEvent", function(self, event, addonName)
     if addonName == SchlingelInc.name then
         SchlingelInc:OnLoad()
 
-        -- Registriere alle anderen Events nach der Initialisierung
+        -- Register all other events after initialization
         SchlingelInc.EventManager:RegisterHandler("PLAYER_ENTERING_WORLD",
             function()
                 if not SchlingelInc.initialPlayTimeRequested then

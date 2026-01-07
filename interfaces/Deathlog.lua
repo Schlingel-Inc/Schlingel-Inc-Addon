@@ -1,3 +1,7 @@
+-- Deathlog.lua
+-- Creates and manages the mini death log window
+
+-- Creates the mini death log frame
 function SchlingelInc:CreateMiniDeathLog()
     if self.MiniDeathLogFrame then return end
 
@@ -24,7 +28,7 @@ function SchlingelInc:CreateMiniDeathLog()
     local topPadding = -35
     local rowHeight = 18
 
-    -- Tabellen-Header
+    -- Table headers
     for i, text in ipairs(headers) do
         local xOffset = 25
         for j = 1, i - 1 do xOffset = xOffset + columnWidths[j] + 10 end
@@ -34,7 +38,7 @@ function SchlingelInc:CreateMiniDeathLog()
         header:SetTextColor(1, 0.8, 0.1)
     end
 
-    -- Zeilen vorbereiten
+    -- Prepare rows
     frame.rows = {}
     for i = 1, 6 do
         local row = {}
@@ -86,10 +90,10 @@ function SchlingelInc:UpdateMiniDeathLog()
     end
 end
 
--- Funktion zum Anzeigen/Verstecken des Info-Fensters
+-- Toggles the death log window visibility
 function SchlingelInc:ToggleDeathLogWindow()
     if not self.MiniDeathLogFrame then
-        self:CreateMiniDeathLog() -- Erstellt das Fenster, falls es noch nicht existiert
+        self:CreateMiniDeathLog() -- Create the window if it doesn't exist yet
         self:UpdateMiniDeathLog()
         self.MiniDeathLogFrame:Show()
     elseif self.MiniDeathLogFrame:IsShown() then

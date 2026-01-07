@@ -1,27 +1,27 @@
 -- Debug.lua
--- Zentrales Debug-Modul für Entwickler
--- Alle Debug-Befehle sind nur für Spieler mit dem Gildenrang "Devschlingel" verfügbar
+-- Central debug module for developers
+-- All debug commands are only available for players with the guild rank "Devschlingel"
 
 SchlingelInc.Debug = {}
 
--- Prüft, ob der Spieler Debug-Berechtigung hat
+-- Checks if the player has debug permission
 function SchlingelInc.Debug:HasPermission()
 	local _, rank = GetGuildInfo("player")
 	return rank == "DevSchlingel"
 end
 
--- Zeigt eine Berechtigung-Fehlermeldung an
+-- Shows a permission error message
 local function ShowPermissionError()
 	SchlingelInc:Print(SchlingelInc.Constants.COLORS.ERROR ..
-		"Dieser Befehl ist nur für Devschlingel verfügbar.|r")
+		"This command is only available for Devschlingel.|r")
 end
 
--- Initialisiert das Debug-Modul
+-- Initializes the debug module
 function SchlingelInc.Debug:Initialize()
-	-- Debug-Modus Toggle
+	-- Debug mode toggle
 	SchlingelInc.Debug.enabled = false
 
-	-- Hauptbefehl: /schlingeldebug
+	-- Main command: /schlingeldebug
 	SLASH_SCHLINGELDEBUG1 = '/schlingeldebug'
 	SlashCmdList["SCHLINGELDEBUG"] = function(msg)
 		if not SchlingelInc.Debug:HasPermission() then
@@ -50,7 +50,7 @@ function SchlingelInc.Debug:Initialize()
 				SchlingelInc.Debug:SetDeathCount(value)
 			else
 				SchlingelInc:Print(SchlingelInc.Constants.COLORS.ERROR ..
-					"Ungültige Zahl. Benutze: /schlingeldebug deathset <Zahl>|r")
+					"Invalid number. Use: /schlingeldebug deathset <number>|r")
 			end
 		elseif command == "guildrequest" then
 			SchlingelInc.Debug:TestGuildRequest(args[2])
@@ -58,10 +58,10 @@ function SchlingelInc.Debug:Initialize()
 			SchlingelInc.Debug:ShowCacheStats()
 		elseif command == "cacherefresh" then
 			SchlingelInc.GuildCache:ForceRefresh()
-			SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS .. "Guild Cache Refresh erzwungen|r")
+			SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS .. "Guild cache refresh forced|r")
 		else
 			SchlingelInc:Print(SchlingelInc.Constants.COLORS.WARNING ..
-				"Unbekannter Befehl. Nutze /schlingeldebug help für Hilfe.|r")
+				"Unknown command. Use /schlingeldebug help for help.|r")
 		end
 	end
 
@@ -70,29 +70,29 @@ function SchlingelInc.Debug:Initialize()
 	SlashCmdList["SDEBUG"] = SlashCmdList["SCHLINGELDEBUG"]
 end
 
--- Zeigt die Debug-Hilfe an
+-- Shows debug help
 function SchlingelInc.Debug:ShowHelp()
-	print(SchlingelInc.Constants.COLORS.INFO .. "=== SchlingelInc Debug-Befehle ===" .. "|r")
-	print(SchlingelInc.colorCode .. "/schlingeldebug help" .. "|r - Zeigt diese Hilfe")
-	print(SchlingelInc.colorCode .. "/schlingeldebug toggle" .. "|r - Aktiviert/Deaktiviert Debug-Modus")
-	print(SchlingelInc.colorCode .. "/schlingeldebug eventdebug" .. "|r - Zeigt EventManager Debug-Info")
-	print(SchlingelInc.colorCode .. "/schlingeldebug deathframe" .. "|r - Test Death Announcement Frame")
-	print(SchlingelInc.colorCode .. "/schlingeldebug deathset <zahl>" .. "|r - Setzt den Tod-Counter")
-	print(SchlingelInc.colorCode .. "/schlingeldebug guildrequest <name>" .. "|r - Testet Guild Request an einen Officer")
-	print(SchlingelInc.colorCode .. "/schlingeldebug cachestats" .. "|r - Zeigt Guild Cache Statistiken")
-	print(SchlingelInc.colorCode .. "/schlingeldebug cacherefresh" .. "|r - Erzwingt Guild Cache Refresh")
-	print(SchlingelInc.Constants.COLORS.WARNING .. "Alias: /sdebug <befehl>" .. "|r")
+	print(SchlingelInc.Constants.COLORS.INFO .. "=== SchlingelInc Debug Commands ===" .. "|r")
+	print(SchlingelInc.colorCode .. "/schlingeldebug help" .. "|r - Shows this help")
+	print(SchlingelInc.colorCode .. "/schlingeldebug toggle" .. "|r - Enables/Disables debug mode")
+	print(SchlingelInc.colorCode .. "/schlingeldebug eventdebug" .. "|r - Shows EventManager debug info")
+	print(SchlingelInc.colorCode .. "/schlingeldebug deathframe" .. "|r - Test death announcement frame")
+	print(SchlingelInc.colorCode .. "/schlingeldebug deathset <number>" .. "|r - Sets the death counter")
+	print(SchlingelInc.colorCode .. "/schlingeldebug guildrequest <name>" .. "|r - Tests guild request to an officer")
+	print(SchlingelInc.colorCode .. "/schlingeldebug cachestats" .. "|r - Shows guild cache statistics")
+	print(SchlingelInc.colorCode .. "/schlingeldebug cacherefresh" .. "|r - Forces guild cache refresh")
+	print(SchlingelInc.Constants.COLORS.WARNING .. "Alias: /sdebug <command>" .. "|r")
 end
 
--- Aktiviert/Deaktiviert den Debug-Modus
+-- Enables/Disables debug mode
 function SchlingelInc.Debug:ToggleDebugMode()
 	SchlingelInc.Debug.enabled = not SchlingelInc.Debug.enabled
-	local status = SchlingelInc.Debug.enabled and "aktiviert" or "deaktiviert"
+	local status = SchlingelInc.Debug.enabled and "enabled" or "disabled"
 	SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS ..
-		"Debug-Modus " .. status .. "|r")
+		"Debug mode " .. status .. "|r")
 end
 
--- Testet das Death Announcement Frame
+-- Tests the death announcement frame
 function SchlingelInc.Debug:TestDeathFrame()
 	local testNames = {"Pudidev", "Cricksumage", "Totanka", "Kurtibrown"}
 	local testClasses = {"Krieger", "Magier", "Schamane", "Jäger"}
@@ -106,7 +106,7 @@ function SchlingelInc.Debug:TestDeathFrame()
 	SchlingelInc.DeathAnnouncement:ShowDeathMessage(
 		string.format("%s der %s ist mit Level %s in %s gestorben.", name, class, level, zone))
 
-	-- Füge zum Death Log hinzu
+	-- Add to death log
 	SchlingelInc.DeathLogData = SchlingelInc.DeathLogData or {}
 	table.insert(SchlingelInc.DeathLogData, {
 		name = name,
@@ -118,27 +118,27 @@ function SchlingelInc.Debug:TestDeathFrame()
 	SchlingelInc:UpdateMiniDeathLog()
 
 	SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS ..
-		"Test Death Frame angezeigt für " .. name .. "|r")
+		"Test death frame shown for " .. name .. "|r")
 end
 
--- Setzt den Death Counter
+-- Sets the death counter
 function SchlingelInc.Debug:SetDeathCount(value)
 	if value < 0 or value > 999999 then
 		SchlingelInc:Print(SchlingelInc.Constants.COLORS.ERROR ..
-			"Der Wert muss zwischen 0 und 999999 liegen|r")
+			"Value must be between 0 and 999999|r")
 		return
 	end
 
 	CharacterDeaths = value
 	SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS ..
-		"Tod-Counter wurde auf " .. CharacterDeaths .. " gesetzt.|r")
+		"Death counter set to " .. CharacterDeaths .. "|r")
 end
 
--- Testet Guild Request
+-- Tests guild request
 function SchlingelInc.Debug:TestGuildRequest(targetName)
 	if not targetName then
 		SchlingelInc:Print(SchlingelInc.Constants.COLORS.ERROR ..
-			"Bitte gib einen Zielnamen an: /schlingeldebug guildrequest <name>|r")
+			"Please provide a target name: /schlingeldebug guildrequest <name>|r")
 		return
 	end
 
@@ -154,32 +154,32 @@ function SchlingelInc.Debug:TestGuildRequest(targetName)
 	C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, message, "WHISPER", targetName)
 
 	SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS ..
-		"Test Guild Request an " .. targetName .. " gesendet|r")
+		"Test guild request sent to " .. targetName .. "|r")
 end
 
--- Zeigt Guild Cache Statistiken
+-- Shows guild cache statistics
 function SchlingelInc.Debug:ShowCacheStats()
 	local stats = SchlingelInc.GuildCache:GetStats()
 
-	print(SchlingelInc.Constants.COLORS.INFO .. "=== Guild Cache Statistiken ===" .. "|r")
-	print(string.format("Mitglieder im Cache: %d", stats.memberCount))
-	print(string.format("Letzte Aktualisierung: vor %.1f Sekunden", stats.age))
-	print(string.format("Cache gültig: %s", stats.isValid and "Ja" or "Nein"))
+	print(SchlingelInc.Constants.COLORS.INFO .. "=== Guild Cache Statistics ===" .. "|r")
+	print(string.format("Members in cache: %d", stats.memberCount))
+	print(string.format("Last update: %.1f seconds ago", stats.age))
+	print(string.format("Cache valid: %s", stats.isValid and "Yes" or "No"))
 
 	if stats.isValid then
-		print(string.format("Cache läuft ab in: %.1f Sekunden", stats.expiresIn))
+		print(string.format("Cache expires in: %.1f seconds", stats.expiresIn))
 	else
-		print(SchlingelInc.Constants.COLORS.WARNING .. "Cache ist abgelaufen und wird beim nächsten Zugriff aktualisiert" .. "|r")
+		print(SchlingelInc.Constants.COLORS.WARNING .. "Cache expired and will be updated on next access" .. "|r")
 	end
 
-	-- Zeige einige Online-Mitglieder als Beispiel
+	-- Show some online members as example
 	local onlineMembers = SchlingelInc.GuildCache:GetOnlineMembers()
-	print(string.format("Online Mitglieder: %d", #onlineMembers))
+	print(string.format("Online members: %d", #onlineMembers))
 
 	print("=======================================")
 end
 
--- Debug-Print-Funktion (nur wenn Debug-Modus aktiviert ist)
+-- Debug print function (only when debug mode is enabled)
 function SchlingelInc.Debug:Print(message)
 	if SchlingelInc.Debug.enabled then
 		print(SchlingelInc.Constants.COLORS.WARNING .. "[DEBUG]|r " .. message)

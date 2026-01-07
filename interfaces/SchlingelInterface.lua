@@ -1,5 +1,9 @@
+-- SchlingelInterface.lua
+-- Main info window showing guild rules, MOTD, and statistics
+
 SchlingelInc = SchlingelInc or {}
 
+-- Formats seconds into days, hours, minutes format
 local function FormatSeconds(totalSeconds)
 	if totalSeconds and totalSeconds > 0 then
 		local d = math.floor(totalSeconds / 86400)
@@ -206,6 +210,7 @@ function SchlingelInc:CreateInfoWindow()
 	mainFrame:Show()
 end
 
+-- Toggles the info window visibility
 function SchlingelInc:ToggleInfoWindow()
 	if not self.infoWindow then
 		self:CreateInfoWindow()
