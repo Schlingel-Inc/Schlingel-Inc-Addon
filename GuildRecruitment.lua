@@ -121,7 +121,7 @@ function SchlingelInc.GuildRecruitment:HandleAcceptRequest(playerName)
     if not playerName then return end
 
     if CanGuildInvite() then
-        SchlingelInc:Print("Attempting to invite " .. playerName .. " to the guild...")
+        SchlingelInc:Print("Versuche " .. playerName .. " in die Gilde einzuladen...")
         C_GuildInfo.Invite(playerName)
 
         -- Notify all online officers about the sent invitation
