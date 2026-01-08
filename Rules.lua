@@ -1,13 +1,30 @@
 -- Global table for rules
 SchlingelInc.Rules = {}
 
-local text = GetGuildInfoText() or "Schlingel:1111"
-local mailRule,auctionHouseRule,tradeRule,groupingRule = text:match("Schlingel:%s*(%d+)%s*,?%s*(%d+)%s*,?%s*(%d+)%s*,?%s*(%d+)")
-mailRule,auctionHouseRule,tradeRule,groupingRule = tonumber(mailRule), tonumber(auctionHouseRule), tonumber(tradeRule), tonumber(groupingRule)
+SchlingelInc.InfoRules = {
+    mailRule = 1,
+    auctionHouseRule = 1,
+    tradeRule = 1,
+    groupingRule = 1
+}
+
+
+function SchlingelInc.Rules:LoadFromGuildInfo()
+    local text = GetGuildInfoText() or "Schlingel:1111"
+    local mailRule,auctionHouseRule,tradeRule,groupingRule = text:match("Schlingel:%s*(%d+)%s*,?%s*(%d+)%s*,?%s*(%d+)%s*,?%s*(%d+)")
+    mailRule,auctionHouseRule,tradeRule,groupingRule = tonumber(mailRule), tonumber(auctionHouseRule), tonumber(tradeRule), tonumber(groupingRule)
+
+    SchlingelInc.InfoRules.mailRule = mailRule
+    SchlingelInc.InfoRules.auctionHouseRule = auctionHouseRule
+    SchlingelInc.InfoRules.tradeRule = tradeRule
+    SchlingelInc.InfoRules.groupingRule = groupingRule
+
+    SchlingelInc:Print("Regeln geladen")
+end
 
 -- Rule: Completely prohibit mailbox usage
-function SchlingelInc.Rules.ProhibitMailboxUsage()
-    if mailRule == 0 then
+function SchlingelInc.Rules:ProhibitMailboxUsage()
+    if SchlingelInc.InfoRules.mailRule == 0 then
         return
     end
 
@@ -19,8 +36,8 @@ function SchlingelInc.Rules.ProhibitMailboxUsage()
 end
 
 -- Rule: Prohibit auction house usage
-function SchlingelInc.Rules.ProhibitAuctionhouseUsage()
-    if auctionHouseRule == 0 then
+function SchlingelInc.Rules:ProhibitAuctionhouseUsage()
+    if SchlingelInc.InfoRules.auctionHouseRule == 0 then
         return
     end
 
@@ -38,7 +55,7 @@ end
 
 -- Rule: Prohibit trading with players outside the guild
 function SchlingelInc.Rules:ProhibitTradeWithNonGuildMembers()
-    if tradeRule == 0 then
+    if SchlingelInc.InfoRules.tradeRule == 0 then
         return
     end
 
@@ -57,7 +74,7 @@ end
 
 -- Rule: Prohibit grouping with players outside the guild
 function SchlingelInc.Rules:ProhibitGroupingWithNonGuildMembers()
-    if groupingRule == 0 then
+    if SchlingelInc.InfoRules.groupingRule == 0 then
         return
     end
 
@@ -108,6 +125,10 @@ end
 
 -- Initialize rules
 function SchlingelInc.Rules:Initialize()
+    C_Timer.After(4, function()
+        SchlingelInc.Rules:LoadFromGuildInfo()
+    end)
+
 	SchlingelInc.EventManager:RegisterHandler("MAIL_SHOW",
 		function()
 			SchlingelInc.Rules:ProhibitMailboxUsage()
