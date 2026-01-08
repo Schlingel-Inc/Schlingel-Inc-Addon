@@ -6,7 +6,7 @@ local GuildJoinFrame
 -- Create the prompt frame
 local function CreateGuildJoinPrompt()
     local frame = CreateFrame("Frame", "SchlingelIncGuildJoinPrompt", UIParent, BackdropTemplateMixin and "BackdropTemplate")
-    frame:SetSize(320, 220)
+    frame:SetSize(320, 280)
     frame:SetPoint("CENTER")
     frame:SetBackdrop(SchlingelInc.Constants.BACKDROP)
     frame:SetBackdropColor(0.05, 0.05, 0.05, 0.95)
