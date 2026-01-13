@@ -10,7 +10,10 @@ SchlingelInc.InfoRules = {
 
 
 function SchlingelInc.Rules:LoadFromGuildInfo()
-    local text = GetGuildInfoText() or "Schlingel:1111"
+    local text = GetGuildInfoText()
+    if text == nil or text == "" then
+        text = "Schlingel:1111"
+    end
     local mailRule,auctionHouseRule,tradeRule,groupingRule = text:match("Schlingel:%s*(%d+)%s*,?%s*(%d+)%s*,?%s*(%d+)%s*,?%s*(%d+)")
     mailRule,auctionHouseRule,tradeRule,groupingRule = tonumber(mailRule), tonumber(auctionHouseRule), tonumber(tradeRule), tonumber(groupingRule)
 
@@ -74,10 +77,9 @@ end
 
 -- Rule: Prohibit grouping with players outside the guild
 function SchlingelInc.Rules:ProhibitGroupingWithNonGuildMembers()
-    if SchlingelInc.InfoRules.groupingRule == 0 then
+   if SchlingelInc.InfoRules.groupingRule == 0 then
         return
     end
-
     -- Request fresh guild roster data
     C_GuildInfo.GuildRoster()
 
