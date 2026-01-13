@@ -38,6 +38,8 @@ function SchlingelInc.Debug:Initialize()
 
 		if command == "help" then
 			SchlingelInc.Debug:ShowHelp()
+		elseif command == "rules" then
+			SchlingelInc.Debug:ShowRules()
 		elseif command == "toggle" then
 			SchlingelInc.Debug:ToggleDebugMode()
 		elseif command == "eventdebug" then
@@ -82,6 +84,15 @@ function SchlingelInc.Debug:ShowHelp()
 	print(SchlingelInc.colorCode .. "/schlingeldebug cachestats" .. "|r - Shows guild cache statistics")
 	print(SchlingelInc.colorCode .. "/schlingeldebug cacherefresh" .. "|r - Forces guild cache refresh")
 	print(SchlingelInc.Constants.COLORS.WARNING .. "Alias: /sdebug <command>" .. "|r")
+end
+
+-- Shows active rules
+function SchlingelInc.Debug:ShowRules()
+	print(SchlingelInc.Constants.COLORS.INFO .. "=== SchlingelInc Rules ===" .. "|r")
+	print(SchlingelInc.colorCode .. "Mailbox Rule: " .. SchlingelInc.InfoRules.mailRule .. "|r")
+	print(SchlingelInc.colorCode .. "Auction House Rule: " .. SchlingelInc.InfoRules.auctionRule .. "|r")
+	print(SchlingelInc.colorCode .. "Trade Rule: " .. SchlingelInc.InfoRules.tradeRule .. "|r")
+	print(SchlingelInc.colorCode .. "Grouping Rule: " .. SchlingelInc.InfoRules.groupingRule .. "|r")
 end
 
 -- Enables/Disables debug mode
