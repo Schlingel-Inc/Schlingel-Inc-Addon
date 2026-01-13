@@ -27,7 +27,7 @@ end
 
 -- Rule: Completely prohibit mailbox usage
 function SchlingelInc.Rules:ProhibitMailboxUsage()
-    if SchlingelInc.InfoRules.mailRule == 0 then
+    if tonumber(SchlingelInc.InfoRules.mailRule) == 0 then
         return
     end
 
@@ -40,7 +40,7 @@ end
 
 -- Rule: Prohibit auction house usage
 function SchlingelInc.Rules:ProhibitAuctionhouseUsage()
-    if SchlingelInc.InfoRules.auctionHouseRule == 0 then
+    if tonumber(SchlingelInc.InfoRules.auctionHouseRule) == 0 then
         return
     end
 
@@ -58,7 +58,7 @@ end
 
 -- Rule: Prohibit trading with players outside the guild
 function SchlingelInc.Rules:ProhibitTradeWithNonGuildMembers()
-    if SchlingelInc.InfoRules.tradeRule == 0 then
+    if tonumber(SchlingelInc.InfoRules.tradeRule) == 0 then
         return
     end
 
@@ -77,7 +77,7 @@ end
 
 -- Rule: Prohibit grouping with players outside the guild
 function SchlingelInc.Rules:ProhibitGroupingWithNonGuildMembers()
-   if SchlingelInc.InfoRules.groupingRule == 0 then
+   if tonumber(SchlingelInc.InfoRules.groupingRule) == 0 then
         return
     end
     -- Request fresh guild roster data
