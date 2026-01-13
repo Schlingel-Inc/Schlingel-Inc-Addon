@@ -56,11 +56,27 @@ SchlingelInc.Constants.OFFICER_RANKS = {
 -- Used when the player is not yet in the guild (Level 1 requests)
 -- This list should contain the main characters of active officers
 SchlingelInc.Constants.FALLBACK_OFFICERS = {
+	-- Officers
+	"Ôny",
+	"Asperra",
+	"Aevela",
+	"Bartzmorea",
+	"HvvTrønix",
+	"Moosbartfro",
+	"Behaart",
+	"Jeriky",
+	"Merandii",
+	"Korvo",
+	"Raixxen",
+	"Markô",
+	"Markoxak",
+	"Cricksudin",
 	-- Dev-Schlingel
 	"Pudidev",
 	"Cricksumage",
 	"Devschlingel",
 	-- Guild leadership
+	"Syluri",
 	"Kurtibrown",
 	"Dörtchen",
 	"Totanka",
