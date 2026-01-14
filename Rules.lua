@@ -149,6 +149,10 @@ function SchlingelInc.Rules:Initialize()
 	-- Instantly decline party invites from non-guild members
 	SchlingelInc.EventManager:RegisterHandler("PARTY_INVITE_REQUEST",
 		function(event, sender)
+            if tonumber(SchlingelInc.InfoRules.groupingRule) == 0 then
+                return
+            end
+
 			local isInGuild = SchlingelInc.GuildCache:IsGuildMember(sender)
 			if not isInGuild then
 				StaticPopup_Hide("PARTY_INVITE")
