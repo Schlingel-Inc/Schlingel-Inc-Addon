@@ -71,6 +71,7 @@ SchlingelInc.Constants.FALLBACK_OFFICERS = {
 	"Markô",
 	"Markoxak",
 	"Cricksudin",
+	"Pryâ",
 	-- Dev-Schlingel
 	"Pudidev",
 	"Cricksumage",
