@@ -108,19 +108,17 @@ local function processDeath(data, isOwnDeath)
 	-- Update UI
 	SchlingelInc:UpdateMiniDeathLog()
 
-	-- Show death announcement popup (not for own death, we already see the message)
-	if not isOwnDeath then
-		local pronoun = data.pronoun or "der"
-		local messageString
-		if data.discordHandle and data.discordHandle ~= "" then
-			messageString = string.format("%s (%s) %s %s ist mit Level %s in %s gestorben.",
-				data.name, data.discordHandle, pronoun, data.class, data.level, data.zone)
-		else
-			messageString = string.format("%s %s %s ist mit Level %s in %s gestorben.",
-				data.name, pronoun, data.class, data.level, data.zone)
-		end
-		SchlingelInc.DeathAnnouncement:ShowDeathMessage(messageString)
+	-- Show death announcement popup
+	local pronoun = data.pronoun or "der"
+	local messageString
+	if data.discordHandle and data.discordHandle ~= "" then
+		messageString = string.format("%s (%s) %s %s ist mit Level %s in %s gestorben.",
+			data.name, data.discordHandle, pronoun, data.class, data.level, data.zone)
+	else
+		messageString = string.format("%s %s %s ist mit Level %s in %s gestorben.",
+			data.name, pronoun, data.class, data.level, data.zone)
 	end
+	SchlingelInc.DeathAnnouncement:ShowDeathMessage(messageString)
 end
 
 -- Initializes the Death module and registers events
