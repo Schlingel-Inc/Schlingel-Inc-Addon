@@ -90,7 +90,7 @@ end
 function SchlingelInc.Debug:ShowRules()
 	print(SchlingelInc.Constants.COLORS.INFO .. "=== SchlingelInc Rules ===" .. "|r")
 	print(SchlingelInc.colorCode .. "Mailbox Rule: " .. SchlingelInc.InfoRules.mailRule .. "|r")
-	print(SchlingelInc.colorCode .. "Auction House Rule: " .. SchlingelInc.InfoRules.auctionRule .. "|r")
+	print(SchlingelInc.colorCode .. "Auction House Rule: " .. SchlingelInc.InfoRules.auctionHouseRule .. "|r")
 	print(SchlingelInc.colorCode .. "Trade Rule: " .. SchlingelInc.InfoRules.tradeRule .. "|r")
 	print(SchlingelInc.colorCode .. "Grouping Rule: " .. SchlingelInc.InfoRules.groupingRule .. "|r")
 end
