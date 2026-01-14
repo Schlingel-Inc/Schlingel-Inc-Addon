@@ -5,7 +5,7 @@ SchlingelInc.GuildInvites = {}
 
 -- Frame for the message
 local InviteMessageFrame = CreateFrame("Frame", "InviteMessageFrame", UIParent, "BackdropTemplate")
-InviteMessageFrame:SetSize(350, 100)
+InviteMessageFrame:SetSize(350, 125)
 InviteMessageFrame:SetPoint("RIGHT", UIParent, "RIGHT", -50, -200)
 InviteMessageFrame:SetFrameStrata("FULLSCREEN_DIALOG")
 InviteMessageFrame:SetFrameLevel(1000)
@@ -18,12 +18,12 @@ InviteMessageFrame:SetBackdropColor(0, 0, 0, 0.8)
 -- Icon
 local icon = InviteMessageFrame:CreateTexture(nil, "ARTWORK")
 icon:SetSize(32, 32)
-icon:SetPoint("TOPLEFT", InviteMessageFrame, "TOPLEFT", 10, -10)
+icon:SetPoint("TOPLEFT", InviteMessageFrame, "TOPLEFT", -15, -10)
 icon:SetTexture("Interface\\Icons\\inv_letter_18")
 
 -- Header
 local header = InviteMessageFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-header:SetPoint("TOPLEFT", icon, "TOPRIGHT", 10, -2)
+header:SetPoint("TOPLEFT", icon, "TOPRIGHT", 0, -2)
 header:SetText("Neue Gildenanfrage!")
 header:SetTextColor(1, 1, 1, 1)
 
@@ -44,7 +44,7 @@ local function HandleAcceptClick()
 end
 local acceptBtn = CreateFrame("Button", nil, InviteMessageFrame, "UIPanelButtonTemplate")
 acceptBtn:SetSize(75, 25)
-acceptBtn:SetPoint("CENTER", InviteMessageFrame, "CENTER", -50, -25)
+acceptBtn:SetPoint("LEFT", InviteMessageFrame, "LEFT", 15, -35)
 acceptBtn:SetText("Annehmen")
 acceptBtn:SetScript("OnClick", HandleAcceptClick)
 
@@ -54,7 +54,7 @@ local function HandleDeclineClick()
 end
 local declineBtn = CreateFrame("Button", nil, InviteMessageFrame, "UIPanelButtonTemplate")
 declineBtn:SetSize(75, 25)
-declineBtn:SetPoint("CENTER", InviteMessageFrame, "CENTER", 50, -25)
+declineBtn:SetPoint("LEFT", InviteMessageFrame, "LEFT", 100, -35)
 declineBtn:SetText("Ablehnen")
 declineBtn:SetScript("OnClick", HandleDeclineClick)
 

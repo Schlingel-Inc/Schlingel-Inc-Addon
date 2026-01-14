@@ -10,7 +10,15 @@ function SchlingelInc:CreateInactivityWindow()
 	local inactiveFrame = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
 	inactiveFrame:SetSize(650, 450)
 	inactiveFrame:SetPoint("CENTER")
-	inactiveFrame:SetBackdrop(SchlingelInc.Constants.BACKDROP)
+	inactiveFrame:SetBackdrop({
+        bgFile = "Interface\\BUTTONS\\WHITE8X8",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = true,
+        tileSize = 16,
+        edgeSize = 16,
+        insets = { left = 4, right = 4, top = 4, bottom = 4 }
+    })
+    inactiveFrame:SetBackdropColor(0, 0, 0, 0.8)
 	inactiveFrame:SetMovable(true)
 	inactiveFrame:EnableMouse(true)
 	inactiveFrame:RegisterForDrag("LeftButton")
