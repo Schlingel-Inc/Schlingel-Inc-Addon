@@ -14,7 +14,7 @@ SchlingelInc.colorCode = "|cFFF48CBA"
 
 -- Version from TOC file
 -- Loads the addon version from the .toc file. If not available, "Unknown" is used.
-SchlingelInc.version = GetAddOnMetadata("SchlingelInc", "Version") or "Unknown"
+SchlingelInc.version = C_AddOns.GetAddOnMetadata("SchlingelInc", "Version") or "Unknown"
 
 -- Playtime variables are updated in Main.lua via TIME_PLAYED_MSG event
 -- and displayed in SchlingelInterface.lua.
