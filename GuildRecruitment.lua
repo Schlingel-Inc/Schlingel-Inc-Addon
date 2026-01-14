@@ -44,7 +44,7 @@ function SchlingelInc.GuildRecruitment:SendGuildRequest()
     end
 
     local zone = SchlingelInc.GuildRecruitment:GetPlayerZone()
-    local playerGold = GetMoney()
+    local playerGold = GetCoinText(GetMoney())
 
     -- Sanitize inputs by replacing delimiters with safe characters
     -- This prevents zone names with colons from breaking the message parsing
