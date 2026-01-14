@@ -1,5 +1,9 @@
+-- InactivityWindow.lua
+-- Displays a list of inactive guild members for officers
+
 SchlingelInc = SchlingelInc or {}
 
+-- Creates the inactivity window frame
 function SchlingelInc:CreateInactivityWindow()
 	if self.InactivityWindow then return end
 
@@ -224,13 +228,14 @@ function SchlingelInc:CreateInactivityWindow()
 	self.InactivityWindow = inactiveFrame
 end
 
+-- Toggles the inactivity window visibility
 function SchlingelInc:ToggleInactivityWindow()
 	if not self.InactivityWindow then
 		self:CreateInactivityWindow()
 	end
 
+	-- Should not happen, but guard against nil
 	if not self.InactivityWindow then
-		SchlingelInc:Print("InactivityWindow konnte nicht erstellt/gefunden werden!")
 		return
 	end
 

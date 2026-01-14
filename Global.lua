@@ -1,23 +1,23 @@
--- Globale Tabelle für das Addon
+-- Global table for the addon
 SchlingelInc = {}
 
--- Addon-Name
+-- Addon name
 SchlingelInc.name = "SchlingelInc"
 
--- Chat-Nachrichten-Prefix
--- Dieser Prefix wird verwendet, um Addon-interne Nachrichten zu identifizieren.
+-- Chat message prefix
+-- This prefix is used to identify addon-internal messages.
 SchlingelInc.prefix = "SchlingelInc"
 
--- ColorCode für den Chat-Text
--- Bestimmt die Farbe, in der Addon-Nachrichten im Chat angezeigt werden.
+-- Color code for chat text
+-- Determines the color in which addon messages are displayed in chat.
 SchlingelInc.colorCode = "|cFFF48CBA"
 
--- Version aus der TOC-Datei
--- Lädt die Version des Addons aus der .toc-Datei. Falls nicht vorhanden, wird "Unbekannt" verwendet.
-SchlingelInc.version = GetAddOnMetadata("SchlingelInc", "Version") or "Unbekannt"
+-- Version from TOC file
+-- Loads the addon version from the .toc file. If not available, "Unknown" is used.
+SchlingelInc.version = C_AddOns.GetAddOnMetadata("SchlingelInc", "Version") or "Unknown"
 
--- Spielzeit-Variablen werden in Main.lua per TIME_PLAYED_MSG Event aktualisiert
--- und in SchlingelInterface.lua angezeigt.
+-- Playtime variables are updated in Main.lua via TIME_PLAYED_MSG event
+-- and displayed in SchlingelInterface.lua.
 SchlingelInc.GameTimeTotal = 0
 SchlingelInc.GameTimePerLevel = 0
 
@@ -29,17 +29,17 @@ function SchlingelInc:CountTable(table)
     return count
 end
 
--- Speichert den Zeitpunkt der letzten PvP-Warnung für jeden Spieler.
+-- Stores the timestamp of the last PvP warning for each player.
 SchlingelInc.lastPvPAlert = {}
 
--- Global Module Initialisierung
+-- Global module initialization
 SchlingelInc.Global = {}
 
 function SchlingelInc.Global:Initialize()
-	-- Registriere Addon Message Prefix
+	-- Register addon message prefix
 	C_ChatInfo.RegisterAddonMessagePrefix(SchlingelInc.prefix)
 
-	-- PLAYER_TARGET_CHANGED für PvP-Warnungen
+	-- PLAYER_TARGET_CHANGED for PvP warnings
 	SchlingelInc.EventManager:RegisterHandler("PLAYER_TARGET_CHANGED",
 		function()
 			if SchlingelOptionsDB["pvp_alert"] == false then
@@ -50,41 +50,41 @@ function SchlingelInc.Global:Initialize()
 			end
 		end, 0, "PvPTargetChecker")
 
-	-- Version Checking Handler
+	-- Version checking handler
 	local newestVersionSeen = SchlingelInc.version
 	SchlingelInc.EventManager:RegisterHandler("CHAT_MSG_ADDON",
 		function(_, prefix, message, _, sender)
 			if prefix == SchlingelInc.prefix then
 				local incomingVersion = message:match("^VERSION:(.+)$")
 				if incomingVersion then
-					-- Speichere Version des Gildenmitglieds
+					-- Store version of guild member
 					if sender then
 						SchlingelInc.guildMemberVersions[sender] = incomingVersion
 					end
 
-					-- Prüfe ob eingehende Version neuer ist als die aktuell neueste bekannte Version
+					-- Check if incoming version is newer than the currently known newest version
 					if SchlingelInc:CompareVersions(incomingVersion, newestVersionSeen) > 0 then
 						newestVersionSeen = incomingVersion
-						SchlingelInc:Print("Eine neuere Addon-Version wurde entdeckt: " ..
-							newestVersionSeen .. ". Bitte aktualisiere dein Addon!")
+						SchlingelInc:Print("Eine neue Version des Addons wurde gefunden: " ..
+							newestVersionSeen .. ". PBitte aktualisiere das Addon!")
 					end
 				end
 			end
 		end, 0, "VersionChecker")
 
-	-- Sende Version bei Guild Chat
+	-- Send version to guild chat
 	if IsInGuild() then
 		C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "VERSION:" .. SchlingelInc.version, "GUILD")
 	end
-    C_GuildInfo.GuildRoster() -- Guild Roster fetchen um Cache aufzubauen.
+    C_GuildInfo.GuildRoster() -- Fetch guild roster to build cache.
 end
 
--- Gibt eine formatierte Nachricht im Chat aus.
+-- Outputs a formatted message in chat.
 function SchlingelInc:Print(message)
     print(SchlingelInc.colorCode .. "[" .. SchlingelInc.name .. "]|r " .. message)
 end
 
--- Überprüft, ob sich der Spieler in einem relevanten Schlachtfeld befindet.
+-- Checks if the player is in a battleground.
 function SchlingelInc:IsInBattleground()
     local inInstance, instanceType = IsInInstance()
     return inInstance and instanceType == SchlingelInc.Constants.INSTANCE_TYPES.PVP
@@ -100,47 +100,72 @@ function SchlingelInc:ParseVersion(v)
     return tonumber(major or 0), tonumber(minor or 0), tonumber(patch or 0)
 end
 
--- Vergleicht zwei Versionsnummern (z.B. "1.2.3" mit "1.3.0").
--- Gibt >0 zurück, wenn version1 > version2; <0 wenn version1 < version2; 0 wenn gleich.
+-- Compares two version numbers (e.g. "1.2.3" with "1.3.0").
+-- Returns >0 if version1 > version2; <0 if version1 < version2; 0 if equal.
 function SchlingelInc:CompareVersions(version1, version2)
     local major1, minor1, patch1 = SchlingelInc:ParseVersion(version1)
     local major2, minor2, patch2 = SchlingelInc:ParseVersion(version2)
 
-    if major1 ~= major2 then return major1 - major2 end -- Vergleiche Major-Version.
-    if minor1 ~= minor2 then return minor1 - minor2 end -- Vergleiche Minor-Version.
-    return patch1 - patch2                              -- Vergleiche Patch-Version.
+    if major1 ~= major2 then return major1 - major2 end -- Compare major version.
+    if minor1 ~= minor2 then return minor1 - minor2 end -- Compare minor version.
+    return patch1 - patch2                              -- Compare patch version.
 end
 
 
--- Speichert die Addon-Versionen von Gildenmitgliedern (Sendername -> Version).
+-- Stores addon versions of guild members (sender name -> version).
 SchlingelInc.guildMemberVersions = {}
 
 -- Chat filter function (defined once, reused if already registered)
 local function GuildChatVersionFilter(_, _, msg, sender, ...)
-    -- Funktion wird nur ausgeführt, wenn der Spieler Gildenmitglieder einladen darf (eine Art Berechtigungsprüfung).
+    -- Function only executes if show_version option is enabled.
     if SchlingelOptionsDB["show_version"] == false then
-        return false, msg, sender, ... -- Nachricht unverändert durchlassen.
+        return false, msg, sender, ... -- Pass message through unchanged.
     end
 
-    local version = SchlingelInc.guildMemberVersions[sender] -- Holt die gespeicherte Version des Senders.
-    local modifiedMessage = msg                                     -- Standardmäßig die Originalnachricht.
+    local version = SchlingelInc.guildMemberVersions[sender] -- Get stored version of sender.
+    local modifiedMessage = msg                              -- Default to original message.
 
-    -- Wenn eine Version für den Sender bekannt ist, füge sie der Nachricht hinzu.
+    -- If a version is known for the sender, add it to the message.
     if version then
         modifiedMessage = SchlingelInc.colorCode .. "[" .. version .. "]|r " .. msg
     end
-    -- 'false' bedeutet, die Nachricht wird nicht unterdrückt, sondern weiterverarbeitet (mit ggf. modifizierter Nachricht).
+    -- 'false' means the message is not suppressed but passed through (possibly modified).
     return false, modifiedMessage, sender, ...
 end
 
--- Fügt einen Filter für Gilden-Chat-Nachrichten hinzu (nur einmal).
+-- Add filter for guild chat messages (only once).
 if not SchlingelInc.guildChatFilterRegistered then
     ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", GuildChatVersionFilter)
     SchlingelInc.guildChatFilterRegistered = true
 end
 
--- Entfernt den Realm-Namen von einem vollständigen Spielernamen (z.B. "Spieler-Realm" -> "Spieler").
--- Verwendet die Blizzard API Funktion Ambiguate.
+-- Removes the realm name from a full player name (e.g. "Player-Realm" -> "Player").
+-- Uses the Blizzard API function Ambiguate.
 function SchlingelInc:RemoveRealmFromName(fullName)
     return Ambiguate(fullName, "short")
+end
+
+-- Sanitizes text to prevent UI injection via escape codes
+-- Removes texture, color, and hyperlink escape sequences
+function SchlingelInc:SanitizeText(text)
+    if not text or type(text) ~= "string" then
+        return text
+    end
+    -- Remove texture escape sequences |Tpath:height:width:...|t
+    text = text:gsub("|T[^|]*|t", "")
+    -- Remove color escape sequences |cFFFFFFFF...|r
+    text = text:gsub("|c%x%x%x%x%x%x%x%x", "")
+    text = text:gsub("|r", "")
+    -- Remove hyperlink escape sequences |Htype:data|h...|h
+    text = text:gsub("|H[^|]*|h", "")
+    text = text:gsub("|h", "")
+    return text
+end
+
+-- Validates that an addon message sender is a guild member
+-- Uses GuildCache for fast lookup to prevent spoofed messages
+function SchlingelInc:IsValidGuildSender(sender)
+    if not sender then return false end
+    local shortName = self:RemoveRealmFromName(sender)
+    return SchlingelInc.GuildCache:IsGuildMember(shortName)
 end

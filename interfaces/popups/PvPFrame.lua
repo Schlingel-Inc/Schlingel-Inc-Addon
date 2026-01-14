@@ -1,3 +1,7 @@
+-- PvPFrame.lua
+-- Displays PvP warning popup when targeting PvP-flagged players
+
+-- Checks if the current target is PvP-flagged and shows a warning
 function SchlingelInc:CheckTargetPvP()
     local unit = "target"
     if not UnitExists(unit) or not UnitIsPVP(unit) then return end
@@ -25,6 +29,7 @@ function SchlingelInc:CheckTargetPvP()
     end
 end
 
+-- Shows the PvP warning popup with the given text
 function SchlingelInc:ShowPvPWarning(text)
     if not SchlingelInc.pvpWarningFrame then
         SchlingelInc:CreatePvPWarningFrame()
@@ -36,7 +41,6 @@ function SchlingelInc:ShowPvPWarning(text)
     SchlingelInc.pvpWarningName:SetText(text)
     SchlingelInc.pvpWarningFrame:SetAlpha(1)
     SchlingelInc.pvpWarningFrame:Show()
-    SchlingelInc:RumbleFrame(SchlingelInc.pvpWarningFrame)
 
     if SchlingelOptionsDB["pvp_alert_sound"] then
         PlaySound(SchlingelInc.Constants.SOUNDS.PVP_ALERT)
@@ -54,6 +58,7 @@ function SchlingelInc:ShowPvPWarning(text)
     end)
 end
 
+-- Creates the PvP warning frame
 function SchlingelInc:CreatePvPWarningFrame()
     if SchlingelInc.pvpWarningFrame and SchlingelInc.pvpWarningFrame:IsObjectType("Frame") then
         return
@@ -90,27 +95,4 @@ function SchlingelInc:CreatePvPWarningFrame()
     SchlingelInc.pvpWarningFrame = pvpFrame
     SchlingelInc.pvpWarningText = text
     SchlingelInc.pvpWarningName = nameText
-end
-
-function SchlingelInc:RumbleFrame(frame)
-    if not frame then return end
-
-    local duration = 0.3
-    local startTime = GetTime()
-    local point, relativeTo, relativePoint, xOfs, yOfs = frame:GetPoint()
-
-    frame:SetScript("OnUpdate", function()
-        local elapsed = GetTime() - startTime
-
-        if elapsed < duration then
-            local offsetX = math.random(-4, 4)
-            local offsetY = math.random(-4, 4)
-            frame:ClearAllPoints()
-            frame:SetPoint("CENTER", UIParent, "CENTER", offsetX, offsetY)
-        else
-            frame:ClearAllPoints()
-            frame:SetPoint(point or "CENTER", relativeTo or UIParent, relativePoint or "CENTER", xOfs or 0, yOfs or 0)
-            frame:SetScript("OnUpdate", nil)
-        end
-    end)
 end

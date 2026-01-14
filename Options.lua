@@ -1,5 +1,10 @@
+-- Options.lua
+-- Manages addon settings through the WoW Settings API
+
 SchlingelOptionsDB = SchlingelOptionsDB or {}
 
+-- UI options configuration
+-- Each option has a label, description, variable name, and default value
 local UIOptions =
 {
     {

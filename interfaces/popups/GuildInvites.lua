@@ -1,6 +1,9 @@
+-- GuildInvites.lua
+-- Displays popup for incoming guild invite requests (for officers)
+
 SchlingelInc.GuildInvites = {}
 
--- Frame für die Nachricht
+-- Frame for the message
 local InviteMessageFrame = CreateFrame("Frame", "InviteMessageFrame", UIParent, "BackdropTemplate")
 InviteMessageFrame:SetSize(350, 100)
 InviteMessageFrame:SetPoint("RIGHT", UIParent, "RIGHT", -50, -200)
@@ -8,7 +11,7 @@ InviteMessageFrame:SetFrameStrata("FULLSCREEN_DIALOG")
 InviteMessageFrame:SetFrameLevel(1000)
 InviteMessageFrame:Hide()
 
--- Hintergrund
+-- Background
 InviteMessageFrame:SetBackdrop(SchlingelInc.Constants.POPUPBACKDROP)
 InviteMessageFrame:SetBackdropColor(0, 0, 0, 0.8)
 
@@ -55,7 +58,7 @@ declineBtn:SetPoint("CENTER", InviteMessageFrame, "CENTER", 50, -25)
 declineBtn:SetText("Ablehnen")
 declineBtn:SetScript("OnClick", HandleDeclineClick)
 
--- Animation vorbereiten
+-- Prepare animation
 local animGroup = InviteMessageFrame:CreateAnimationGroup()
 local fadeIn = animGroup:CreateAnimation("Alpha")
 fadeIn:SetDuration(0.3)
@@ -63,7 +66,7 @@ fadeIn:SetFromAlpha(0)
 fadeIn:SetToAlpha(1)
 fadeIn:SetSmoothing("IN")
 
--- Nachricht anzeigen
+-- Shows the invite request message
 function SchlingelInc.GuildInvites:ShowInviteMessage(message, requestData)
     if InviteMessageFrame:IsShown() then return
     end
@@ -75,7 +78,7 @@ function SchlingelInc.GuildInvites:ShowInviteMessage(message, requestData)
     animGroup:Play()
 end
 
--- Nachricht verbergen
+-- Hides the invite request message
 function SchlingelInc.GuildInvites:HideInviteMessage()
     InviteMessageFrame:Hide()
 end
