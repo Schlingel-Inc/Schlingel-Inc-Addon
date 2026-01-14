@@ -148,4 +148,24 @@ function SchlingelInc:InitializeDiscordHandlePrompt()
             pendingDiscordHandle = nil
         end
     end, 0, "DiscordHandlePending")
+
+    -- Slash command to set Discord handle: /setHandle <handle>
+    SLASH_SETHANDLE1 = '/setHandle'
+    SLASH_SETHANDLE2 = '/sethandle'
+    SlashCmdList["SETHANDLE"] = function(msg)
+        local handle = msg:match("^%s*(.-)%s*$") -- Trim whitespace
+        if handle and handle ~= "" then
+            SchlingelInc:SetDiscordHandle(handle)
+            SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS ..
+                "Discord Handle gesetzt: " .. handle .. "|r")
+        else
+            local currentHandle = SchlingelInc:GetDiscordHandle()
+            if currentHandle and currentHandle ~= "" then
+                SchlingelInc:Print("Aktueller Discord Handle: " .. currentHandle)
+            else
+                SchlingelInc:Print(SchlingelInc.Constants.COLORS.WARNING ..
+                    "Verwendung: /setHandle <dein Discord Handle>|r")
+            end
+        end
+    end
 end

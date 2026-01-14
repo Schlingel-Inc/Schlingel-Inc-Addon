@@ -334,11 +334,24 @@ function SchlingelInc:UpdateMiniDeathLog()
                 highlight:Show()
                 GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR")
                 GameTooltip:ClearLines()
-                GameTooltip:SetText(safeName, 1, 1, 1)
+                if entry.discordHandle then
+                    local safeHandle = SchlingelInc:SanitizeText(entry.discordHandle)
+                    GameTooltip:AddDoubleLine("Discord:", safeHandle, 0.8, 0.8, 0.8, 0.45, 0.63, 0.82)
+                end
                 GameTooltip:AddDoubleLine("Klasse:", safeClass, 0.8, 0.8, 0.8, 1, 1, 1)
                 GameTooltip:AddDoubleLine("Level:", tostring(entry.level or "?"), 0.8, 0.8, 0.8, 1, 1, 1)
                 if safeZone then
                     GameTooltip:AddDoubleLine("Zone:", safeZone, 0.8, 0.8, 0.8, 1, 1, 1)
+                end
+                if entry.cause then
+                    local safeCause = SchlingelInc:SanitizeText(entry.cause)
+                    GameTooltip:AddDoubleLine("Todesursache:", safeCause, 0.8, 0.8, 0.8, 1, 0.3, 0.3)
+                end
+                if entry.lastWords then
+                    local safeLastWords = SchlingelInc:SanitizeText(entry.lastWords)
+                    GameTooltip:AddLine(" ")
+                    GameTooltip:AddLine("Letzte Worte:", 0.8, 0.8, 0.8)
+                    GameTooltip:AddLine('"' .. safeLastWords .. '"', 1, 0.85, 0.1, true)
                 end
                 GameTooltip:Show()
             end)

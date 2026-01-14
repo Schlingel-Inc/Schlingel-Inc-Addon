@@ -33,14 +33,15 @@ Alle Tode werden in der Gilde geteilt und angezeigt.
 **Features:**
 - **Todeszähler:** Verfolgt die Anzahl deiner Tode pro Charakter
 - **Automatische Todesmeldungen im Gildenchat:**
-  - Name, Klasse, Level
+  - Name und Discord Handle (falls vorhanden)
+  - Klasse und Level
   - Zone des Todes
-  - Letzte Worte (aus dem Chat erfasst)
   - Todesursache (was dich getötet hat)
+  - Letzte Worte (aus dem Chat erfasst)
 - **Todes-Popup:** Visuelle Benachrichtigung mit Animation wenn Gildenmitglieder sterben
 - **Mini-Deathlog:** Kompaktes, skalierbares Fenster zeigt die letzten 50 Tode
   - Spalten: Name, Klasse, Level
-  - Tooltip mit vollständigen Details beim Hover
+  - Tooltip mit vollständigen Details beim Hover (Discord Handle, Zone, Todesursache, Letzte Worte)
   - Größe anpassbar: 250x120 Minimum bis 500x350 Maximum
   - Speichert Position und Größe automatisch
 - **Slash Command:** `/deathset <nummer>` zum manuellen Setzen des Todeszählers
@@ -91,8 +92,9 @@ Discord Handles werden für die Gilden-Kommunikation gespeichert.
 - **Automatische Guild Note:** Handle wird automatisch in die Gildennotiz geschrieben
 - **Tooltip Integration:** Discord Handles werden in Spieler-Tooltips angezeigt
 - **Format:** `DeinHandle#1234 (Tode: X)`
+- **Slash Command:** `/setHandle <handle>` zum Ändern des Discord Handles
 
-> **Einrichtung:** Beim ersten Login erscheint automatisch ein Fenster. Gib einfach deinen Discord Namen ein.
+> **Einrichtung:** Beim ersten Login erscheint automatisch ein Fenster. Gib einfach deinen Discord Namen ein. Später kannst du ihn mit `/setHandle` ändern.
 
 ### Tooltip Erweiterungen
 
@@ -168,6 +170,7 @@ Das Addon hat einige optionale Einstellungen die du im WoW Options-Menü unter "
 - **Death Log:** Linksklick auf Minimap Icon zum Öffnen/Schließen
 - **Death Log Größe:** Ziehe an der unteren rechten Ecke um die Größe anzupassen
 - **Discord Handle:** Wird automatisch beim ersten Login abgefragt und in der Gildennotiz gespeichert
+- **Discord Handle ändern:** `/setHandle <handle>` um den Discord Handle zu ändern
 - **Gildenbeitritt:** Rechtsklick auf Minimap-Icon und "Beitrittsanfrage senden" drücken
 - **Todeszähler setzen:** `/deathset <nummer>` um den Zähler manuell anzupassen
 
@@ -206,7 +209,7 @@ Das Addon hat einige optionale Einstellungen die du im WoW Options-Menü unter "
 - Alle Blockaden (Briefkasten, AH, etc.) zeigen Popup-Meldungen zur Information
 - Dein Todeszähler wird automatisch in deiner Gildennotiz angezeigt
 - Das Addon ist speziell für die Schlingel Inc Gilde entwickelt
-- Der Discord Handle wird nur beim ersten Login abgefragt - du kannst ihn durch erneutes Eingeben ändern
+- Der Discord Handle wird nur beim ersten Login abgefragt - du kannst ihn jederzeit mit `/setHandle` ändern
 - Bei Beitrittsanfragen kann es zu Wartezeiten kommen wenn keine Offiziere online sind
 
 ---
