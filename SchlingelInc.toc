@@ -7,8 +7,9 @@
 ## SavedVariables: DiscordHandle
 
 # Notwendiges externe Abhängigkeiten aus dem Lib Folder
-## OptionalDeps: LibStub, LibDataBroker-1.1, LibDBIcon-1.0
+## OptionalDeps: LibStub, CallbackHandler-1.0, LibDataBroker-1.1, LibDBIcon-1.0
 libs\LibStub\LibStub.lua
+libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
 libs\libdatabroker-1-1\LibDataBroker-1.1.lua
 libs\LibDBIcon-1.0\LibDBIcon-1.0\LibDBIcon-1.0.lua
 
