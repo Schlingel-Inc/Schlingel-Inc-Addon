@@ -8,21 +8,46 @@ SchlingelInc.InfoRules = {
     groupingRule = 1
 }
 
-
-function SchlingelInc.Rules:LoadFromGuildInfo()
+function SchlingelInc.Rules:GetRules(callback)
     local text = GetGuildInfoText()
     if text == nil or text == "" then
-        text = "Schlingel:1111"
+        if callback then
+            C_Timer.After(2, function()
+                SchlingelInc.Rules:GetRules(callback)
+            end)
+            return nil
+        else
+            C_Timer.After(2, function()
+                SchlingelInc.Rules:GetRules()
+            end)
+            return nil
+        end
     end
-    local mailRule,auctionHouseRule,tradeRule,groupingRule = text:match("Schlingel:%s*(%d+)%s*,?%s*(%d+)%s*,?%s*(%d+)%s*,?%s*(%d+)")
-    mailRule,auctionHouseRule,tradeRule,groupingRule = tonumber(mailRule), tonumber(auctionHouseRule), tonumber(tradeRule), tonumber(groupingRule)
 
-    SchlingelInc.InfoRules.mailRule = mailRule
-    SchlingelInc.InfoRules.auctionHouseRule = auctionHouseRule
-    SchlingelInc.InfoRules.tradeRule = tradeRule
-    SchlingelInc.InfoRules.groupingRule = groupingRule
+    if callback then
+        callback(text)
+        return nil
+    end
 
-    SchlingelInc:Print("Regeln geladen")
+    return text
+end
+
+function SchlingelInc.Rules:LoadFromGuildInfo()
+    SchlingelInc.Rules:GetRules(function(text)
+        if not text then
+            return
+        end
+
+        local mailRule,auctionHouseRule,tradeRule,groupingRule = text:match("Schlingel:%s*(%d+)%s*,?%s*(%d+)%s*,?%s*(%d+)%s*,?%s*(%d+)")
+        mailRule,auctionHouseRule,tradeRule,groupingRule = tonumber(mailRule), tonumber(auctionHouseRule), tonumber(tradeRule), tonumber(groupingRule)
+
+        SchlingelInc.InfoRules.mailRule = mailRule
+        SchlingelInc.InfoRules.auctionHouseRule = auctionHouseRule
+        SchlingelInc.InfoRules.tradeRule = tradeRule
+        SchlingelInc.InfoRules.groupingRule = groupingRule
+
+        SchlingelInc:Print("Regeln geladen")
+    end)
 end
 
 -- Rule: Completely prohibit mailbox usage
@@ -127,9 +152,7 @@ end
 
 -- Initialize rules
 function SchlingelInc.Rules:Initialize()
-    C_Timer.After(4, function()
-        SchlingelInc.Rules:LoadFromGuildInfo()
-    end)
+    SchlingelInc.Rules:LoadFromGuildInfo()
 
 	SchlingelInc.EventManager:RegisterHandler("MAIL_SHOW",
 		function()
