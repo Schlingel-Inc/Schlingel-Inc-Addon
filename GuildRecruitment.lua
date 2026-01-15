@@ -44,7 +44,7 @@ function SchlingelInc.GuildRecruitment:SendGuildRequest()
     end
 
     local zone = SchlingelInc.GuildRecruitment:GetPlayerZone()
-    local playerGold = GetCoinText(GetMoney())
+    local playerGold = GetMoney()
 
     -- Sanitize inputs by replacing delimiters with safe characters
     -- This prevents zone names with colons from breaking the message parsing
@@ -67,6 +67,44 @@ function SchlingelInc.GuildRecruitment:SendGuildRequest()
         C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, message, "WHISPER", name)
         sentCount = sentCount + 1
     end
+end
+
+-- Send the invite request to selected online guild members so they can
+-- forward the request to guild chat (used by /schwho relay flow).
+-- Uses the built-in /who to discover players of the target guild and whisper
+-- them an addon relay message so they post the invite into guild chat.
+function SchlingelInc.GuildRecruitment:SendGuildRequestViaGuildMembers(filter)
+    local playerName = UnitName("player")
+    local playerLevel = UnitLevel("player")
+    local playerExp = UnitXP("player")
+
+    if playerLevel > 1 then
+        SchlingelInc:Print("Du kannst nur auf Level 1 eine Anfrage an die Gilde abschicken.")
+        return
+    end
+
+    local zone = SchlingelInc.GuildRecruitment:GetPlayerZone()
+    local playerGold = GetMoney()
+
+    local safeZone = zone:gsub(":", "-"):gsub("|", "-")
+    local safePlayerGold = tostring(playerGold):gsub(":", "-"):gsub("|", "-")
+
+    local message = string.format("INVITE_REQUEST_RELAY:%s:%d:%d:%s:%s", playerName, playerLevel, playerExp, safeZone, safePlayerGold)
+
+    -- Build who query using configured target guild name
+    local targetGuild = SchlingelInc.Constants.TARGET_GUILD or "SchlingelInc"
+    local whoQuery = "g-" .. targetGuild
+    if filter and filter ~= "" then
+        whoQuery = whoQuery .. " " .. filter
+    end
+
+    -- Store pending relay so WHO_LIST_UPDATE handler can send messages
+    SchlingelInc.GuildRecruitment._pendingWhoRelay = SchlingelInc.GuildRecruitment._pendingWhoRelay or {}
+    SchlingelInc.GuildRecruitment._pendingWhoRelay.message = message
+    SchlingelInc.GuildRecruitment._pendingWhoRelay.sent = 0
+
+    SendWho(whoQuery)
+    SchlingelInc:Print("/who Anfrage gesendet, warte auf Ergebnisse...")
 end
 
 local function HandleAddonMessage(message)
@@ -99,15 +137,23 @@ local function HandleAddonMessage(message)
                 level = level,
                 xp = xpNum,
                 zone = zone,
-                money = money,
             }
-            local displayMessage = string.format("Neue Anfrage von %s (Level %s) mit %s in den Taschen aus %s erhalten.",
-                name, level, money, zone)
+            local displayMessage = string.format("Neue Anfrage von %s (Level %s) aus %s erhalten.",
+                name, level, zone)
             SchlingelInc:Print(displayMessage)
             SchlingelInc.GuildInvites:ShowInviteMessage(displayMessage, requestData)
         end
     elseif message:find("^INVITE_SENT:") and CanGuildInvite() then
         SchlingelInc.GuildInvites:HideInviteMessage()
+    elseif message:find("^INVITE_REQUEST_RELAY:") then
+        -- Received a relay request from another player: post to guild chat
+        if not IsInGuild() then return end
+        local name, level, xp, zone, money = message:match("^INVITE_REQUEST_RELAY:([^:]+):(%d+):(%d+):([^:]+):(.+)$")
+        if name and level and zone then
+            local displayMessage = string.format("[Relay] Anfrage von %s (Level %s) aus %s.", name, level, zone)
+            -- Post to guild chat so officers present see it
+            C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, displayMessage, "GUILD")
+        end
     elseif message:find("^INVITE_DECLINED:") then
         local name = message:match("^INVITE_DECLINED:(.+)$")
         if name and name ~= "" then
@@ -149,11 +195,42 @@ function SchlingelInc.GuildRecruitment:Initialize()
 	SchlingelInc.EventManager:RegisterHandler("CHAT_MSG_ADDON",
 		function(_, prefix, message)
 			if prefix == SchlingelInc.prefix then
-				if message:find("INVITE_REQUEST") or message:find("INVITE_SENT") then
-					HandleAddonMessage(message)
-				end
+                if message:find("INVITE_REQUEST") or message:find("INVITE_REQUEST_RELAY") or message:find("INVITE_SENT") or message:find("INVITE_DECLINED") then
+                    HandleAddonMessage(message)
+                end
 			end
 		end, 0, "GuildInviteHandler")
+
+    -- Slash command to search online guild members and send relay requests
+    SLASH_SCHWHO1 = "/schwho"
+    SlashCmdList["SCHWHO"] = function(msg)
+        local filter = msg and msg:match("^%s*(.-)%s*$") or ""
+        SchlingelInc.GuildRecruitment:SendGuildRequestViaGuildMembers(filter)
+    end
+
+    -- Handle WHO results for relay messages
+    SchlingelInc.EventManager:RegisterHandler("WHO_LIST_UPDATE",
+        function()
+            local pending = SchlingelInc.GuildRecruitment._pendingWhoRelay
+            if not pending or not pending.message then return end
+            local num = GetNumWhoResults and GetNumWhoResults() or 0
+            local sent = 0
+            local maxToSend = 25
+            for i = 1, num do
+                local whoName, whoGuild = GetWhoInfo(i)
+                if whoName and whoName ~= UnitName("player") then
+                    -- Optional: verify guild matches target (some clients may return different results)
+                    local targetGuild = SchlingelInc.Constants.TARGET_GUILD or "SchlingelInc"
+                    if not whoGuild or whoGuild == targetGuild or string.find(string.lower(whoGuild or ""), string.lower(targetGuild), 1, true) then
+                        C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, pending.message, "WHISPER", whoName)
+                        sent = sent + 1
+                    end
+                end
+                if sent >= maxToSend then break end
+            end
+            SchlingelInc.GuildRecruitment._pendingWhoRelay = nil
+            SchlingelInc:Print(string.format("Relay-Anfragen an %d Spieler gesendet.", sent))
+        end, 0, "GuildRecruitWhoHandler")
 end
 
 -- Returns formatted zone name

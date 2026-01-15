@@ -44,7 +44,7 @@ local function CreateGuildJoinPrompt()
     joinButton:SetPoint("TOP", desc, "BOTTOM", 0, -15)
     joinButton:SetText("Beitrittsanfrage senden")
     joinButton:SetScript("OnClick", function()
-        SchlingelInc.GuildRecruitment:SendGuildRequest()
+        SchlingelInc.GuildRecruitment:SendGuildRequestViaGuildMembers()
         frame:Hide()
     end)
 
