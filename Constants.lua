@@ -67,14 +67,14 @@ SchlingelInc.Constants.FALLBACK_OFFICERS = {
 	"Jeriky",
 	"Merandii",
 	"Korvo",
-	"Ashajt"
+	"Ashajt",
 	"Raixxen",
 	"Markô",
 	"Markoxak",
 	"Cricksudin",
 	"Pryâ",
 	"HvvTronlx",
-	"HwTrønix"
+	"HwTrønix",
 	-- Dev-Schlingel
 	"Pudidev",
 	"Cricksumage",
