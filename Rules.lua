@@ -193,4 +193,10 @@ function SchlingelInc.Rules:Initialize()
 		function()
 			SchlingelInc.Rules:ProhibitGroupingWithNonGuildMembers()
 		end, 0, "RaidRosterCheck")
+
+    -- Reload rules when the player's guild membership changes
+    SchlingelInc.EventManager:RegisterHandler("PLAYER_GUILD_UPDATE",
+        function()
+            SchlingelInc.Rules:LoadFromGuildInfo()
+        end, 0, "PlayerGuildUpdate")
 end

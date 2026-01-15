@@ -44,7 +44,7 @@ function SchlingelInc.GuildRecruitment:SendGuildRequest()
     end
 
     local zone = SchlingelInc.GuildRecruitment:GetPlayerZone()
-    local playerGold = GetCoinText(GetMoney())
+    local playerGold = GetMoney()
 
     -- Sanitize inputs by replacing delimiters with safe characters
     -- This prevents zone names with colons from breaking the message parsing
@@ -99,10 +99,9 @@ local function HandleAddonMessage(message)
                 level = level,
                 xp = xpNum,
                 zone = zone,
-                money = money,
             }
-            local displayMessage = string.format("Neue Anfrage von %s (Level %s) mit %s in den Taschen aus %s erhalten.",
-                name, level, money, zone)
+            local displayMessage = string.format("Neue Anfrage von %s (Level %s) aus %s erhalten.",
+                name, level, zone)
             SchlingelInc:Print(displayMessage)
             SchlingelInc.GuildInvites:ShowInviteMessage(displayMessage, requestData)
         end
