@@ -152,7 +152,7 @@ local function HandleAddonMessage(message)
         if name and level and zone then
             local displayMessage = string.format("[Relay] Anfrage von %s (Level %s) aus %s.", name, level, zone)
             -- Post to guild chat so officers present see it
-            SendChatMessage(displayMessage, "GUILD")
+            C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, displayMessage, "GUILD")
         end
     elseif message:find("^INVITE_DECLINED:") then
         local name = message:match("^INVITE_DECLINED:(.+)$")
