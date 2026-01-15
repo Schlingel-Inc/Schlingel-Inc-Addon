@@ -49,7 +49,7 @@ function SchlingelInc.GuildRecruitment:SendGuildRequest()
     -- This prevents zone names with colons from breaking the message parsing
     local safeZone = zone:gsub(":", "-"):gsub("|", "-")
 
-    local message = string.format("INVITE_REQUEST:%s:%d:%d:%s:%s", playerName, playerLevel, playerExp, safeZone)
+    local message = string.format("INVITE_REQUEST:%s:%d:%d:%s", playerName, playerLevel, playerExp, safeZone)
 
     -- Level 1 players are ALWAYS outside the guild
     -- Use the fallback officer list from Constants
