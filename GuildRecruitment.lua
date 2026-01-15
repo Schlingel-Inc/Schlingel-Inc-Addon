@@ -44,14 +44,12 @@ function SchlingelInc.GuildRecruitment:SendGuildRequest()
     end
 
     local zone = SchlingelInc.GuildRecruitment:GetPlayerZone()
-    local playerGold = GetCoinText(GetMoney())
 
     -- Sanitize inputs by replacing delimiters with safe characters
     -- This prevents zone names with colons from breaking the message parsing
     local safeZone = zone:gsub(":", "-"):gsub("|", "-")
-    local safePlayerGold = playerGold:gsub(":", "-"):gsub("|", "-")
 
-    local message = string.format("INVITE_REQUEST:%s:%d:%d:%s:%s", playerName, playerLevel, playerExp, safeZone, safePlayerGold)
+    local message = string.format("INVITE_REQUEST:%s:%d:%d:%s:%s", playerName, playerLevel, playerExp, safeZone)
 
     -- Level 1 players are ALWAYS outside the guild
     -- Use the fallback officer list from Constants
@@ -71,8 +69,8 @@ end
 
 local function HandleAddonMessage(message)
     if message:find("^INVITE_REQUEST:") then
-        local name, level, xp, zone, money = message:match("^INVITE_REQUEST:([^:]+):(%d+):(%d+):([^:]+):(.+)$")
-        if name and level and xp and zone and money then
+        local name, level, xp, zone = message:match("^INVITE_REQUEST:([^:]+):(%d+):(%d+):([^:]+)$")
+        if name and level and xp and zone then
             -- Validate data before using
             local levelNum = tonumber(level)
             local xpNum = tonumber(xp)
@@ -89,7 +87,7 @@ local function HandleAddonMessage(message)
             end
 
             -- Ensure strings are not empty
-            if name == "" or zone == "" or money == "" then
+            if name == "" or zone == "" then
                 SchlingelInc.Debug:Print("Empty fields received in guild request")
                 return
             end
@@ -99,10 +97,9 @@ local function HandleAddonMessage(message)
                 level = level,
                 xp = xpNum,
                 zone = zone,
-                money = money,
             }
-            local displayMessage = string.format("Neue Anfrage von %s (Level %s) mit %s in den Taschen aus %s erhalten.",
-                name, level, money, zone)
+            local displayMessage = string.format("Neue Anfrage von %s (Level %s) aus %s erhalten.",
+                name, level, zone)
             SchlingelInc:Print(displayMessage)
             SchlingelInc.GuildInvites:ShowInviteMessage(displayMessage, requestData)
         end
