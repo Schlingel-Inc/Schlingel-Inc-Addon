@@ -38,6 +38,10 @@ SchlingelInc.Constants.COOLDOWNS = {
 	GUILD_ROSTER_CACHE = 60  -- 1 minute
 }
 
+-- Target guild name used for /who queries when the player is not in the guild
+-- Set this to your guild's exact name if different
+SchlingelInc.Constants.TARGET_GUILD = "Schlingel Inc"
+
 -- Pronouns for genders (German articles)
 SchlingelInc.Constants.PRONOUNS = {
 	[2] = "der",  -- Male
