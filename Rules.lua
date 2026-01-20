@@ -150,6 +150,14 @@ function SchlingelInc.Rules:ProhibitGroupingWithNonGuildMembers()
     end
 end
 
+function SchlingelInc.Rules:AutoDeclineDuels()
+	if(not SchlingelOptionsDB.auto_decline_duels) then
+		return
+	end
+
+	CancelDuel()
+end
+
 -- Initialize rules
 function SchlingelInc.Rules:Initialize()
     SchlingelInc.Rules:LoadFromGuildInfo()
@@ -193,4 +201,9 @@ function SchlingelInc.Rules:Initialize()
 		function()
 			SchlingelInc.Rules:ProhibitGroupingWithNonGuildMembers()
 		end, 0, "RaidRosterCheck")
+
+    SchlingelInc.EventManager:RegisterHandler("DUEL_REQUESTED",
+		function()
+			SchlingelInc.Rules:AutoDeclineDuels()
+		end, 0, "DuelAutoDecline")
 end

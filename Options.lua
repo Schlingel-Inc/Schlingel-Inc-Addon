@@ -37,6 +37,12 @@ local UIOptions =
         variable = "show_version",
         value = false,
     },
+    {
+        label = "Duelle Ablehnen",
+        description = "Lehnt automatisch alle Duell-Anfragen ab",
+        variable = "auto_decline_duels",
+        value = false,
+    },
 }
 
 local category = Settings.RegisterVerticalLayoutCategory("Schlingel Inc")

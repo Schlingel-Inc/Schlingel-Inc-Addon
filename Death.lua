@@ -8,6 +8,10 @@ SchlingelInc.Death = {
 -- Initialize CharacterDeaths to avoid nil reference
 CharacterDeaths = CharacterDeaths or 0
 
+-- Cooldown for sending own death to guild (seconds)
+local OWN_DEATH_COOLDOWN = 30
+local lastOwnDeathSendTime = 0
+
 -- Session-based death log (NOT persisted, only during session)
 -- This prevents out-of-sync issues when players are offline
 SchlingelInc.DeathLogData = {}
@@ -194,7 +198,12 @@ function SchlingelInc.Death:Initialize()
 				SchlingelInc.Death.lastChatMessage = ""
 			end
 
-			SendChatMessage(messageString, "GUILD")
+			-- Enforce cooldown: only send own death every OWN_DEATH_COOLDOWN seconds
+			local now = time()
+			if (now - lastOwnDeathSendTime) >= OWN_DEATH_COOLDOWN then
+				SendChatMessage(messageString, "GUILD")
+				lastOwnDeathSendTime = now
+			end
 
 			-- Process own death immediately (add to log with cause, last words, and handle)
 			local deathData = {
