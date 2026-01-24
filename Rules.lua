@@ -168,7 +168,7 @@ function SchlingelInc.Rules:CheckDivineHearth(event, _, _, spellId)
 
     local hasBuff = C_UnitAuras.GetPlayerAuraBySpellID(1020) or C_UnitAuras.GetPlayerAuraBySpellID(642) -- Divine Shield (Rank 1 and 2)
 
-    if spellId == 8690 then
+    if spellId == 8690 or spellId == 1265709 or spellId == 348699 then
         if hasBuff then
             local playerName = UnitName("player") or "Unbekannt"
             local msg = "SCHANDE! " .. playerName .. " benutzt Bubble-Ruhestein"

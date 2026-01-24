@@ -117,25 +117,46 @@ SchlingelInc.guildMemberVersions = {}
 
 -- Chat filter function (defined once, reused if already registered)
 local function GuildChatVersionFilter(_, _, msg, sender, ...)
-    -- Function only executes if show_version option is enabled.
-    if SchlingelOptionsDB["show_version"] == false then
-        return false, msg, sender, ... -- Pass message through unchanged.
+    local modifiedMessage = msg
+
+    -- Prepend guild public note (Gildeninfo) only if the option is explicitly enabled
+    if SchlingelOptionsDB and SchlingelOptionsDB.show_discord_handle == true then
+        local notePrefix = SchlingelInc:GetGuildPublicNotePrefix(sender)
+        if notePrefix ~= "" then
+            modifiedMessage = notePrefix .. modifiedMessage
+        end
     end
 
-    local version = SchlingelInc.guildMemberVersions[sender] -- Get stored version of sender.
-    local modifiedMessage = msg                              -- Default to original message.
-
-    -- If a version is known for the sender, add it to the message.
-    if version then
-        modifiedMessage = SchlingelInc.colorCode .. "[" .. version .. "]|r " .. msg
+    -- Prepend stored addon version only if the option is explicitly enabled
+    if SchlingelOptionsDB and SchlingelOptionsDB.show_version == true then
+        local version = SchlingelInc.guildMemberVersions[sender]
+        if version then
+            modifiedMessage = SchlingelInc.colorCode .. "[" .. version .. "]|r " .. modifiedMessage
+        end
     end
-    -- 'false' means the message is not suppressed but passed through (possibly modified).
+
     return false, modifiedMessage, sender, ...
 end
 
--- Add filter for guild chat messages (only once).
+-- Add filter for multiple chat message events (only once).
 if not SchlingelInc.guildChatFilterRegistered then
-    ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", GuildChatVersionFilter)
+    local events = {
+        "CHAT_MSG_GUILD",
+        "CHAT_MSG_OFFICER",
+        "CHAT_MSG_SAY",
+        "CHAT_MSG_YELL",
+        "CHAT_MSG_PARTY",
+        "CHAT_MSG_PARTY_LEADER",
+        "CHAT_MSG_INSTANCE_CHAT",
+        "CHAT_MSG_INSTANCE_CHAT_LEADER",
+        "CHAT_MSG_RAID",
+        "CHAT_MSG_RAID_LEADER",
+        "CHAT_MSG_WHISPER",
+        "CHAT_MSG_CHANNEL",
+    }
+    for _, ev in ipairs(events) do
+        ChatFrame_AddMessageEventFilter(ev, GuildChatVersionFilter)
+    end
     SchlingelInc.guildChatFilterRegistered = true
 end
 
@@ -160,6 +181,33 @@ function SchlingelInc:SanitizeText(text)
     text = text:gsub("|H[^|]*|h", "")
     text = text:gsub("|h", "")
     return text
+end
+
+-- Returns a formatted prefix containing the guild public note (Gildeninfo) for a sender.
+function SchlingelInc:GetGuildPublicNotePrefix(sender)
+    if not sender then return "" end
+    -- Ensure roster cache is reasonably fresh
+    if not SchlingelInc.GuildCache:IsValid() then
+        SchlingelInc.GuildCache:RequestUpdate()
+    end
+    local member = SchlingelInc.GuildCache:GetMemberInfo(sender)
+    if member and member.publicNote and member.publicNote ~= "" then
+        local note = SchlingelInc:SanitizeText(member.publicNote)
+
+        note = note:gsub("%b()", function(par)
+            if par:lower():find("tode") then
+                return ""
+            end
+            return par
+        end)
+
+        note = note:gsub("[Tt]ode[:%s%d]*", "")
+        -- Trim whitespace
+        note = note:match("^%s*(.-)%s*$") or note
+        if note == "" then return "" end
+        return SchlingelInc.colorCode .. "[" .. note .. "]|r "
+    end
+    return ""
 end
 
 -- Validates that an addon message sender is a guild member

@@ -43,6 +43,12 @@ local UIOptions =
         variable = "auto_decline_duels",
         value = false,
     },
+    {
+        label = "Discord Handle im Gildenchat anzeigen",
+        description = "Zeigt deinen Discord Handle im Gildenchat an",
+        variable = "show_discord_handle",
+        value = false,
+    }
 }
 
 local category = Settings.RegisterVerticalLayoutCategory("Schlingel Inc")
