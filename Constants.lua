@@ -35,7 +35,8 @@ SchlingelInc.Constants.COLORS = {
 SchlingelInc.Constants.COOLDOWNS = {
 	PVP_ALERT = 10,
 	INVITE_REQUEST = 300,  -- 5 minutes
-	GUILD_ROSTER_CACHE = 60  -- 1 minute
+	GUILD_ROSTER_CACHE = 60,  -- 1 minute
+	DEATH_ANNOUNCEMENT = 10
 }
 
 -- Pronouns for genders (German articles)

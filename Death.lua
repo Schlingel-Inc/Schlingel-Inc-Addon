@@ -9,7 +9,6 @@ SchlingelInc.Death = {
 CharacterDeaths = CharacterDeaths or 0
 
 -- Cooldown for sending own death to guild (seconds)
-local OWN_DEATH_COOLDOWN = 30
 local lastOwnDeathSendTime = 0
 
 -- Session-based death log (NOT persisted, only during session)
@@ -200,8 +199,9 @@ function SchlingelInc.Death:Initialize()
 
 			-- Enforce cooldown: only send own death every OWN_DEATH_COOLDOWN seconds
 			local now = time()
-			if (now - lastOwnDeathSendTime) >= OWN_DEATH_COOLDOWN then
+			if (now - lastOwnDeathSendTime) >= SchlingelInc.Constants.COOLDOWNS.DEATH_ANNOUNCEMENT then
 				SendChatMessage(messageString, "GUILD")
+				CharacterDeaths = CharacterDeaths + 1
 				lastOwnDeathSendTime = now
 			end
 
@@ -218,7 +218,6 @@ function SchlingelInc.Death:Initialize()
 			}
 			processDeath(deathData, true)
 
-			CharacterDeaths = CharacterDeaths + 1
 			-- Update guild note with new death count
 			local handle = SchlingelInc:GetDiscordHandle()
 			if handle and handle ~= "" then
