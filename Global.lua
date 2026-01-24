@@ -66,7 +66,7 @@ function SchlingelInc.Global:Initialize()
 					if SchlingelInc:CompareVersions(incomingVersion, newestVersionSeen) > 0 then
 						newestVersionSeen = incomingVersion
 						SchlingelInc:Print("Eine neue Version des Addons wurde gefunden: " ..
-							newestVersionSeen .. ". PBitte aktualisiere das Addon!")
+							newestVersionSeen .. ". Bitte aktualisiere das Addon!")
 					end
 				end
 			end
