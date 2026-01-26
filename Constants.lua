@@ -76,6 +76,7 @@ SchlingelInc.Constants.FALLBACK_OFFICERS = {
 	"Pryâ",
 	"HvvTronlx",
 	"HwTrønix",
+	"Onylock",
 	-- Dev-Schlingel
 	"Pudidev",
 	"Cricksumage",
