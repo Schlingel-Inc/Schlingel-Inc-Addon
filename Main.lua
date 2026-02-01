@@ -62,37 +62,5 @@ addonLoadedFrame:RegisterEvent("ADDON_LOADED")
 addonLoadedFrame:SetScript("OnEvent", function(self, event, addonName)
     if addonName == SchlingelInc.name then
         SchlingelInc:OnLoad()
-
-        -- Register all other events after initialization
-        SchlingelInc.EventManager:RegisterHandler("PLAYER_ENTERING_WORLD",
-            function()
-                if not SchlingelInc.initialPlayTimeRequested then
-                    RequestTimePlayed()
-                    SchlingelInc.initialPlayTimeRequested = true
-                end
-            end, 100, "MainAddonInit")
-
-        SchlingelInc.EventManager:RegisterHandler("TIME_PLAYED_MSG",
-            function(_, totalTimeSeconds, levelTimeSeconds)
-                SchlingelInc.GameTimeTotal = totalTimeSeconds or 0
-                SchlingelInc.GameTimePerLevel = levelTimeSeconds or 0
-
-                local charTabIndex = 1
-                if SchlingelInc.infoWindow and SchlingelInc.infoWindow:IsShown() then
-                    if SchlingelInc.infoWindow.tabContentFrames and
-                        SchlingelInc.infoWindow.tabContentFrames[charTabIndex] and
-                        SchlingelInc.infoWindow.tabContentFrames[charTabIndex]:IsShown() and
-                        SchlingelInc.infoWindow.tabContentFrames[charTabIndex].Update then
-                        SchlingelInc.infoWindow.tabContentFrames[charTabIndex]:Update(
-                            SchlingelInc.infoWindow.tabContentFrames[charTabIndex])
-                    end
-                end
-            end, 0, "TimePlayedUpdate")
-
-        SchlingelInc.EventManager:RegisterHandler("PLAYER_LEVEL_UP",
-            function()
-                SchlingelInc.CharacterPlaytimeLevel = 0
-                RequestTimePlayed()
-            end, 50, "PlaytimeReset")
     end
 end)
