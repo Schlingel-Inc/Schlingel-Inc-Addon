@@ -52,10 +52,6 @@ end
 
 -- Rule: Completely prohibit mailbox usage
 function SchlingelInc.Rules:ProhibitMailboxUsage()
-    if tonumber(SchlingelInc.InfoRules.mailRule) == 0 then
-        return
-    end
-
     CloseMail()
     SchlingelInc.Popup:Show({
         title = "Briefkasten gesperrt!",
@@ -179,14 +175,40 @@ function SchlingelInc.Rules:CheckDivineHearth(event, _, _, spellId)
     end
 end
 
+local function HideMinimapMail()
+	local mail = MiniMapMailFrame or MiniMapMailIcon
+	if not mail then return end
+
+	-- Stop Blizzard from updating/showing it
+	if mail.UnregisterAllEvents then
+		mail:UnregisterAllEvents()
+	end
+
+	-- Hide it now
+	mail:Hide()
+
+	-- Make it non-interactive
+	mail:SetAlpha(0)
+	mail:SetScript("OnEnter", nil)
+	mail:SetScript("OnLeave", nil)
+
+	-- Prevent future :Show() calls
+	if mail.Show then
+		mail.Show = function() end
+	end
+end
+
 -- Initialize rules
 function SchlingelInc.Rules:Initialize()
     SchlingelInc.Rules:LoadFromGuildInfo()
 
-	SchlingelInc.EventManager:RegisterHandler("MAIL_SHOW",
-		function()
-			SchlingelInc.Rules:ProhibitMailboxUsage()
-		end, 0, "RuleMailbox")
+    if tonumber(SchlingelInc.InfoRules.mailRule) == 1 then
+        HideMinimapMail()
+        SchlingelInc.EventManager:RegisterHandler("MAIL_SHOW", function()
+            SchlingelInc.Rules:ProhibitMailboxUsage()
+            end, 0, "RuleMailbox")
+    end
+
 
 	SchlingelInc.EventManager:RegisterHandler("AUCTION_HOUSE_SHOW",
 		function()

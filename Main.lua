@@ -1,31 +1,3 @@
-local function MuteGroupInviteSounds()
-	-- Mute party invite sound (the "whoosh" when receiving/sending invites)
-	MuteSoundFile(567275) -- IG_PLAYER_INVITE file ID
-end
-
-local function HideMinimapMail()
-	local mail = MiniMapMailFrame or MiniMapMailIcon
-	if not mail then return end
-
-	-- Stop Blizzard from updating/showing it
-	if mail.UnregisterAllEvents then
-		mail:UnregisterAllEvents()
-	end
-
-	-- Hide it now
-	mail:Hide()
-
-	-- Make it non-interactive
-	mail:SetAlpha(0)
-	mail:SetScript("OnEnter", nil)
-	mail:SetScript("OnLeave", nil)
-
-	-- Prevent future :Show() calls
-	if mail.Show then
-		mail.Show = function() end
-	end
-end
-
 -- SchlingelInc:OnLoad() function - executes when the addon is loaded.
 function SchlingelInc:OnLoad()
     -- Initialize EventManager first
@@ -48,10 +20,6 @@ function SchlingelInc:OnLoad()
 
     -- Initialize minimap icon functionality.
     SchlingelInc:InitMinimapIcon()
-
-    -- QoL: Hide mail icon and mute annoying sounds
-    HideMinimapMail()
-    MuteGroupInviteSounds()
 end
 
 -- --- Event registrations via the central EventManager ---
