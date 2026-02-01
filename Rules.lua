@@ -8,6 +8,9 @@ SchlingelInc.InfoRules = {
     groupingRule = 1
 }
 
+-- Current level cap (fetched from guild info)
+SchlingelInc.Rules.CurrentCap = 0
+
 function SchlingelInc.Rules:GetRules(callback)
     local text = GetGuildInfoText()
     if text == nil or text == "" then
@@ -45,6 +48,12 @@ function SchlingelInc.Rules:LoadFromGuildInfo()
         SchlingelInc.InfoRules.auctionHouseRule = auctionHouseRule
         SchlingelInc.InfoRules.tradeRule = tradeRule
         SchlingelInc.InfoRules.groupingRule = groupingRule
+
+        -- Extract and store CurrentCap from guild info
+        local currentCap = text:match("Aktuelles Bracket:.-Level%s*(%d+)")
+        if currentCap then
+            SchlingelInc.Rules.CurrentCap = tonumber(currentCap)
+        end
 
         SchlingelInc:Print("Regeln geladen")
     end)

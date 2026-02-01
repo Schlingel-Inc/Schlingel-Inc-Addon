@@ -132,7 +132,7 @@ function SchlingelInc.Death:Initialize()
 	SchlingelInc.EventManager:RegisterHandler("PLAYER_DEAD",
 		function()
 			-- If in raid or battleground, skip everything because we neither track nor announce the death
-			if SchlingelInc:IsInBattleground() or SchlingelInc:IsInRaid() then return end
+			if SchlingelInc:IsInRaid() then return end
 
 			local name = UnitName("player")
 			if not name then return end
@@ -141,6 +141,10 @@ function SchlingelInc.Death:Initialize()
 			local class = UnitClass("player")
 			local level = UnitLevel("player")
 			local sex = UnitSex("player")
+
+			if SchlingelInc:IsInBattleground() and level == SchlingelInc.Rules.CurrentCap then
+				return
+			end
 
 			-- Safe zone query with error handling
 			local zone, mapID
