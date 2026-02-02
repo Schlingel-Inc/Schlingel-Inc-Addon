@@ -31,7 +31,7 @@ end
 
 -- Eigenes Warn-Popup, wenn man auf eine "fremde" Mail klickt
 StaticPopupDialogs["CONFIRM_DELETE_NON_GUILD_MAIL"] = {
-    text = "|cffff0000GEFAHR:|r Post von Nicht-Gildenmitglied!\n\nDiese Post muss gelöscht werden.",
+    text = "|cffff0000HINWEIS:|r Post von Nicht-Gildenmitglied!\n\nDiese Post muss gelöscht werden.",
     button1 = "Löschen",
     button2 = "Abbrechen",
     OnAccept = function(_, data)
@@ -142,8 +142,12 @@ local function UniversalScan()
     if MailFrame and MailFrame:IsVisible() then
         -- Check known mail addon buttons
         local mailButtons = {
-            "OpenAllMail",           -- Common addon button
-            "PostalOpenAllButton",   -- Postal addon
+            "OpenAllMail",              -- Common addon button
+            "PostalOpenAllButton",      -- Postal: Open All
+            "PostalSelectOpenButton",   -- Postal: Open Selected (main bypass method)
+            "PostalSelectReturnButton", -- Postal: Return Selected
+            "Postal_OpenAllMenuButton", -- Postal: Menu
+            "Postal_ModuleMenuButton",  -- Postal: Module menu
             "InboxPrevPageButton",
             "AutoLootMailButton"
         }
@@ -170,6 +174,15 @@ local function UniversalScan()
                         end
                     end
                 end
+            end
+        end
+
+        -- Disable Postal checkboxes to prevent selecting mail
+        for i = 1, 7 do -- 7 visible mail items per page
+            local cb = _G["PostalInboxCB"..i]
+            if cb then
+                cb:Hide()
+                cb:Disable()
             end
         end
     end
