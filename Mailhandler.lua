@@ -148,7 +148,6 @@ local function UniversalScan()
             "PostalSelectReturnButton", -- Postal: Return Selected
             "Postal_OpenAllMenuButton", -- Postal: Menu
             "Postal_ModuleMenuButton",  -- Postal: Module menu
-            "InboxPrevPageButton",
             "AutoLootMailButton"
         }
 
