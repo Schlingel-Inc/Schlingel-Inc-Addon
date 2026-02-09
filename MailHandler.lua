@@ -1,11 +1,53 @@
+SchlingelInc.MailHandler = {}
+
+local mailboxAddons = {
+        "TradeSkillMaster",
+        "Postal"
+}
+
+function SchlingelInc.MailHandler:HideMinimapMail()
+	local mail = MiniMapMailFrame or MiniMapMailIcon
+	if not mail then return end
+
+	-- Stop Blizzard from updating/showing it
+	if mail.UnregisterAllEvents then
+		mail:UnregisterAllEvents()
+	end
+
+	-- Hide it now
+	mail:Hide()
+
+	-- Make it non-interactive
+	mail:SetAlpha(0)
+	mail:SetScript("OnEnter", nil)
+	mail:SetScript("OnLeave", nil)
+
+	-- Prevent future :Show() calls
+	if mail.Show then
+		mail.Show = function() end
+	end
+end
+
+-- Check for active mailbox addons
+function SchlingelInc.MailHandler:MailboxAddonActive()
+    local detectedAddons = {}
+    for _, addonName in ipairs(mailboxAddons) do
+        if IsAddOnLoaded(addonName) then
+            table.insert(detectedAddons, addonName)
+        end
+    end
+
+    return detectedAddons
+end
+
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("MAIL_INBOX_UPDATE")
 
 -- Checkt, ob der Absender "sicher" ist (man selbst, Gildenkollege oder Blizzard)
 local function IsSafeSender(index)
     -- Wir holen uns die wichtigen Daten direkt über den Index
-    -- 3: sender, 11: isGM
-    local _, _, sender, _, _, _, _, _, _, _, isGM = GetInboxHeaderInfo(index)
+    -- 3: sender, 9: wasRead 13: isGM
+    local _, _, sender, _, _, _, _, _, wasRead, _, _, _, isGM = GetInboxHeaderInfo(index)
 
     -- 1. Blizzard/System Check (isGM ist true bei offizieller Post)
     if isGM then return true end
@@ -15,8 +57,11 @@ local function IsSafeSender(index)
 
     -- 3. Eigen-Check
     if sender == UnitName("player") then return true end
+	
+	-- 4. Eine bereits gelesene Mail
+	if wasRead then return true end
 
-    -- 4. Gilden-Check
+    -- 5. Gilden-Check
     local numGuild = GetNumGuildMembers()
     for i = 1, numGuild do
         local fullName = GetGuildRosterInfo(i)
@@ -39,7 +84,9 @@ StaticPopupDialogs["CONFIRM_DELETE_NON_GUILD_MAIL"] = {
             if not data.itemCount or data.itemCount == 0 then
                 DeleteInboxItem(data.slot)
             else
-                local mailButton = _G["MailItem"..data.slot.."Button"]
+				local itemsPerPage = INBOXITEMS_TO_DISPLAY or 7
+                local buttonIndex = ((data.slot - 1) % itemsPerPage) + 1
+                local mailButton = _G["MailItem"..buttonIndex.."Button"]
                 if mailButton then
                     -- Hide the guard temporarily to allow the original click handler to work
                     if mailButton.mailGuard then
@@ -50,12 +97,12 @@ StaticPopupDialogs["CONFIRM_DELETE_NON_GUILD_MAIL"] = {
                     mailButton:Click()
 
                     -- Kurz warten, bis das Fenster offen ist, dann Blizzards Lösch-Button triggern
-                    C_Timer.After(0.3, function()
+                    C_Timer.After(0.1, function()
                         if OpenMailFrame:IsVisible() then
                             OpenMailDeleteButton:Click()
 
                             -- Falls Blizzard nochmal nachfragt (bei Items/Geld), bestätigen wir das auch automatisch
-                            C_Timer.After(0.2, function()
+                            C_Timer.After(0.1, function()
                                 for j = 1, 4 do
                                     local f = _G["StaticPopup"..j]
                                     if f and f:IsVisible() and (f.which == "DELETE_MAIL" or f.which == "CONFIRM_DELETE_ITEM") then
@@ -103,38 +150,55 @@ end
 local function UniversalScan()
     if not MailFrame:IsVisible() then return end
 
-    local numItems, _ = GetInboxNumItems()
-    for i = 1, numItems do
-        local item = _G["MailItem"..i]
-        local senderText = _G["MailItem"..i.."Sender"]
-        local button = _G["MailItem"..i.."Button"]
+    -- Wie viele Items sind insgesamt da?
+    local numItems = GetInboxNumItems()
+    
+    -- Wie viele Items werden pro Seite angezeigt? (Standard ist 7)
+    local itemsPerPage = INBOXITEMS_TO_DISPLAY
 
-        if item and button then
-            local _, _, _, _, _, _, _, itemCount = GetInboxHeaderInfo(i)
-            if not IsSafeSender(i) then
-                -- Fremder Absender: Name wird rot
-                senderText:SetTextColor(1, 0, 0)
+    -- Aktuelle Seite berechnen (Blizzard speichert das in InboxFrame.pageNum)
+    local currentPage = InboxFrame.pageNum or 1
 
-                -- Create guard overlay if it doesn't exist
-                if not button.mailGuard then
-                    button.mailGuard = CreateFrame("Button", nil, button)
-                    button.mailGuard:SetAllPoints()
-                    button.mailGuard:SetFrameLevel(button:GetFrameLevel() + 10)
-                    button.mailGuard:EnableMouse(true)
+    -- Wir loopen NUR über die 7 sichtbaren Buttons
+    for i = 1, itemsPerPage do
+        local mailIndex = ((currentPage - 1) * itemsPerPage) + i
+        
+        -- Nur fortfahren, wenn der berechnete Index nicht über der Gesamtzahl liegt
+        if mailIndex <= numItems then
+            local item = _G["MailItem"..i]
+            local senderText = _G["MailItem"..i.."Sender"]
+            local button = _G["MailItem"..i.."Button"]
+
+            if item and button then
+                local _, _, _, subject, _, _, _, itemCount = GetInboxHeaderInfo(mailIndex)
+                
+                if not IsSafeSender(mailIndex) then
+                    -- Fremder Absender: Name wird rot
+                    if senderText then senderText:SetTextColor(1, 0, 0) end
+
+                    if not button.mailGuard then
+                        button.mailGuard = CreateFrame("Button", nil, button)
+                        button.mailGuard:SetAllPoints()
+                        button.mailGuard:SetFrameLevel(button:GetFrameLevel() + 10)
+                        button.mailGuard:EnableMouse(true)
+                    end
+
+                    button.mailGuard:SetScript("OnClick", function()
+                        local d = StaticPopup_Show("CONFIRM_DELETE_NON_GUILD_MAIL")
+                        if d then d.data = {slot = mailIndex, itemCount = itemCount} end
+                    end)
+                    button.mailGuard:Show()
+                else
+                    -- Sicherer Absender
+                    if senderText then senderText:SetTextColor(1, 0.8, 0) end
+                    if button.mailGuard then button.mailGuard:Hide() end
                 end
-
-                -- Set up the guard's click handler
-                button.mailGuard:SetScript("OnClick", function()
-                    local id = i
-                    local d = StaticPopup_Show("CONFIRM_DELETE_NON_GUILD_MAIL")
-                    if d then d.data = {slot = id, itemCount = itemCount} end
-                end)
-                button.mailGuard:Show()
-            else
-                -- Gildenkollege: Alles okay, Button freigeben
-                if senderText then senderText:SetTextColor(1, 0.8, 0) end
-                if button.mailGuard then button.mailGuard:Hide() end
             end
+        else
+            -- Falls weniger als 7 Briefe auf der aktuellen Seite sind (z.B. letzte Seite)
+            -- müssen wir die Guards der leeren Zeilen verstecken
+            local button = _G["MailItem"..i.."Button"]
+            if button and button.mailGuard then button.mailGuard:Hide() end
         end
     end
 
@@ -143,11 +207,6 @@ local function UniversalScan()
         -- Check known mail addon buttons
         local mailButtons = {
             "OpenAllMail",              -- Common addon button
-            "PostalOpenAllButton",      -- Postal: Open All
-            "PostalSelectOpenButton",   -- Postal: Open Selected (main bypass method)
-            "PostalSelectReturnButton", -- Postal: Return Selected
-            "Postal_OpenAllMenuButton", -- Postal: Menu
-            "Postal_ModuleMenuButton",  -- Postal: Module menu
             "AutoLootMailButton"
         }
 
@@ -175,20 +234,40 @@ local function UniversalScan()
                 end
             end
         end
-
-        -- Disable Postal checkboxes to prevent selecting mail
-        for i = 1, 7 do -- 7 visible mail items per page
-            local cb = _G["PostalInboxCB"..i]
-            if cb then
-                cb:Hide()
-                cb:Disable()
-            end
-        end
     end
 end
 
+-- Delayed Scan
+local function DelayedScan()
+    C_Timer.After(0.05, UniversalScan)
+end
+
+-- Event-Handler
 frame:SetScript("OnEvent", function(_, event)
     if event == "MAIL_INBOX_UPDATE" then
-        UniversalScan()
+        DelayedScan()
+    end
+end)
+
+-- Hook auf das MailFrame
+MailFrame:HookScript("OnShow", DelayedScan)
+
+-- Diese Funktion wird von Blizzard jedes Mal aufgerufen, wenn die Inbox sich optisch aktualisiert
+hooksecurefunc("InboxFrame_Update", function()
+    DelayedScan()
+end)
+
+-- Falls irgendein Addon noch was macht
+if MailFrameTab1 then
+    MailFrameTab1:HookScript("OnClick", DelayedScan)
+end
+
+local errorListener = CreateFrame("Frame")
+errorListener:RegisterEvent("UI_ERROR_MESSAGE")
+errorListener:SetScript("OnEvent", function(_, _, messageType, msg)
+    if msg == ERR_MAIL_TARGET_NOT_FOUND then
+        if UIErrorsFrame then UIErrorsFrame:Clear() end
+        
+        SchlingelInc:Print("Diese Mail kann nicht gelöscht werden, da sie bereits geöffnet war und der Charakter mittlerweile gelöscht wurde! Ein Bezug zur Gilde ist nicht mehr nachvollziehbar")
     end
 end)
