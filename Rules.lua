@@ -189,7 +189,7 @@ function SchlingelInc.Rules:Initialize()
     SchlingelInc.Rules:LoadFromGuildInfo()
 
     if tonumber(SchlingelInc.InfoRules.mailRule) == 1 or #SchlingelInc.MailHandler:MailboxAddonActive() > 0 then
-        SchlingelInc.MaiHandler:HideMinimapMail()
+        SchlingelInc.MailHandler:HideMinimapMail()
         SchlingelInc.EventManager:RegisterHandler("MAIL_SHOW", function()
             SchlingelInc.Rules:ProhibitMailboxUsage()
             end, 0, "RuleMailbox")

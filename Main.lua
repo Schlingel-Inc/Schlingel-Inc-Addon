@@ -20,6 +20,7 @@ function SchlingelInc:OnLoad()
 
     -- Initialize minimap icon functionality.
     SchlingelInc:InitMinimapIcon()
+    SchlingelInc.LevelUps:CheckForCap(UnitLevel("player"))
 end
 
 -- --- Event registrations via the central EventManager ---
