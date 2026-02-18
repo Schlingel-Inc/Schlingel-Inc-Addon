@@ -32,6 +32,30 @@ local UIOptions =
         value = true,
     },
     {
+        label = "Level-Up Meldungen",
+        description = "Aktiviert die Level-Up Meldungen",
+        variable = "levelmessages",
+        value = true,
+    },
+    {
+        label = "Level-Up Meldungen Ton",
+        description = "Aktiviert den Ton für die Level-Up Meldungen",
+        variable = "levelmessages_sound",
+        value = true,
+    },
+    {
+        label = "Cap-Meldungen",
+        description = "Aktiviert die Level-Cap Meldungen",
+        variable = "capmessages",
+        value = true,
+    },
+    {
+        label = "Cap-Meldungen Ton",
+        description = "Aktiviert den Ton für die Level-Cap Meldungen",
+        variable = "capmessages_sound",
+        value = true,
+    },
+    {
         label = "Version anzeigen",
         description = "Zeigt die Versionen der Spieler:innen im Gildenchat an",
         variable = "show_version",

@@ -71,6 +71,16 @@ function SchlingelInc.Global:Initialize()
 				elseif message == "VERSION_REQUEST" and IsInGuild() then
 					-- Respond to version requests from already-online guild members
 					C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "VERSION:" .. SchlingelInc.version, "GUILD")
+				else
+					local levelName, levelNum = message:match("^LEVELUP:(.+):(%d+)$")
+					if levelName and levelNum and SchlingelInc:IsValidGuildSender(sender) then
+						SchlingelInc.LevelUpAnnouncement:ShowMessage(levelName, tonumber(levelNum))
+					end
+
+					local capName, capNum = message:match("^CAP:(.+):(%d+)$")
+					if capName and capNum and SchlingelInc:IsValidGuildSender(sender) then
+						SchlingelInc.LevelUpAnnouncement:ShowCap(capName, tonumber(capNum))
+					end
 				end
 			end
 		end, 0, "VersionChecker")

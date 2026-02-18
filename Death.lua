@@ -131,7 +131,8 @@ function SchlingelInc.Death:Initialize()
 	-- PLAYER_DEAD event handler
 	SchlingelInc.EventManager:RegisterHandler("PLAYER_DEAD",
 		function()
-			-- If in raid or battleground, skip everything because we neither track nor announce the death
+			-- Raids are always skipped. Battleground deaths are only skipped at the level cap;
+			-- below cap they are tracked and announced normally.
 			if SchlingelInc:IsInRaid() then return end
 
 			local name = UnitName("player")

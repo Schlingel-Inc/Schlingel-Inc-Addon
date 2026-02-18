@@ -1,3 +1,18 @@
+# 3.1.0
+
+- Level-Up Ankündigungen: Popup für Gildenmitglieder bei Meilensteinen (10, 20, 30, 40, 50, 60) via AddonMessage
+- Cap-Ankündigung: eigenes Popup mit speziellem Sound bei Erreichen des Level Caps
+- Erreicht ein Spieler das Cap auf einem Meilensteins-Level, wird nur die Cap-Ankündigung abgespielt
+- Queue-System: Tod-, Level-Up- und Cap-Popups überlagern sich nicht mehr, sondern werden nacheinander angezeigt
+- Neue Optionen: Level-Up Meldungen, Level-Up Ton, Cap-Meldungen, Cap-Ton separat ein-/ausschaltbar
+
+# 3.0.7
+
+- Mailbox im Gildenchat nutzbar; NPC-Mails werden korrekt gefiltert; Tab-Wechsel Bugs behoben; Schaltflächen korrekt gesperrt
+- LevelCap Popup warnt vor dem unbeabsichtigten Brechen des Level Caps
+- PvP Tode unter dem Level Cap werden weiterhin im Gildenchat gemeldet; am Cap nicht
+- Versions-Sync: Versionsnummern aller eingeloggten Gildenmitglieder werden jetzt korrekt übertragen
+
 # 2.3.0
 
 -- Major code cleanup and optimizations

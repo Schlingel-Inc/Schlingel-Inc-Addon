@@ -19,7 +19,9 @@ SchlingelInc.Constants.INSTANCE_TYPES = {
 -- Sound IDs
 SchlingelInc.Constants.SOUNDS = {
 	PVP_ALERT = 8174,  -- Horde Flag Sound
-	DEATH_ANNOUNCEMENT = 8192
+	DEATH_ANNOUNCEMENT = 8192,
+	LEVELUP_ANNOUNCMENT = 8574,
+	CAP_ANNOUNCEMENT = "Interface\\AddOns\\SchlingelInc\\media\\cap_announcement.wav"
 }
 
 -- Colors for messages
