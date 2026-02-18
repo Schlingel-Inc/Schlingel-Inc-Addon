@@ -30,7 +30,7 @@ function SchlingelInc.LevelUps:CheckForCap(level)
 		local currentXPPercent = playerExp / levelUpXP * 100
 		SchlingelInc.Popup:Show({
         title = "Level Cap erreicht",
-        message = string.format("Du bist bei %d%% XP von Level %d.\nDas aktuelle Cap ist %d.\n Achte auf die Level Schande!", currentXPPercent, level + 1, SchlingelInc.Rules.CurrentCap),
+        message = string.format("Du bist bei %d%% von Level %d.\nDas aktuelle Cap ist %d.\n Achte auf die Level Schande!", currentXPPercent, level + 1, SchlingelInc.Rules.CurrentCap),
 		displayTime = 5
 	})
 	end

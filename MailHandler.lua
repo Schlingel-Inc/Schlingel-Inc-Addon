@@ -46,22 +46,26 @@ frame:RegisterEvent("MAIL_INBOX_UPDATE")
 -- Checkt, ob der Absender "sicher" ist (man selbst, Gildenkollege oder Blizzard)
 local function IsSafeSender(index)
     -- Wir holen uns die wichtigen Daten direkt über den Index
-    -- 3: sender, 9: wasRead 13: isGM
-    local _, _, sender, _, _, _, _, _, wasRead, _, _, _, isGM = GetInboxHeaderInfo(index)
+    -- 3: sender, 9: wasRead, 12: canReply, 13: isGM
+    local _, _, sender, _, _, _, _, _, wasRead, _, _, canReply, isGM = GetInboxHeaderInfo(index)
 
     -- 1. Blizzard/System Check (isGM ist true bei offizieller Post)
     if isGM then return true end
+    
+    -- 2. NPC/System Check
+    -- Wenn man auf eine Mail NICHT antworten kann, kommt sie vom System (AH, Postmeister, NPCs).
+    if not canReply then return true end
 
-    -- 2. Falls kein Sender existiert, ist es meist eine System-Mail
+    -- 3. Falls kein Sender existiert, ist es meist eine System-Mail
     if not sender or sender == "" then return true end
 
-    -- 3. Eigen-Check
+    -- 4. Eigen-Check
     if sender == UnitName("player") then return true end
-	
-	-- 4. Eine bereits gelesene Mail
-	if wasRead then return true end
+    
+    -- 5. Eine bereits gelesene Mail
+    if wasRead then return true end
 
-    -- 5. Gilden-Check
+    -- 6. Gilden-Check
     local numGuild = GetNumGuildMembers()
     for i = 1, numGuild do
         local fullName = GetGuildRosterInfo(i)
