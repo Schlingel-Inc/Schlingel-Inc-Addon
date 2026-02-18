@@ -68,13 +68,17 @@ function SchlingelInc.Global:Initialize()
 						SchlingelInc:Print("Eine neue Version des Addons wurde gefunden: " ..
 							newestVersionSeen .. ". Bitte aktualisiere das Addon!")
 					end
+				elseif message == "VERSION_REQUEST" and IsInGuild() then
+					-- Respond to version requests from already-online guild members
+					C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "VERSION:" .. SchlingelInc.version, "GUILD")
 				end
 			end
 		end, 0, "VersionChecker")
 
-	-- Send version to guild chat
+	-- Broadcast own version and request versions from already-online guild members
 	if IsInGuild() then
 		C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "VERSION:" .. SchlingelInc.version, "GUILD")
+		C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "VERSION_REQUEST", "GUILD")
 	end
     C_GuildInfo.GuildRoster() -- Fetch guild roster to build cache.
 end
