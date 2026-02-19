@@ -53,6 +53,7 @@ function SchlingelInc.Rules:LoadFromGuildInfo()
         local currentCap = text:match("Aktuelles Bracket:.-Level%s*(%d+)")
         if currentCap then
             SchlingelInc.Rules.CurrentCap = tonumber(currentCap)
+            SchlingelInc.LevelUps:CheckForCap(UnitLevel("player"))
         end
 
         SchlingelInc:Print("Regeln geladen")

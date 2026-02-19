@@ -11,10 +11,7 @@ function SchlingelInc.LevelUps:Initialize()
 			CheckForMilestone(level)
 			SchlingelInc.LevelUps:CheckForCap(level)
 		end, 0, "LevelUpEvents")
-	SchlingelInc.EventManager:RegisterHandler("PLAYER_LOGIN",
-		function()
-			SchlingelInc.LevelUps:CheckForCap(UnitLevel("player"))
-		end, 0, "LevelUpEvents")
+
 end
 
 function CheckForMilestone(level)
@@ -32,6 +29,7 @@ function CheckForMilestone(level)
 end
 
 function SchlingelInc.LevelUps:CheckForCap(level)
+	if SchlingelInc.Rules.CurrentCap == 0 then return end
 	if level >= SchlingelInc.Rules.CurrentCap then
 		local playerExp = UnitXP("player")
 		local levelUpXP = UnitXPMax("player")
