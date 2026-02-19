@@ -9,7 +9,7 @@ function SchlingelInc.LevelUps:Initialize()
 	SchlingelInc.EventManager:RegisterHandler("PLAYER_LEVEL_UP",
 		function(_, level)
 			CheckForMilestone(level)
-			SchlingelInc.LevelUps:CheckForCap(level)
+			SchlingelInc.LevelUps:CheckForCap(level, true)
 		end, 0, "LevelUpEvents")
 
 end
@@ -28,7 +28,7 @@ function CheckForMilestone(level)
 	end
 end
 
-function SchlingelInc.LevelUps:CheckForCap(level)
+function SchlingelInc.LevelUps:CheckForCap(level, announce)
 	if SchlingelInc.Rules.CurrentCap == 0 then return end
 	if level >= SchlingelInc.Rules.CurrentCap then
 		local playerExp = UnitXP("player")
@@ -40,10 +40,12 @@ function SchlingelInc.LevelUps:CheckForCap(level)
 			displayTime = 5
 		})
 
-		local player = UnitName("player")
-		local capMessage = player .. " hat das Level Cap von " .. level .. " erreicht! Herzlichen Glückwunsch!"
-		SendChatMessage(capMessage, "GUILD")
-		C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "CAP:" .. player .. ":" .. level, "GUILD")
+		if announce then
+			local player = UnitName("player")
+			local capMessage = player .. " hat das Level Cap von " .. level .. " erreicht! Herzlichen Glückwunsch!"
+			SendChatMessage(capMessage, "GUILD")
+			C_ChatInfo.SendAddonMessage(SchlingelInc.prefix, "CAP:" .. player .. ":" .. level, "GUILD")
+		end
 	end
 end
 
