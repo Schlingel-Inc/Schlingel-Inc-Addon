@@ -11,6 +11,10 @@ function SchlingelInc.LevelUps:Initialize()
 			CheckForMilestone(level)
 			SchlingelInc.LevelUps:CheckForCap(level)
 		end, 0, "LevelUpEvents")
+	SchlingelInc.EventManager:RegisterHandler("PLAYER_LOGIN",
+		function()
+			SchlingelInc.LevelUps:CheckForCap(UnitLevel("player"))
+		end, 0, "LevelUpEvents")
 end
 
 function CheckForMilestone(level)
@@ -31,7 +35,7 @@ function SchlingelInc.LevelUps:CheckForCap(level)
 	if level >= SchlingelInc.Rules.CurrentCap then
 		local playerExp = UnitXP("player")
 		local levelUpXP = UnitXPMax("player")
-		local currentXPPercent = playerExp / levelUpXP * 100
+		local currentXPPercent = (levelUpXP > 0) and (playerExp / levelUpXP * 100) or 0
 		SchlingelInc.Popup:Show({
 			title = "Level Cap erreicht",
 			message = string.format("Du bist bei %d%% von Level %d.\nDas aktuelle Cap ist %d.\n Achte auf die Level Schande!", currentXPPercent, level + 1, SchlingelInc.Rules.CurrentCap),
