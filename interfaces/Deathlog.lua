@@ -223,7 +223,7 @@ function SchlingelInc:CreateMiniDeathLog()
     local iconBg = iconFrame:CreateTexture(nil, "ARTWORK")
     iconBg:SetPoint("CENTER")
     iconBg:SetSize(20, 20)
-    iconBg:SetTexture("Interface\\AddOns\\SchlingelInc\\media\\icon-minimap.tga")
+    iconBg:SetTexture("Interface\\AddOns\\SchlingelInc\\media\\graphics\\icon-minimap.tga")
 
     -- Create circular mask for icon
     local mask = iconFrame:CreateMaskTexture()

@@ -21,7 +21,7 @@ local function CreateGuildJoinPrompt()
 
     -- Icon (centered at top)
     local icon = frame:CreateTexture(nil, "ARTWORK")
-    icon:SetTexture("Interface\\AddOns\\SchlingelInc\\media\\SI_Transp_512_x_512_px.tga")
+    icon:SetTexture("Interface\\AddOns\\SchlingelInc\\media\\graphics\\SI_Transp_512_x_512_px.tga")
     icon:SetSize(80, 80)
     icon:SetPoint("TOP", frame, "TOP", 0, -20)
 

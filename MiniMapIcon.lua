@@ -10,7 +10,7 @@ if LDB then -- Only proceeds if LibDataBroker is available
     SchlingelInc.minimapDataObject = LDB:NewDataObject(SchlingelInc.name, {
         type = "launcher",                                                 -- LDB object type: Launches a UI or function
         label = SchlingelInc.name,                                         -- Text next to icon (often only visible in LDB display addons)
-        icon = "Interface\\AddOns\\SchlingelInc\\media\\icon-minimap.tga", -- Path to icon
+        icon = "Interface\\AddOns\\SchlingelInc\\media\\graphics\\icon-minimap.tga", -- Path to icon
         OnClick = function(clickedFrame, button)
             if button == "LeftButton" then
                 SchlingelInc:ToggleDeathLogWindow()

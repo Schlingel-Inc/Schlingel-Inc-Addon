@@ -18,10 +18,18 @@ SchlingelInc.Constants.INSTANCE_TYPES = {
 
 -- Sound IDs
 SchlingelInc.Constants.SOUNDS = {
-	PVP_ALERT = 8174,  -- Horde Flag Sound
+	-- Standard WoW sounds (sound_pack = "standard")
+	PVP_ALERT = 8174,
 	DEATH_ANNOUNCEMENT = 8192,
-	LEVELUP_ANNOUNCMENT = 8574,
-	CAP_ANNOUNCEMENT = "Interface\\AddOns\\SchlingelInc\\media\\cap_announcement.wav"
+	LEVELUP_ANNOUNCEMENT = 888,
+	CAP_ANNOUNCEMENT_STANDARD = 8574,  -- Achievement sound
+	-- Torro custom sound files (sound_pack = "torro")
+	TORRO_DEATH = {
+		"Interface\\AddOns\\SchlingelInc\\media\\sounds\\schandenschlingel.wav",
+		"Interface\\AddOns\\SchlingelInc\\media\\sounds\\tausendTode.wav",
+	},
+	TORRO_LEVELUP = "Interface\\AddOns\\SchlingelInc\\media\\sounds\\ehrenschlingel.wav",
+	TORRO_CAP = "Interface\\AddOns\\SchlingelInc\\media\\sounds\\cap_announcement.wav",
 }
 
 -- Colors for messages

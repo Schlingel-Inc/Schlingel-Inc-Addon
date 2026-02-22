@@ -84,6 +84,13 @@ local function OnSettingChanged(setting, value)
     SchlingelOptionsDB = SchlingelOptionsDB
 end
 
+local function GetSoundPackOptions()
+    local container = Settings.CreateControlTextContainer()
+    container:Add("standard", "Standard")
+    container:Add("torro", "Coole Torro Sounds")
+    return container:GetData()
+end
+
 function SchlingelInc:InitializeOptionsUI()
     for _, setting in ipairs(UIOptions) do
         local name = setting.label
@@ -103,6 +110,13 @@ function SchlingelInc:InitializeOptionsUI()
         -- Create a checkbox for the setting.
         Settings.CreateCheckbox(category, settingObj, setting.description)
     end
+
+    -- Dropdown for sound pack selection
+    local soundPackSetting = Settings.RegisterAddOnSetting(category, "sound_pack", "sound_pack", SchlingelOptionsDB,
+        type(""), "Soundpaket", SchlingelOptionsDB["sound_pack"] or "standard")
+    soundPackSetting:SetValueChangedCallback(OnSettingChanged)
+    Settings.CreateDropdown(category, soundPackSetting, GetSoundPackOptions,
+        "Wähle zwischen Standard WoW Sounds und coolen Torro Sounds")
 end
 
 Settings.RegisterAddOnCategory(category)
@@ -115,6 +129,9 @@ function SchlingelInc:InitializeOptionsDB()
         else
             setting.value = SchlingelOptionsDB[setting.variable]
         end
+    end
+    if SchlingelOptionsDB["sound_pack"] == nil then
+        SchlingelOptionsDB["sound_pack"] = "standard"
     end
     SchlingelInc:InitializeOptionsUI()
 end

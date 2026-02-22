@@ -46,6 +46,10 @@ function SchlingelInc.Debug:Initialize()
 			SchlingelInc.EventManager:DebugInfo()
 		elseif command == "deathframe" then
 			SchlingelInc.Debug:TestDeathFrame()
+		elseif command == "levelup" then
+			SchlingelInc.Debug:TestLevelUpFrame()
+		elseif command == "cap" then
+			SchlingelInc.Debug:TestCapFrame()
 		elseif command == "deathset" then
 			local value = tonumber(args[2])
 			if value then
@@ -79,6 +83,8 @@ function SchlingelInc.Debug:ShowHelp()
 	print(SchlingelInc.colorCode .. "/schlingeldebug toggle" .. "|r - Enables/Disables debug mode")
 	print(SchlingelInc.colorCode .. "/schlingeldebug eventdebug" .. "|r - Shows EventManager debug info")
 	print(SchlingelInc.colorCode .. "/schlingeldebug deathframe" .. "|r - Test death announcement frame")
+	print(SchlingelInc.colorCode .. "/schlingeldebug levelup" .. "|r - Test level-up announcement frame")
+	print(SchlingelInc.colorCode .. "/schlingeldebug cap" .. "|r - Test cap announcement frame")
 	print(SchlingelInc.colorCode .. "/schlingeldebug deathset <number>" .. "|r - Sets the death counter")
 	print(SchlingelInc.colorCode .. "/schlingeldebug guildrequest <name>" .. "|r - Tests guild request to an officer")
 	print(SchlingelInc.colorCode .. "/schlingeldebug cachestats" .. "|r - Shows guild cache statistics")
@@ -130,6 +136,29 @@ function SchlingelInc.Debug:TestDeathFrame()
 
 	SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS ..
 		"Test death frame shown for " .. name .. "|r")
+end
+
+-- Tests the level-up announcement frame
+function SchlingelInc.Debug:TestLevelUpFrame()
+	local testNames = {"Pudidev", "Cricksumage", "Totanka", "Kurtibrown"}
+	local name = testNames[math.random(#testNames)]
+	local level = SchlingelInc.Constants.LEVEL_MILESTONES[math.random(#SchlingelInc.Constants.LEVEL_MILESTONES - 1)]
+
+	SchlingelInc.LevelUpAnnouncement:ShowMessage(name, level)
+
+	SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS ..
+		"Test level-up frame shown for " .. name .. " (Level " .. level .. ")|r")
+end
+
+-- Tests the cap announcement frame
+function SchlingelInc.Debug:TestCapFrame()
+	local testNames = {"Pudidev", "Cricksumage", "Totanka", "Kurtibrown"}
+	local name = testNames[math.random(#testNames)]
+
+	SchlingelInc.LevelUpAnnouncement:ShowCap(name, SchlingelInc.Constants.MAX_LEVEL)
+
+	SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS ..
+		"Test cap frame shown for " .. name .. "|r")
 end
 
 -- Sets the death counter

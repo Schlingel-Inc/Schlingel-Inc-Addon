@@ -18,7 +18,7 @@ DeathMessageFrame:SetBackdropBorderColor(1, 0.15, 0.15, 1)
 local icon = DeathMessageFrame:CreateTexture(nil, "ARTWORK")
 icon:SetSize(96, 96)
 icon:SetPoint("TOP", DeathMessageFrame, "TOP", 0, -14)
-icon:SetTexture("Interface\\AddOns\\SchlingelInc\\media\\Wappenrock.tga")
+icon:SetTexture("Interface\\AddOns\\SchlingelInc\\media\\graphics\\Wappenrock.tga")
 
 -- Header
 local header = DeathMessageFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
@@ -82,7 +82,8 @@ function SchlingelInc.DeathAnnouncement:ShowDeathMessage(message)
 		animGroup:Stop()
 		animGroup:Play()
 		if SchlingelOptionsDB["deathmessages_sound"] then
-			PlaySound(SchlingelInc.Constants.SOUNDS.DEATH_ANNOUNCEMENT)
+			SchlingelInc:PlayAnnouncementSound(SchlingelInc.Constants.SOUNDS.DEATH_ANNOUNCEMENT,
+				SchlingelInc.Constants.SOUNDS.TORRO_DEATH)
 		end
 	end)
 end

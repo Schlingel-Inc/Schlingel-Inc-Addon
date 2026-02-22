@@ -43,7 +43,7 @@ function SchlingelInc.Popup:Show(options)
 
 	local icon = iconFrame:CreateTexture(nil, "ARTWORK")
 	icon:SetAllPoints(iconFrame)
-	icon:SetTexture("Interface\\AddOns\\SchlingelInc\\media\\SI_Transp_512_x_512_px.tga")
+	icon:SetTexture("Interface\\AddOns\\SchlingelInc\\media\\graphics\\SI_Transp_512_x_512_px.tga")
 	icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
 
 	-- Title

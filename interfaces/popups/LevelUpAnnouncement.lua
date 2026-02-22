@@ -17,7 +17,7 @@ LevelUpFrame:SetBackdrop(SchlingelInc.Constants.POPUPBACKDROP)
 local icon = LevelUpFrame:CreateTexture(nil, "ARTWORK")
 icon:SetSize(96, 96)
 icon:SetPoint("TOP", LevelUpFrame, "TOP", 0, -14)
-icon:SetTexture("Interface\\AddOns\\SchlingelInc\\media\\Wappenrock.tga")
+icon:SetTexture("Interface\\AddOns\\SchlingelInc\\media\\graphics\\Wappenrock.tga")
 
 -- Header
 local header = LevelUpFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
@@ -96,7 +96,8 @@ function SchlingelInc.LevelUpAnnouncement:ShowMessage(name, level)
 	SchlingelInc.AnnouncementQueue:Push(function()
 		ShowDirect(name, level, false)
 		if SchlingelOptionsDB["levelmessages_sound"] then
-			PlaySound(SchlingelInc.Constants.SOUNDS.LEVELUP_ANNOUNCMENT)
+			SchlingelInc:PlayAnnouncementSound(SchlingelInc.Constants.SOUNDS.LEVELUP_ANNOUNCEMENT,
+				SchlingelInc.Constants.SOUNDS.TORRO_LEVELUP)
 		end
 	end)
 end
@@ -107,7 +108,8 @@ function SchlingelInc.LevelUpAnnouncement:ShowCap(name, level)
 	SchlingelInc.AnnouncementQueue:Push(function()
 		ShowDirect(name, level, true)
 		if SchlingelOptionsDB["capmessages_sound"] then
-			PlaySoundFile(SchlingelInc.Constants.SOUNDS.CAP_ANNOUNCEMENT, "Master")
+			SchlingelInc:PlayAnnouncementSound(SchlingelInc.Constants.SOUNDS.CAP_ANNOUNCEMENT_STANDARD,
+				SchlingelInc.Constants.SOUNDS.TORRO_CAP)
 		end
 	end)
 end

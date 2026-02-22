@@ -21,6 +21,21 @@ SchlingelInc.version = C_AddOns.GetAddOnMetadata("SchlingelInc", "Version") or "
 SchlingelInc.GameTimeTotal = 0
 SchlingelInc.GameTimePerLevel = 0
 
+-- Plays either a standard WoW sound or a Torro custom sound file based on the sound_pack setting.
+-- torroFile may be a single path string or a table of paths (one is picked at random).
+-- Torro sounds always play on the "Music" channel.
+function SchlingelInc:PlayAnnouncementSound(standardId, torroFile)
+	if SchlingelOptionsDB["sound_pack"] == "torro" and torroFile then
+		local file = torroFile
+		if type(torroFile) == "table" then
+			file = torroFile[math.random(#torroFile)]
+		end
+		PlaySoundFile(file, "Music")
+	else
+		PlaySound(standardId)
+	end
+end
+
 function SchlingelInc:CountTable(table)
     local count = 0
     for _ in pairs(table) do

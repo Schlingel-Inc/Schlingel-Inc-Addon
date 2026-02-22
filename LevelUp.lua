@@ -37,7 +37,7 @@ function SchlingelInc.LevelUps:CheckForCap(level, announce)
 		SchlingelInc.Popup:Show({
 			title = "Level Cap erreicht",
 			message = string.format("Du bist bei %d%% von Level %d.\nDas aktuelle Cap ist %d.\n Achte auf die Level Schande!", currentXPPercent, level + 1, SchlingelInc.Rules.CurrentCap),
-			displayTime = 5
+			displayTime = 8
 		})
 
 		if announce then
