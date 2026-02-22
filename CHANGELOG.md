@@ -1,3 +1,12 @@
+# 3.1.2
+
+- Soundpaket-Auswahl: In den Optionen kann nun zwischen Standard WoW Sounds und Torro Sounds gewählt werden
+- Torro Sounds für Todesmeldungen: "Schandenschlingel" und "Tausend Tode" werden zufällig abgespielt
+- Torro Sound für Level-Up Meldungen: "Ehrenschlingel"
+- Torro Sound für Cap-Meldungen: bestehender Cap-Sound
+- Mediendateien in Unterordner aufgeteilt: `media/sounds/` und `media/graphics/`
+- Debug-Befehle: `/schlingeldebug levelup` und `/schlingeldebug cap` zum lokalen Testen der Popups hinzugefügt
+
 # 3.1.0
 
 - Level-Up Ankündigungen: Popup für Gildenmitglieder bei Meilensteinen (10, 20, 30, 40, 50, 60) via AddonMessage
