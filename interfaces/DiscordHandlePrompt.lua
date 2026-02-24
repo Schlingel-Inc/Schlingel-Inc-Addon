@@ -243,6 +243,55 @@ local function CreateDiscordHandlePrompt()
     return frame
 end
 
+-- Parses a guild note written by this addon and returns handle, pronouns, deaths (or nil).
+-- Expected formats:
+--   "handle (pronouns) Tode: N"
+--   "handle (Tode: N)"
+function SchlingelInc:ParseGuildNote(note)
+    if not note or note == "" then return nil end
+
+    -- Format with pronouns: "handle (pronouns) Tode: N"
+    local handle, pronouns, deaths = note:match("^(.-)%s+%((.-)%)%s+Tode:%s*(%d+)%s*$")
+    if handle and handle ~= "" then
+        return handle, pronouns, tonumber(deaths)
+    end
+
+    -- Format without pronouns: "handle (Tode: N)"
+    handle, deaths = note:match("^(.-)%s+%(Tode:%s*(%d+)%)%s*$")
+    if handle and handle ~= "" then
+        return handle, nil, tonumber(deaths)
+    end
+
+    return nil
+end
+
+-- Checks own guild note for saved handle/pronouns/deaths. If found, initializes from there
+-- (covers reinstall / PC-switch). If the note is empty or not in our format, shows the prompt.
+-- Called after a delay, so the guild cache is guaranteed to be populated.
+function SchlingelInc:InitFromGuildNoteOrShowPrompt()
+    local playerName = UnitName("player")
+    local member = SchlingelInc.GuildCache:GetMemberInfo(playerName)
+    if member then
+        local handle, pronouns, deaths = SchlingelInc:ParseGuildNote(member.publicNote)
+        if handle then
+            DiscordHandle = handle
+            if pronouns and pronouns ~= "" then
+                Pronouns = pronouns
+            end
+            if deaths then
+                CharacterDeaths = deaths
+            end
+            SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS ..
+                "Discord Handle aus Gildennotiz wiederhergestellt: " .. handle .. "|r")
+            SchlingelInc:CheckAndShowGuildJoinPrompt()
+            return
+        end
+    end
+    -- Note absent or not in our format: fresh install, show prompt
+    DiscordPromptFrame = DiscordPromptFrame or CreateDiscordHandlePrompt()
+    DiscordPromptFrame:Show()
+end
+
 -- Show the prompt if needed
 function SchlingelInc:ShowDiscordHandlePromptIfNeeded()
     if not UnitName("player") then
@@ -251,22 +300,29 @@ function SchlingelInc:ShowDiscordHandlePromptIfNeeded()
 
     local handle = SchlingelInc:GetDiscordHandle()
 
-    -- If handle is set and not empty, update guild note silently and check for guild
+    -- Handle already set: update guild note silently and check for guild invite
     if handle and handle ~= "" then
         SchlingelInc:UpdateGuildNote()
-        -- Check if player needs guild invite prompt (handle set but not in guild)
         SchlingelInc:CheckAndShowGuildJoinPrompt()
-    -- Show prompt if no handle is set (nil means never asked)
+    -- nil means never set (fresh install, reinstall, or PC switch)
     elseif handle == nil then
-        DiscordPromptFrame = DiscordPromptFrame or CreateDiscordHandlePrompt()
-        DiscordPromptFrame:Show()
+        if IsInGuild() then
+            -- Try to restore from the existing guild note before prompting
+            SchlingelInc:InitFromGuildNoteOrShowPrompt()
+        else
+            DiscordPromptFrame = DiscordPromptFrame or CreateDiscordHandlePrompt()
+            DiscordPromptFrame:Show()
+        end
     end
 end
 
 -- Initialize and register events
 function SchlingelInc:InitializeDiscordHandlePrompt()
     SchlingelInc.EventManager:RegisterHandler("PLAYER_ENTERING_WORLD", function()
-        SchlingelInc:ShowDiscordHandlePromptIfNeeded()
+        -- Delay to ensure IsInGuild() is accurate and the guild cache is populated
+        C_Timer.After(5, function()
+            SchlingelInc:ShowDiscordHandlePromptIfNeeded()
+        end)
         SchlingelInc.EventManager:UnregisterHandler("PLAYER_ENTERING_WORLD", "DiscordHandlePrompt")
     end, 0, "DiscordHandlePrompt")
 
