@@ -1,6 +1,8 @@
 # 3.1.3
 
 - Bevorzugte Pronomen: Spieler können optional ihre Pronomen hinterlegen; diese werden in Chatnachrichten, Gildennotiz und Tooltip korrekt verwendet
+- `/setPronouns <Pronomen>`: Setzt die bevorzugten Pronomen als Freitext – alles nach dem Befehl wird als Pronomen übernommen (z.B. `/setPronouns er/ihm`)
+- `/clearPronouns`: Entfernt die gespeicherten Pronomen vollständig
 - Verbesserter Discord-Handle-Abfrage: Bei einem PC-Wechsel oder einer Neuinstallation wird die Gildennotiz zuerst abgerufen um eine unnötige Neueingabe durch das Popup zu verhindern
 
 # 3.1.2

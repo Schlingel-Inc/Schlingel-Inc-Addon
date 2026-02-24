@@ -361,4 +361,12 @@ function SchlingelInc:InitializeDiscordHandlePrompt()
                 "Verwendung: /setPronouns <deine präferierten Pronomen>|r")
         end
     end
+
+    -- Slash command to clear preferred pronouns: /clearPronouns
+    SLASH_CLEARPRONOUNS1 = '/clearPronouns'
+    SLASH_CLEARPRONOUNS2 = '/clearpronouns'
+    SlashCmdList["CLEARPRONOUNS"] = function()
+        SchlingelInc:SetPreferredPronouns(nil)
+        SchlingelInc:Print(SchlingelInc.Constants.COLORS.SUCCESS .. "Pronomen gelöscht.|r")
+    end
 end
