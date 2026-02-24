@@ -5,7 +5,7 @@
 ## Version: 3.1.2
 ## IconTexture: Interface\AddOns\SchlingelInc\media\graphics\SI_Transp_512_x_512_px.tga
 ## SavedVariablesPerCharacter: CharacterDeaths, SchlingelOptionsDB
-## SavedVariables: DiscordHandle
+## SavedVariables: DiscordHandle, Pronouns
 
 # Notwendiges externe Abhängigkeiten aus dem Lib Folder
 ## OptionalDeps: LibStub, CallbackHandler-1.0, LibDataBroker-1.1, LibDBIcon-1.0

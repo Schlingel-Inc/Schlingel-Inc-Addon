@@ -177,7 +177,9 @@ function SchlingelInc.Rules:CheckDivineHearth(event, _, _, spellId)
     if spellId == 8690 or spellId == 1265709 or spellId == 348699 then
         if hasBuff then
             local playerName = UnitName("player") or "Unbekannt"
-            local msg = "SCHANDE! " .. playerName .. " benutzt Bubble-Ruhestein"
+            local handle = SchlingelInc:GetDiscordHandle()
+            local playerDisplay = (handle and handle ~= "") and (playerName .. " (" .. handle .. ")") or playerName
+            local msg = "SCHANDE! " .. playerDisplay .. " benutzt Bubble-Ruhestein"
             if IsInGuild() then
                 SendChatMessage(msg, "GUILD")
             end
