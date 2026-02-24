@@ -1,3 +1,8 @@
+# 3.1.3
+
+- Bevorzugte Pronomen: Spieler können optional ihre Pronomen hinterlegen; diese werden in Chatnachrichten, Gildennotiz und Tooltip korrekt verwendet
+- Verbesserter Discord-Handle-Abfrage: Bei einem PC-Wechsel oder einer Neuinstallation wird die Gildennotiz zuerst abgerufen um eine unnötige Neueingabe durch das Popup zu verhindern
+
 # 3.1.2
 
 - Soundpaket-Auswahl: In den Optionen kann nun zwischen Standard WoW Sounds und Torro Sounds gewählt werden
