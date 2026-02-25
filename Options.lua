@@ -1,137 +1,218 @@
 -- Options.lua
--- Manages addon settings through the WoW Settings API
+-- Manages addon settings via AceConfig-3.0
 
 SchlingelOptionsDB = SchlingelOptionsDB or {}
 
--- UI options configuration
--- Each option has a label, description, variable name, and default value
-local UIOptions =
-{
-    {
-        label = "PVP Warnung",
-        description = "Aktiviert die PVP Warnung",
-        variable = "pvp_alert",
-        value = true,
+local AceConfig       = LibStub("AceConfig-3.0")
+local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+
+-- Generic getter/setter: arg key must match the SchlingelOptionsDB key
+local function get(info) return SchlingelOptionsDB[info[#info]] end
+local function set(info, val) SchlingelOptionsDB[info[#info]] = val end
+
+local options = {
+    name = "Schlingel Inc",
+    type = "group",
+    childGroups = "tab",
+    args = {
+        allgemein = {
+            name  = "Allgemein",
+            type  = "group",
+            order = 1,
+            args  = {
+                show_version = {
+                    type  = "toggle",
+                    name  = "Version anzeigen",
+                    desc  = "Zeigt die Versionen der Spieler:innen im Gildenchat an",
+                    order = 1,
+                    width = "full",
+                    get   = get,
+                    set   = set,
+                },
+                auto_decline_duels = {
+                    type  = "toggle",
+                    name  = "Duelle Ablehnen",
+                    desc  = "Lehnt automatisch alle Duell-Anfragen ab",
+                    order = 2,
+                    width = "full",
+                    get   = get,
+                    set   = set,
+                },
+                show_discord_handle = {
+                    type  = "toggle",
+                    name  = "Discord Handle im Gildenchat anzeigen",
+                    desc  = "Zeigt deinen Discord Handle im Gildenchat an",
+                    order = 3,
+                    width = "full",
+                    get   = get,
+                    set   = set,
+                },
+            },
+        },
+        benachrichtigungen = {
+            name  = "Benachrichtigungen",
+            type  = "group",
+            order = 2,
+            args  = {
+                pvp = {
+                    type   = "group",
+                    name   = "PVP Warnung",
+                    inline = true,
+                    order  = 1,
+                    args   = {
+                        pvp_alert = {
+                            type  = "toggle",
+                            name  = "Aktiviert",
+                            desc  = "Aktiviert die PVP Warnung",
+                            order = 1,
+                            get   = get,
+                            set   = set,
+                        },
+                        pvp_alert_sound = {
+                            type  = "toggle",
+                            name  = "Ton",
+                            desc  = "Aktiviert den Ton für die PVP Warnung",
+                            order = 2,
+                            get   = get,
+                            set   = set,
+                        },
+                    },
+                },
+                death = {
+                    type   = "group",
+                    name   = "Todesmeldungen",
+                    inline = true,
+                    order  = 2,
+                    args   = {
+                        deathmessages = {
+                            type  = "toggle",
+                            name  = "Aktiviert",
+                            desc  = "Aktiviert die Todesmeldungen",
+                            order = 1,
+                            get   = get,
+                            set   = set,
+                        },
+                        deathmessages_sound = {
+                            type  = "toggle",
+                            name  = "Ton",
+                            desc  = "Aktiviert den Ton für die Todesmeldungen",
+                            order = 2,
+                            get   = get,
+                            set   = set,
+                        },
+                    },
+                },
+                levelup = {
+                    type   = "group",
+                    name   = "Level-Up Meldungen",
+                    inline = true,
+                    order  = 3,
+                    args   = {
+                        levelmessages = {
+                            type  = "toggle",
+                            name  = "Aktiviert",
+                            desc  = "Aktiviert die Level-Up Meldungen",
+                            order = 1,
+                            get   = get,
+                            set   = set,
+                        },
+                        levelmessages_sound = {
+                            type  = "toggle",
+                            name  = "Ton",
+                            desc  = "Aktiviert den Ton für die Level-Up Meldungen",
+                            order = 2,
+                            get   = get,
+                            set   = set,
+                        },
+                    },
+                },
+                cap = {
+                    type   = "group",
+                    name   = "Cap-Meldungen",
+                    inline = true,
+                    order  = 4,
+                    args   = {
+                        capmessages = {
+                            type  = "toggle",
+                            name  = "Aktiviert",
+                            desc  = "Aktiviert die Level-Cap Meldungen",
+                            order = 1,
+                            get   = get,
+                            set   = set,
+                        },
+                        capmessages_sound = {
+                            type  = "toggle",
+                            name  = "Ton",
+                            desc  = "Aktiviert den Ton für die Level-Cap Meldungen",
+                            order = 2,
+                            get   = get,
+                            set   = set,
+                        },
+                    },
+                },
+            },
+        },
+        sound = {
+            name  = "Sound",
+            type  = "group",
+            order = 3,
+            args  = {
+                sound_pack = {
+                    type   = "select",
+                    name   = "Soundpaket",
+                    desc   = "Wähle zwischen Standard WoW Sounds und coolen Torro Sounds",
+                    order  = 1,
+                    values = { standard = "Standard", torro = "Coole Torro Sounds" },
+                    get    = get,
+                    set    = set,
+                },
+                spacer = {
+                    type  = "description",
+                    name  = "",
+                    order = 2,
+                    width = "full",
+                },
+                sound_channel = {
+                    type   = "select",
+                    name   = "Soundkanal",
+                    desc   = "Wähle über welchen ingame Regler du die Schlingel Sounds regulieren möchtest",
+                    order  = 3,
+                    values = {
+                        Master   = "Master Regler",
+                        SFX      = "Effekte Regler",
+                        Ambience = "Umgebungs Regler",
+                        Music    = "Musik Regler",
+                    },
+                    get    = get,
+                    set    = set,
+                },
+            },
+        },
     },
-    {
-        label = "PVP Warnung Ton",
-        description = "Aktiviert den Ton für die PVP Warnung",
-        variable = "pvp_alert_sound",
-        value = true,
-    },
-    {
-        label = "Todesmeldungen",
-        description = "Aktiviert die Todesmeldungen",
-        variable = "deathmessages",
-        value = true,
-    },
-    {
-        label = "Todesmeldungen Ton",
-        description = "Aktiviert den Ton für die Todesmeldungen",
-        variable = "deathmessages_sound",
-        value = true,
-    },
-    {
-        label = "Level-Up Meldungen",
-        description = "Aktiviert die Level-Up Meldungen",
-        variable = "levelmessages",
-        value = true,
-    },
-    {
-        label = "Level-Up Meldungen Ton",
-        description = "Aktiviert den Ton für die Level-Up Meldungen",
-        variable = "levelmessages_sound",
-        value = true,
-    },
-    {
-        label = "Cap-Meldungen",
-        description = "Aktiviert die Level-Cap Meldungen",
-        variable = "capmessages",
-        value = true,
-    },
-    {
-        label = "Cap-Meldungen Ton",
-        description = "Aktiviert den Ton für die Level-Cap Meldungen",
-        variable = "capmessages_sound",
-        value = true,
-    },
-    {
-        label = "Version anzeigen",
-        description = "Zeigt die Versionen der Spieler:innen im Gildenchat an",
-        variable = "show_version",
-        value = false,
-    },
-    {
-        label = "Duelle Ablehnen",
-        description = "Lehnt automatisch alle Duell-Anfragen ab",
-        variable = "auto_decline_duels",
-        value = false,
-    },
-    {
-        label = "Discord Handle im Gildenchat anzeigen",
-        description = "Zeigt deinen Discord Handle im Gildenchat an",
-        variable = "show_discord_handle",
-        value = false,
-    }
 }
 
-local category = Settings.RegisterVerticalLayoutCategory("Schlingel Inc")
-
-local function OnSettingChanged(setting, value)
-    -- This callback will be invoked whenever a setting is modified.
-    local key = setting:GetVariable()
-    SchlingelOptionsDB[key] = value
-    SchlingelOptionsDB = SchlingelOptionsDB
-end
-
-local function GetSoundPackOptions()
-    local container = Settings.CreateControlTextContainer()
-    container:Add("standard", "Standard")
-    container:Add("torro", "Coole Torro Sounds")
-    return container:GetData()
-end
-
-function SchlingelInc:InitializeOptionsUI()
-    for _, setting in ipairs(UIOptions) do
-        local name = setting.label
-        local variable = setting.variable
-        local variableKey = setting.variable
-        local variableTbl = SchlingelOptionsDB
-        local defaultValue = setting.value
-
-        -- Register the setting with the Settings API.
-        local settingObj = Settings.RegisterAddOnSetting(category, variable, variableKey, variableTbl, type(defaultValue),
-            name,
-            defaultValue, setting.value)
-
-        -- Set a callback for when the setting changes.
-        settingObj:SetValueChangedCallback(OnSettingChanged)
-
-        -- Create a checkbox for the setting.
-        Settings.CreateCheckbox(category, settingObj, setting.description)
-    end
-
-    -- Dropdown for sound pack selection
-    local soundPackSetting = Settings.RegisterAddOnSetting(category, "sound_pack", "sound_pack", SchlingelOptionsDB,
-        type(""), "Soundpaket", SchlingelOptionsDB["sound_pack"] or "standard")
-    soundPackSetting:SetValueChangedCallback(OnSettingChanged)
-    Settings.CreateDropdown(category, soundPackSetting, GetSoundPackOptions,
-        "Wähle zwischen Standard WoW Sounds und coolen Torro Sounds")
-end
-
-Settings.RegisterAddOnCategory(category)
+AceConfig:RegisterOptionsTable("SchlingelInc", options)
+AceConfigDialog:AddToBlizOptions("SchlingelInc", "Schlingel Inc")
 
 function SchlingelInc:InitializeOptionsDB()
-    -- Initialize all options with default values if not present
-    for _, setting in ipairs(UIOptions) do
-        if SchlingelOptionsDB[setting.variable] == nil then
-            SchlingelOptionsDB[setting.variable] = setting.value
-        else
-            setting.value = SchlingelOptionsDB[setting.variable]
+    local defaults = {
+        show_version        = false,
+        auto_decline_duels  = false,
+        show_discord_handle = false,
+        pvp_alert           = true,
+        pvp_alert_sound     = true,
+        deathmessages       = true,
+        deathmessages_sound = true,
+        levelmessages       = true,
+        levelmessages_sound = true,
+        capmessages         = true,
+        capmessages_sound   = true,
+        sound_pack          = "standard",
+        sound_channel       = "Master",
+    }
+    for key, value in pairs(defaults) do
+        if SchlingelOptionsDB[key] == nil then
+            SchlingelOptionsDB[key] = value
         end
     end
-    if SchlingelOptionsDB["sound_pack"] == nil then
-        SchlingelOptionsDB["sound_pack"] = "standard"
-    end
-    SchlingelInc:InitializeOptionsUI()
 end

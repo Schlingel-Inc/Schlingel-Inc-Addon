@@ -1,3 +1,9 @@
+# 3.2.0
+
+- Optionsmenü komplett überarbeitet: Einstellungen sind jetzt übersichtlich in drei Tabs aufgeteilt – Allgemein, Benachrichtigungen und Sound
+- Jede Ankündigung hat ihren eigenen Bereich mit separaten Schaltern für die Meldung und den dazugehörigen Ton
+- Neue Option: Soundkanal – ihr könnt selbst wählen, über welchen ingame Lautstärkeregler (Master, Effekte, Umgebung, Musik) die Schlingel-Sounds laufen
+
 # 3.1.3
 
 - Bevorzugte Pronomen: Spieler können optional ihre Pronomen hinterlegen; diese werden in Chatnachrichten, Gildennotiz und Tooltip korrekt verwendet
