@@ -93,6 +93,9 @@ function SchlingelInc.Rules:ProhibitTradeWithNonGuildMembers()
         return
     end
 
+    local inPvP = SchlingelInc:IsInBattleground() or SchlingelInc:IsInRaid() or SchlingelInc:IsInArena()
+    if inPvP then return end
+
     local tradePartner = UnitName("NPC")
     if tradePartner then
         local isInGuild = C_GuildInfo.MemberExistsByName(tradePartner)
