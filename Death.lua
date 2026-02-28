@@ -131,10 +131,6 @@ function SchlingelInc.Death:Initialize()
 	-- PLAYER_DEAD event handler
 	SchlingelInc.EventManager:RegisterHandler("PLAYER_DEAD",
 		function()
-			-- Raids are always skipped. Battleground deaths are only skipped at the level cap;
-			-- below cap they are tracked and announced normally.
-			if SchlingelInc:IsInRaid() then return end
-
 			local name = UnitName("player")
 			if not name then return end
 
@@ -143,7 +139,8 @@ function SchlingelInc.Death:Initialize()
 			local level = UnitLevel("player")
 			local sex = UnitSex("player")
 
-			if SchlingelInc:IsInBattleground() and level == SchlingelInc.Rules.CurrentCap then
+			local inPvP = SchlingelInc:IsInBattleground() or SchlingelInc:IsInRaid() or SchlingelInc:IsInArena()
+			if inPvP and level == SchlingelInc.Rules.CurrentCap then
 				return
 			end
 

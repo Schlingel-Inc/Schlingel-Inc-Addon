@@ -123,6 +123,11 @@ function SchlingelInc:IsInRaid()
     return inInstance and instanceType == SchlingelInc.Constants.INSTANCE_TYPES.RAID
 end
 
+function SchlingelInc:IsInArena()
+    local isArena, _ = IsActiveBattlefieldArena()
+    return isArena
+end
+
 function SchlingelInc:ParseVersion(v)
     local major, minor, patch = string.match(v, "(%d+)%.(%d+)%.?(%d*)")
     return tonumber(major or 0), tonumber(minor or 0), tonumber(patch or 0)
