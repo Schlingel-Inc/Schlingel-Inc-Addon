@@ -1,3 +1,8 @@
+# 3.2.1
+
+- Bugfix: PvP-Todesmeldungen wurden durch einen Operator-Fehler nicht korrekt unterdrückt – wer am Cap im BG gestorben ist, hat trotzdem eine Meldung bekommen.
+- Handel mit Nicht-Gildenmitgliedern ist jetzt in Battlegrounds, Raids und Arenen erlaubt
+
 # 3.2.0
 
 - Optionsmenü komplett überarbeitet: Einstellungen sind jetzt übersichtlich in drei Tabs aufgeteilt – Allgemein, Benachrichtigungen und Sound
